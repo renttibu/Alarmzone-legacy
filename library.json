@@ -1,0 +1,12 @@
+{
+    "id": "{8464371D-1C4E-B070-9884-82DB73545FFA}",
+    "author": "Ulrich Bittner",
+    "name": "Alarmzone",
+    "url": "https://github.com/ubittner/Alarmzone",
+    "compatibility": {
+        "version": "5.2"
+    },
+    "version": "4.0",
+    "build": 1,
+    "date": 1580313100
+}

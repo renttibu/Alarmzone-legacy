@@ -1,0 +1,1621 @@
+{
+  "elements": [
+    {
+      "type": "ExpansionPanel",
+      "caption": "Instanzinformationen",
+      "items": [
+        {
+          "type": "Image",
+          "image": "data:image/png;base64,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"
+        },
+        {
+          "type": "Label",
+          "caption": "Ein Gemeinschaftsprojekt von Normen Thiel und Ulrich Bittner\n"
+        },
+        {
+          "type": "Label",
+          "caption": "Mit dieser Instanz kann eine Alarmzone überwacht werden.\nWeitere Informationen entnehmen Sie bitte der Dokumentation.\n"
+        },
+        {
+          "type": "Label",
+          "caption": "Symcon Version:\t5.2>"
+        },
+        {
+          "type": "Label",
+          "caption": "Name:\t\t\tAlarmzone"
+        },
+        {
+          "type": "Label",
+          "caption": "Version:\t\t\t4.00-1"
+        },
+        {
+          "type": "Label",
+          "caption": "Datum:\t\t\t29. Januar 2020"
+        },
+        {
+          "type": "Label",
+          "caption": "Uhrzeit:\t\t\t18:00"
+        },
+        {
+          "type": "Label",
+          "caption": "Entwickler:\t\tUlrich Bittner"
+        },
+        {
+          "type": "Label",
+          "caption": "Präfix:\t\t\tAZON"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Bezeichnungen",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte geben Sie eine eindeutige Bezeichnung für das Überwachungssystem an (z.B. Überwachungssystem oder Alarmanlage):"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "MonitoringSystemName",
+          "caption": "Überwachungssystem"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie eine eindeutige Bezeichnung für das zu überwachende Objekt an (z.B. Musterstraße 1):"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "ObjectName",
+          "caption": "Objekt"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie ein eindeutige Bezeichnung für diese Alarmzone an (z.B. Erdgeschoss oder Obergeschoss):"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "AlarmZoneName",
+          "caption": "Alarmzone"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie ein eindeutige Bezeichnung für den Abwesenheitsmodus an:"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "AbsenceModeName",
+          "caption": "Abwesenheitsmodus"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie ein eindeutige Bezeichnung für den Anwesenheitsmodus an:"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "PresenceModeName",
+          "caption": "Anwesenheitsmodus"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie ein eindeutige Bezeichnung für den Nachtmodus an:"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "NightModeName",
+          "caption": "Nachtmodus"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Bezeichnungen",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Die Bezeichnungen werden zur Identifizierung und für die Benachrichtigungen benötigt."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmzonensteuerung",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bei mehreren Alarmzonen wählen Sie bitte die zugehörige Alarmzonensteuerung aus."
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmZoneControl",
+          "caption": "Alarmzonensteuerung"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmzonensteuerung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Mit einer Alarmzonensteuerung können mehrere Alarmzonen zentral geschaltet werden."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmprotokoll",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie das zugehörige Alarmprotokoll aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmProtocol",
+          "caption": "Alarmprotokoll"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmprotokoll",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Mit einem Alarmprotokoll können Ereignisse protokolliert und archiviert werden."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Informationsoptionen",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie aus, welche Informationen angezeigt werden sollen:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableObjectName",
+          "caption": "Name des Objekts"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmZoneName",
+          "caption": "Name der Alarmzone"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Informationsoptionen",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es können verschiedene Informationen angezeigt oder ausgeblendet werden."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Schaltoptionen",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie aus, welche Schaltoptionen für diese Alarmzone verwendet werden sollen:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAbsenceMode",
+          "caption": "Abwesenheitsmodus (Vollschutz)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnablePresenceMode",
+          "caption": "Anwesenheitsmodus (Hüllschutz)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableNightMode",
+          "caption": "Nachtmodus (Teilschutz)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmSiren",
+          "caption": "Alarmsirene"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmLight",
+          "caption": "Alarm- / Außenbeleuchtung"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Schaltoptionen",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es können verschiedene Schaltoptionen angezeigt oder ausgeblendet werden."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Statusoptionen",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie aus, welche Status angezeigt werden sollen:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmZoneState",
+          "caption": "Alarmzone"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmState",
+          "caption": "Alarm"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableDoorWindowState",
+          "caption": "Türen und Fenster"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableMotionDetectorState",
+          "caption": "Bewegungsmelder"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableSmokeDetectorState",
+          "caption": "Rauchmelder"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableWaterSensorState",
+          "caption": "Wassersensoren"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Statusoptionen",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es können verschiedene Status angezeigt oder ausgeblendet werden."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Aktivierungsprüfung",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie aus, bei welchem Modus eine Aktivierungsprüfung durchgeführt werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "CheckAbsenceModeActivation",
+          "caption": "Abwesenheitsmodus (Vollschutz)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "CheckPresenceModeActivation",
+          "caption": "Anwesenheitsmodus (Hüllschutz)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "CheckNightModeActivation",
+          "caption": "Nachtmodus (Teilschutz)"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Aktivierungsprüfung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Für eine Scharfschaltung müssen alle Türen und Fenster geschlossen sein.\nIst mindestens eine Tür oder Fenster geöffnet, so wird die Scharfschaltung abgebrochen."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Einschaltverzögerung",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie die Einschaltverzögerung in Sekunden für den Abwesenheitsmodus (Vollschutz) an:"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "AbsenceModeActivationDelayDuration",
+          "caption": "Abwesenheitsmodus (Vollschutz)",
+          "suffix": "s"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie die Einschaltverzögerung in Sekunden für Anwesenheitsmodus (Hüllschutz) an:"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "PreenceModeActivationDelayDuration",
+          "caption": "Anwesenheitsmodus (Hüllschutz)",
+          "suffix": "s"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie die Einschaltverzögerung in Sekunden für Nachtmodus (Teilschutz) an:"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "NightModeActivationDelayDuration",
+          "caption": "Nachtmodus (Teilchutz)",
+          "suffix": "s"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Einschaltverzögerung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Mit einer Einschaltverzögerung wird die Scharfschaltung erst nach der vorgegebenen Zeit durchgeführt.\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Fernbedienungen",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte fügen Sie die Fernbedienungen hinzu:"
+        },
+        {
+          "type": "List",
+          "name": "RemoteControls",
+          "caption": "Fernbedienungen",
+          "rowCount": 20,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Aktiviert",
+              "name": "Use",
+              "width": "100px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Variable",
+              "name": "ID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Name",
+              "width": "350px",
+              "add": "Handsender",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Aktion",
+              "name": "Action",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "Bitte auswählen",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 - Abwesenheitsmodus (Vollschutz) deaktivieren",
+                    "value": 1
+                  },
+                  {
+                    "caption": "2 - Abwesenheitsmodus (Vollschutz) aktivieren",
+                    "value": 2
+                  },
+                  {
+                    "caption": "3 - Anwesenheitsmodus (Hüllschutz) deaktivieren",
+                    "value": 3
+                  },
+                  {
+                    "caption": "4 - Anwesenheitsmodus (Hüllschutz) aktivieren",
+                    "value": 4
+                  },
+                  {
+                    "caption": "5 - Nachtmodus (Teilschutz) deaktivieren",
+                    "value": 5
+                  },
+                  {
+                    "caption": "6 - Nachtmodus (Teilschutz) aktivieren",
+                    "value": 6
+                  },
+                  {
+                    "caption": "7 - Alarmsirene ausschalten",
+                    "value": 7
+                  },
+                  {
+                    "caption": "8 - Alarmsirene einschalten",
+                    "value": 8
+                  },
+                  {
+                    "caption": "9 - Alarmbeleuchtung ausschalten",
+                    "value": 9
+                  },
+                  {
+                    "caption": "10 - Alarmbeleuchtung einschalten",
+                    "value": 10
+                  },
+                  {
+                    "caption": "11 - Skript",
+                    "value": 11
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Skript",
+              "name": "ScriptID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectScript"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Fernbedienung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Mit einer Fernbedienung können verschiedene Schaltvorgänge ausgelöst werden.\n\nWird ein Skript als Aktion verwendet, so wird das Skript ausgeführt."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Quittungston",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie den Quittungston aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "ToneAcknowledgement",
+          "caption": "Quittungston"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "ToneAcknowlegementScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "UseAlarmZoneControlToneAcknowledgement",
+          "caption": "Übergeordnete Konfiguration verwenden"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Quittungston",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Mit einem Quittungston kann ein Schaltvorgang akustisch signalisiert werden.\n\nWird ein Skript verwendet, so wird das Skript ausgeführt."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmzonenstatus",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Signalleuchte für den Alarmzonenstatus aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmZoneStateSignalLamp",
+          "caption": "Signalleuchte"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "AlarmZoneStateSignalLampScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmzonenstatus",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Der Alarmzonenstatus kann optisch signalisiert werden.\n\nGrün\t= unscharf\nRot\t\t= scharf\nGelb\t= verzögert scharf\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= unscharf\n1\t\t= scharf\n2\t\t= verzögert scharf"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Tür- / Fensterstatus",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Signalleuchte für den Tür- / Fensterstatus aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "DoorWindowStateSignalLamp",
+          "caption": "Signalleuchte"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "DoorWindowStateSignalLampScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Tür- / Fensterstatus",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Der Tür- / Fensterstatus kann optisch signalisiert werden.\n\nGrün\t= geschlossen\nBlau\t= geöffnet\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= geschlossen\n1\t\t= geöffnet"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmstatus",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Signalleuchte für den Alarmstatus aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmStateSignalLamp",
+          "caption": "Signalleuchte"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "AlarmStateSignalLampScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmstatus",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Der Alarmstatus kann optisch signalisiert werden.\n\nGrün\t= kein Alarm\nRot\t\t= Alarm\nGelb\t= Voralarm\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= Kein Alarm\n1\t\t= Alarm\n2\t\t= Voralarm"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Benachrichtigungszentrale",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Benachrichtigungszentrale aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "NotificationCenter",
+          "caption": "Benachrichtigungszentrale"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "NotificationScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "UseAlarmZoneControlNotificationCenter",
+          "caption": "Übergeordnete Konfiguration verwenden"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Benachrichtigung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es können Benchrichtigungen über die Benachrichtigungszentrale versendet werden.\n\nWird ein Skript verwendet, so werden nachfolgende Parameter dem Skript übergeben:\n\n$_IPS['ActionText']\n\n$_IPS['MessageText']\n\n$_IPS['LogText']\n\n$_IPS['MessageType']\n\n0\t\t= Benachrichtigungsmeldung\n1\t\t= Bestätigungsmeldung\n2\t\t= Alarmmeldung\n3\t\t= Sabotagemeldung\n4\t\t= Batteriemeldung"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Tür- / Fenstersensoren",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte fügen Sie die Tür- / Fenstersensoren hinzu."
+        },
+        {
+          "type": "List",
+          "name": "DoorWindowSensors",
+          "caption": "Tür- / Fenstersensoren",
+          "rowCount": 15,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Variable",
+              "name": "ID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Name",
+              "width": "350px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Auslösender Wert",
+              "name": "AlertingValue",
+              "width": "150px",
+              "add": 1,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "0 - false",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 - true",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Abwesenheitsmodus",
+              "name": "AbsenceModeActive",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Anwesenheitsmodus",
+              "name": "PresenceModeActive",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Nachtmodus",
+              "name": "NightModeActive",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmmeldung",
+              "name": "UseAlertNotification",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLight",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Tür- / Fenstersensoren",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Sie können festlegen bei welchem Modus der Tür- / und Fenstersensor überwacht werden soll.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Bewegungsmelder",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte fügen Sie die Bewegungsmelder hinzu:"
+        },
+        {
+          "type": "List",
+          "name": "MotionDetectors",
+          "caption": "Bewegungsmelder",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Variable",
+              "name": "ID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Name",
+              "width": "350px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Auslösender Wert",
+              "name": "AlertingValue",
+              "width": "150px",
+              "add": 1,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "0 - false",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 - true",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Dauerhafte Bewegungserkennung",
+              "name": "PermanentMotionDetection",
+              "width": "250px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Abwesenheitsmodus",
+              "name": "AbsenceModeActive",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Anwesenheitsmodus",
+              "name": "PresenceModeActive",
+              "width": "200px",
+              "add": false,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Nachtmodus",
+              "name": "NightModeActive",
+              "width": "202px",
+              "add": false,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmmeldung",
+              "name": "UseAlertNotification",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLight",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Bewegungsmelder",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Sie können festlegen bei welchem Modus der Bewegungsmelder überwacht werden soll.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Rauchmelder",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte fügen Sie die Rauchmelder hinzu:"
+        },
+        {
+          "type": "List",
+          "name": "SmokeDetectors",
+          "caption": "Rauchmelder",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Variable",
+              "name": "ID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Name",
+              "width": "350px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Auslösender Wert",
+              "name": "AlertingValue",
+              "width": "150px",
+              "add": 1,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "0 - false",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 - true",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Alarmmeldung",
+              "name": "UseAlertNotification",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLighting",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Rauchmelder",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Rauchmelder werden unabhängig vom Zustand der Alarmzone immer überwacht.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Wassersensoren",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte fügen Sie die Wassersensoren hinzu:"
+        },
+        {
+          "type": "List",
+          "name": "WaterSensors",
+          "caption": "Wassersensoren",
+          "rowCount": 3,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Variable",
+              "name": "ID",
+              "width": "350px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Name",
+              "width": "350px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Auslösender Wert",
+              "name": "AlertingValue",
+              "width": "150px",
+              "add": 1,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "0 - false",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 - true",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Alarmmeldung",
+              "name": "UseAlertNotification",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLighting",
+              "width": "200px",
+              "add": false,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "200px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Wassersensoren",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Wassersensoren werden unabhängig vom Zustand der Alarmzone immer überwacht.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmierungsverzögerung",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte geben Sie die Alarmierungsverzögerung in Sekunden an:"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "AlertingDelayDuration",
+          "caption": "Alarmierungsverzögerung",
+          "suffix": "s"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmierungsverzögerung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Eine Alarmierung erfolgt erst nach der vorgegebenen Zeit:\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmsirene",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Alarmsirene aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmSiren",
+          "caption": "Alarmsirene"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "AlarmSirenScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "UseAlarmZoneControlAlarmSiren",
+          "caption": "Übergeordnete Konfiguration verwenden"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmsirene",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es kann eine Alarmsirene geschaltet werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmbeleuchtung",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie die Alarmbeleuchtung aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmLight",
+          "caption": "Alarmbeleuchtung"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "AlarmLightScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "UseAlarmZoneControlAlarmLight",
+          "caption": "Übergeordnete Konfiguration verwenden"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmbeleuchtung",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Es kann eine Alarmbeleuchtung geschaltet werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmanruf",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "Bitte wählen Sie den Alarmanruf aus:"
+        },
+        {
+          "type": "SelectInstance",
+          "name": "AlarmCall",
+          "caption": "Alarmanruf"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie alternativ ein Skript aus:"
+        },
+        {
+          "type": "SelectScript",
+          "name": "AlarmCallScript",
+          "caption": "Skript"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "UseAlarmZoneControlAlarmCall",
+          "caption": "Übergeordnete Konfiguration verwenden"
+        },
+        {
+          "type": "Label",
+          "caption": " "
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Hinweis",
+          "popup": {
+            "caption": "Alarmanruf",
+            "items": [
+              {
+                "type": "Label",
+                "caption": "Bei einer Alarmauslösung kann ein Alarmanruf ausgelöst werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n1\t\t= auslösen\n2\t\t= verzögert auslösen"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "ExpansionPanel",
+      "caption": "Registrierte Nachrichten",
+      "items": [
+        {
+          "type": "Button",
+          "caption": "Alle Nachrichten anzeigen",
+          "onClick": "AZON_DisplayRegisteredMessages($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Fernbedienungen anzeigen",
+          "onClick": "AZON_DisplayRegisteredRemoteControls($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Tür- / Fenstersensoren anzeigen",
+          "onClick": "AZON_DisplayRegisteredDoorWindowSensors($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Bewegungsmelder anzeigen",
+          "onClick": "AZON_DisplayRegisteredMotionDetectors($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Rauchmelder anzeigen",
+          "onClick": "AZON_DisplayRegisteredSmokeDetectors($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Wassersensoren anzeigen",
+          "onClick": "AZON_DisplayRegisteredWaterSensors($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Alarmsirene anzeigen",
+          "onClick": "AZON_DisplayRegisteredAlarmSiren($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Alarmbeleuchtung anzeigen",
+          "onClick": "AZON_DisplayRegisteredAlarmLight($id);"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Sperrliste",
+      "items": [
+        {
+          "type": "Button",
+          "caption": "Sperrliste anzeigen",
+          "onClick": "AZON_DisplayBlackList($id);"
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Sperrliste zurücksetzen",
+          "popup": {
+            "caption": "Sperrliste wirklich zurücksetzen?",
+            "items": [
+              {
+                "type": "Button",
+                "caption": "Sperrliste zurücksetzen",
+                "onClick": "AZON_ResetBlackList($id); echo 'Sperrliste wurde erfolgreich zurückgesetzt!';"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Button",
+          "caption": "Gesperrte Tür- und Fenstersensoren anzeigen",
+          "onClick": "AZON_DisplayBlacklistedDoorWindowSensors($id);"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmsensoren",
+      "items": [
+        {
+          "type": "PopupButton",
+          "caption": "Variablenprofile zuweisen",
+          "popup": {
+            "caption": "Variablenprofile wirklich zuweisen?",
+            "items": [
+              {
+                "type": "Button",
+                "caption": "Variablenprofile zuweisen",
+                "onClick": "AZON_AssignProfiles($id);"
+              }
+            ]
+          }
+        },
+        {
+          "type": "PopupButton",
+          "caption": "Verknüpfungen erstellen",
+          "popup": {
+            "caption": "Verknüpfungen wirklich erstellen?",
+            "items": [
+              {
+                "type": "Button",
+                "caption": "Verknüfungen erstellen",
+                "onClick": "AZON_CreateLinks($id);"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Testzentrum",
+      "items": [
+        {
+          "type": "TestCenter"
+        }
+      ]
+    }
+  ],
+  "status": [
+    {
+      "code": 101,
+      "icon": "active",
+      "caption": "Alarmzone wird erstellt"
+    },
+    {
+      "code": 102,
+      "icon": "active",
+      "caption": "Alarmzone ist aktiv"
+    },
+    {
+      "code": 103,
+      "icon": "active",
+      "caption": "Alarmzone wird gelöscht"
+    },
+    {
+      "code": 104,
+      "icon": "inactive",
+      "caption": "Alarmzone ist inaktiv"
+    },
+    {
+      "code": 200,
+      "icon": "inactive",
+      "caption": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen oder im Log"
+    }
+  ]
+}
