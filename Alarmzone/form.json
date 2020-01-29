@@ -103,23 +103,6 @@
           "type": "ValidationTextBox",
           "name": "NightModeName",
           "caption": "Nachtmodus"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Bezeichnungen",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Die Bezeichnungen werden zur Identifizierung und für die Benachrichtigungen benötigt."
-              }
-            ]
-          }
         }
       ]
     },
@@ -135,23 +118,6 @@
           "type": "SelectInstance",
           "name": "AlarmZoneControl",
           "caption": "Alarmzonensteuerung"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmzonensteuerung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Mit einer Alarmzonensteuerung können mehrere Alarmzonen zentral geschaltet werden."
-              }
-            ]
-          }
         }
       ]
     },
@@ -167,23 +133,6 @@
           "type": "SelectInstance",
           "name": "AlarmProtocol",
           "caption": "Alarmprotokoll"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmprotokoll",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Mit einem Alarmprotokoll können Ereignisse protokolliert und archiviert werden."
-              }
-            ]
-          }
         }
       ]
     },
@@ -204,23 +153,6 @@
           "type": "CheckBox",
           "name": "EnableAlarmZoneName",
           "caption": "Name der Alarmzone"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Informationsoptionen",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es können verschiedene Informationen angezeigt oder ausgeblendet werden."
-              }
-            ]
-          }
         }
       ]
     },
@@ -256,23 +188,6 @@
           "type": "CheckBox",
           "name": "EnableAlarmLight",
           "caption": "Alarm- / Außenbeleuchtung"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Schaltoptionen",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es können verschiedene Schaltoptionen angezeigt oder ausgeblendet werden."
-              }
-            ]
-          }
         }
       ]
     },
@@ -313,23 +228,6 @@
           "type": "CheckBox",
           "name": "EnableWaterSensorState",
           "caption": "Wassersensoren"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Statusoptionen",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es können verschiedene Status angezeigt oder ausgeblendet werden."
-              }
-            ]
-          }
         }
       ]
     },
@@ -339,7 +237,11 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Bitte wählen Sie aus, bei welchem Modus eine Aktivierungsprüfung durchgeführt werden soll:"
+          "caption": "Für eine Scharfschaltung müssen alle Türen und Fenster geschlossen sein.\nIst mindestens eine Tür oder Fenster geöffnet, so wird die Scharfschaltung abgebrochen."
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, bei welchem Modus eine Aktivierungsprüfung durchgeführt werden soll:"
         },
         {
           "type": "CheckBox",
@@ -355,23 +257,6 @@
           "type": "CheckBox",
           "name": "CheckNightModeActivation",
           "caption": "Nachtmodus (Teilschutz)"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Aktivierungsprüfung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Für eine Scharfschaltung müssen alle Türen und Fenster geschlossen sein.\nIst mindestens eine Tür oder Fenster geöffnet, so wird die Scharfschaltung abgebrochen."
-              }
-            ]
-          }
         }
       ]
     },
@@ -379,6 +264,10 @@
       "type": "ExpansionPanel",
       "caption": "Einschaltverzögerung",
       "items": [
+        {
+          "type": "Label",
+          "caption": "Mit einer Einschaltverzögerung wird die Scharfschaltung erst nach der vorgegebenen Zeit durchgeführt.\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
+        },
         {
           "type": "Label",
           "caption": "\nBitte geben Sie die Einschaltverzögerung in Sekunden für den Abwesenheitsmodus (Vollschutz) an:"
@@ -408,23 +297,6 @@
           "name": "NightModeActivationDelayDuration",
           "caption": "Nachtmodus (Teilchutz)",
           "suffix": "s"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Einschaltverzögerung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Mit einer Einschaltverzögerung wird die Scharfschaltung erst nach der vorgegebenen Zeit durchgeführt.\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
-              }
-            ]
-          }
         }
       ]
     },
@@ -543,20 +415,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Fernbedienung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Mit einer Fernbedienung können verschiedene Schaltvorgänge ausgelöst werden.\n\nWird ein Skript als Aktion verwendet, so wird das Skript ausgeführt."
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript als Aktion verwendet, so wird das Skript ausgeführt."
         }
       ]
     },
@@ -593,20 +452,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Quittungston",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Mit einem Quittungston kann ein Schaltvorgang akustisch signalisiert werden.\n\nWird ein Skript verwendet, so wird das Skript ausgeführt."
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird das Skript ausgeführt."
         }
       ]
     },
@@ -616,7 +462,11 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Bitte wählen Sie die Signalleuchte für den Alarmzonenstatus aus:"
+          "caption": "Der Alarmzonenstatus kann optisch signalisiert werden.\n\nGrün\t= unscharf\nRot\t\t= scharf\nGelb\t= verzögert scharf"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie die Signalleuchte für den Alarmzonenstatus aus:"
         },
         {
           "type": "SelectInstance",
@@ -634,20 +484,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmzonenstatus",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Der Alarmzonenstatus kann optisch signalisiert werden.\n\nGrün\t= unscharf\nRot\t\t= scharf\nGelb\t= verzögert scharf\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= unscharf\n1\t\t= scharf\n2\t\t= verzögert scharf"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= unscharf\n1\t\t= scharf\n2\t\t= verzögert scharf"
         }
       ]
     },
@@ -657,7 +494,11 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Bitte wählen Sie die Signalleuchte für den Tür- / Fensterstatus aus:"
+          "caption": "Der Tür- / Fensterstatus kann optisch signalisiert werden.\n\nGrün\t= geschlossen\nBlau\t= geöffnet"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie die Signalleuchte für den Tür- / Fensterstatus aus:"
         },
         {
           "type": "SelectInstance",
@@ -675,20 +516,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Tür- / Fensterstatus",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Der Tür- / Fensterstatus kann optisch signalisiert werden.\n\nGrün\t= geschlossen\nBlau\t= geöffnet\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= geschlossen\n1\t\t= geöffnet"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= geschlossen\n1\t\t= geöffnet"
         }
       ]
     },
@@ -698,7 +526,11 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Bitte wählen Sie die Signalleuchte für den Alarmstatus aus:"
+          "caption": "Der Alarmstatus kann optisch signalisiert werden.\n\nGrün\t= kein Alarm\nRot\t\t= Alarm\nGelb\t= Voralarm"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie die Signalleuchte für den Alarmstatus aus:"
         },
         {
           "type": "SelectInstance",
@@ -716,20 +548,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmstatus",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Der Alarmstatus kann optisch signalisiert werden.\n\nGrün\t= kein Alarm\nRot\t\t= Alarm\nGelb\t= Voralarm\n\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['Status']\n\n0\t\t= Kein Alarm\n1\t\t= Alarm\n2\t\t= Voralarm"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= Kein Alarm\n1\t\t= Alarm\n2\t\t= Voralarm"
         }
       ]
     },
@@ -766,20 +585,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Benachrichtigung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es können Benchrichtigungen über die Benachrichtigungszentrale versendet werden.\n\nWird ein Skript verwendet, so werden nachfolgende Parameter dem Skript übergeben:\n\n$_IPS['ActionText']\n\n$_IPS['MessageText']\n\n$_IPS['LogText']\n\n$_IPS['MessageType']\n\n0\t\t= Benachrichtigungsmeldung\n1\t\t= Bestätigungsmeldung\n2\t\t= Alarmmeldung\n3\t\t= Sabotagemeldung\n4\t\t= Batteriemeldung"
-              }
-            ]
-          }
+          "caption": "Wird ein Skript verwendet, so werden nachfolgende Parameter dem Skript übergeben:\n\n$_IPS['ActionText']\n\n$_IPS['MessageText']\n\n$_IPS['LogText']\n\n$_IPS['MessageType']\n\n0\t\t= Benachrichtigungsmeldung\n1\t\t= Bestätigungsmeldung\n2\t\t= Alarmmeldung\n3\t\t= Sabotagemeldung\n4\t\t= Batteriemeldung"
         }
       ]
     },
@@ -900,23 +706,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Tür- / Fenstersensoren",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Sie können festlegen bei welchem Modus der Tür- / und Fenstersensor überwacht werden soll.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
-              }
-            ]
-          }
         }
       ]
     },
@@ -1046,23 +835,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Bewegungsmelder",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Sie können festlegen bei welchem Modus der Bewegungsmelder überwacht werden soll.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
-              }
-            ]
-          }
         }
       ]
     },
@@ -1156,23 +928,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Rauchmelder",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Rauchmelder werden unabhängig vom Zustand der Alarmzone immer überwacht.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
-              }
-            ]
-          }
         }
       ]
     },
@@ -1266,23 +1021,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Wassersensoren",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Wassersensoren werden unabhängig vom Zustand der Alarmzone immer überwacht.\n\nAusserdem können Sie die Alarmierungsmöglichkeiten festlegen."
-              }
-            ]
-          }
         }
       ]
     },
@@ -1292,30 +1030,17 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Bitte geben Sie die Alarmierungsverzögerung in Sekunden an:"
+          "caption": "Eine Alarmierung erfolgt erst nach der vorgegebenen Zeit:\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte geben Sie die Alarmierungsverzögerung in Sekunden an:"
         },
         {
           "type": "NumberSpinner",
           "name": "AlertingDelayDuration",
           "caption": "Alarmierungsverzögerung",
           "suffix": "s"
-        },
-        {
-          "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmierungsverzögerung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Eine Alarmierung erfolgt erst nach der vorgegebenen Zeit:\n\n0\t\t= keine Verzögerung\n> 0\t\t= Verzögerung in Sekunden"
-              }
-            ]
-          }
         }
       ]
     },
@@ -1352,20 +1077,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmsirene",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es kann eine Alarmsirene geschaltet werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
         }
       ]
     },
@@ -1402,20 +1114,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmbeleuchtung",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Es kann eine Alarmbeleuchtung geschaltet werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
         }
       ]
     },
@@ -1452,20 +1151,7 @@
         },
         {
           "type": "Label",
-          "caption": " "
-        },
-        {
-          "type": "PopupButton",
-          "caption": "Hinweis",
-          "popup": {
-            "caption": "Alarmanruf",
-            "items": [
-              {
-                "type": "Label",
-                "caption": "Bei einer Alarmauslösung kann ein Alarmanruf ausgelöst werden.\n\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n1\t\t= auslösen\n2\t\t= verzögert auslösen"
-              }
-            ]
-          }
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n1\t\t= auslösen\n2\t\t= verzögert auslösen"
         }
       ]
     }

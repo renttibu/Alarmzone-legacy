@@ -34,7 +34,7 @@ trait AZON_signalLamp
         // Execute script
         $id = $this->ReadPropertyInteger('AlarmZoneStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            IPS_RunScriptEx($id, ['Status' => $alarmZoneState]);
+            IPS_RunScriptEx($id, ['State' => $alarmZoneState]);
         }
     }
 
@@ -56,7 +56,7 @@ trait AZON_signalLamp
         // Execute script
         $id = $this->ReadPropertyInteger('DoorWindowStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            IPS_RunScriptEx($id, ['Status' => $doorWindowState]);
+            IPS_RunScriptEx($id, ['State' => $doorWindowState]);
         }
     }
 
@@ -76,7 +76,7 @@ trait AZON_signalLamp
         // Execute script
         $id = $this->ReadPropertyInteger('AlarmStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            IPS_RunScriptEx($id, ['Status' => $alarmState]);
+            IPS_RunScriptEx($id, ['State' => $alarmState]);
         }
     }
 }
