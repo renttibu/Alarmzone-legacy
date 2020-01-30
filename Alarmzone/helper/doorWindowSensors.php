@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 trait AZON_doorWindowSensors
 {
-
     /**
      * Determines the door and window state variables automatically.
      */
