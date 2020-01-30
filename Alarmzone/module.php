@@ -1,7 +1,5 @@
 <?php
 
-// ToDo: Alarmzonensteuerung: KZEN_UpdateControlCenterState -> AZST_UpdateStates
-
 /*
  * @module      Alarmzone
  *
@@ -59,6 +57,7 @@ class Alarmzone extends IPSModule
     private const ALARMSIREN_MODULE_GUID = '{118660A6-0784-4AD9-81D3-218BD03B1FF5}';
     private const ALARMLIGHT_MODULE_GUID = '{9C804D2B-54AF-690E-EC36-31BF41690EBA}';
     private const ALARMCALL_MODULE_GUID = '{8BB803E5-876D-B342-5CAE-A6A9A0928B61}';
+    private const HOMEMATIC_MODULE_GUID = '{EE4A81C6-5C90-4DB7-AD2F-F6BBD521412E}';
 
     public function Create()
     {
@@ -68,8 +67,8 @@ class Alarmzone extends IPSModule
         // Register properties
         $this->RegisterProperties();
 
-        // Register profiles
-        $this->RegisterProfiles();
+        // Create profiles
+        $this->CreateProfiles();
 
         // Register variables
         $this->RegisterVariables();
@@ -346,7 +345,7 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('UseAlarmZoneControlAlarmCall', false);
     }
 
-    private function RegisterProfiles(): void
+    private function CreateProfiles(): void
     {
         // Alarm zone state
         $profile = 'AZON.' . $this->InstanceID . '.AlarmZoneState';

@@ -31,7 +31,7 @@ trait AZON_alarmCall
         $alarmCallScript = $this->ReadPropertyInteger('AlarmCallScript');
         if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
             // Execute script
-            IPS_RunScriptEx($alarmCallScript, ['Action' => $action]);
+            IPS_RunScriptEx($alarmCallScript, ['State' => $action]);
         }
 
         // Check configuration of alarm zone control
@@ -52,7 +52,7 @@ trait AZON_alarmCall
                 $alarmCallScript = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmCallScript');
                 if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
                     // Execute script
-                    IPS_RunScriptEx($alarmCallScript, ['Action' => $action]);
+                    IPS_RunScriptEx($alarmCallScript, ['State' => $action]);
                 }
             }
         }

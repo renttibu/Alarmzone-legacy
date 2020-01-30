@@ -624,6 +624,15 @@
               }
             },
             {
+              "caption": "Adresse",
+              "name": "Address",
+              "width": "200px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
               "caption": "Auslösender Wert",
               "name": "AlertingValue",
               "width": "150px",
@@ -738,6 +747,15 @@
               "caption": "Bezeichnung",
               "name": "Name",
               "width": "350px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
+              "caption": "Adresse",
+              "name": "Address",
+              "width": "200px",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -1077,7 +1095,7 @@
         },
         {
           "type": "Label",
-          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
         }
       ]
     },
@@ -1114,7 +1132,7 @@
         },
         {
           "type": "Label",
-          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
         }
       ]
     },
@@ -1151,7 +1169,7 @@
         },
         {
           "type": "Label",
-          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['Action']\n\n1\t\t= auslösen\n2\t\t= verzögert auslösen"
+          "caption": "\nWird ein Skript verwendet, so wird die Aktion dem Skript übergeben:\n\n$_IPS['State']\n\n1\t\t= auslösen\n2\t\t= verzögert auslösen"
         }
       ]
     }
@@ -1237,6 +1255,72 @@
       "type": "ExpansionPanel",
       "caption": "Alarmsensoren",
       "items": [
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "PopupButton",
+              "caption": "Tür- / Fenstersensoren automatisch ermitteln",
+              "popup": {
+                "caption": "Tür- / Fenstersensoren wirklich automatisch ermitteln?",
+                "items": [
+                  {
+                    "type": "Button",
+                    "caption": "Tür- / Fenstersensoren ermitteln",
+                    "onClick": "AZON_DetermineDoorWindowVariables($id);"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "PopupButton",
+              "caption": "Zugewiesene Tür- / Fenstersensoren löschen",
+              "popup": {
+                "caption": "Zugewiesene Tür- / Fenstersensoren wirklich löschen?",
+                "items": [
+                  {
+                    "type": "Button",
+                    "caption": "Tür- / Fenstersensoren  löschen",
+                    "onClick": "AZON_DeleteAssignedDoorWindowVariables($id);"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "PopupButton",
+              "caption": "Bewegungsmelder automatisch ermitteln",
+              "popup": {
+                "caption": "Bewegungsmelder wirklich automatisch ermitteln?",
+                "items": [
+                  {
+                    "type": "Button",
+                    "caption": "Bewegungsmelder ermitteln",
+                    "onClick": "AZON_DetermineMotionDetectorVariables($id);"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "PopupButton",
+              "caption": "Zugewiesene Bewegungsmelder löschen",
+              "popup": {
+                "caption": "Zugewiesene Bewegungsmelder wirklich löschen?",
+                "items": [
+                  {
+                    "type": "Button",
+                    "caption": "Bewegungsmelder löschen",
+                    "onClick": "AZON_DeleteAssignedMotionDetectorVariables($id);"
+                  }
+                ]
+              }
+            }
+          ]
+        },
         {
           "type": "PopupButton",
           "caption": "Variablenprofile zuweisen",

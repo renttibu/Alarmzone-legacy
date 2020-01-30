@@ -1,0 +1,14 @@
+{
+  "id": "{E70D37CB-7732-9CC5-B29E-EC567D841B0C}",
+  "name": "Alarmzonensteuerung",
+  "type": 3,
+  "vendor": "NTUB",
+  "aliases": [
+    "Alarmzonensteuerung"
+  ],
+  "url": "https://github.com/ubittner/Alarmzone",
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "AZST"
+}

@@ -6,6 +6,91 @@ declare(strict_types=1);
 trait AZON_motionDetectors
 {
     /**
+     * Determines the door and window state variables automatically.
+     */
+    public function DetermineMotionDetectorVariables(): void
+    {
+        $listedVariables = [];
+        $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_MODULE_GUID);
+        if (!empty($instanceIDs)) {
+            $variables = [];
+            foreach ($instanceIDs as $instanceID) {
+                $childrenIDs = @IPS_GetChildrenIDs($instanceID);
+                foreach ($childrenIDs as $childrenID) {
+                    $match = false;
+                    $object = @IPS_GetObject($childrenID);
+                    if ($object['ObjectIdent'] == 'MOTION') {
+                        $match = true;
+                    }
+                    if ($match) {
+                        // Check for variable
+                        if ($object['ObjectType'] == 2) {
+                            $name = strstr(@IPS_GetName($instanceID), ':', true);
+                            if ($name == false) {
+                                $name = @IPS_GetName($instanceID);
+                            }
+                            $deviceAddress = @IPS_GetProperty(IPS_GetParent($childrenID), 'Address');
+                            array_push($variables, ['ID' => $childrenID, 'Name' => $name, 'Address' => $deviceAddress]);
+                        }
+                    }
+                }
+            }
+            // Get already listed variables
+            $listedVariables = json_decode($this->ReadPropertyString('MotionDetectors'), true);
+            // Delete non existing variables anymore
+            if (!empty($listedVariables)) {
+                $deleteVariables = array_diff(array_column($listedVariables, 'ID'), array_column($variables, 'ID'));
+                if (!empty($deleteVariables)) {
+                    foreach ($deleteVariables as $key => $deleteVariable) {
+                        unset($listedVariables[$key]);
+                    }
+                }
+            }
+            // Add new variables
+            if (!empty($listedVariables)) {
+                $addVariables = array_diff(array_column($variables, 'ID'), array_column($listedVariables, 'ID'));
+                if (!empty($addVariables)) {
+                    foreach ($addVariables as $addVariable) {
+                        $name = strstr(@IPS_GetName(@IPS_GetParent($addVariable)), ':', true);
+                        $deviceAddress = @IPS_GetProperty(@IPS_GetParent($addVariable), 'Address');
+                        array_push($listedVariables, ['ID' => $addVariable, 'Name' => $name, 'Address' => $deviceAddress]);
+                    }
+                }
+            } else {
+                $listedVariables = $variables;
+            }
+        }
+        // Sort variables by name
+        usort($listedVariables, function ($a, $b)
+        {
+            return $a['Name'] <=> $b['Name'];
+        });
+        // Rebase array
+        $listedVariables = array_values($listedVariables);
+        // Update variable list
+        $json = json_encode($listedVariables);
+        @IPS_SetProperty($this->InstanceID, 'MotionDetectors', $json);
+        if (@IPS_HasChanges($this->InstanceID)) {
+            @IPS_ApplyChanges($this->InstanceID);
+        }
+        echo 'Bewegungsmelder wurden automatisch ermittelt!';
+    }
+
+    /**
+     * Deletes all assigned door and window state variables.
+     */
+    public function DeleteAssignedMotionDetectorVariables(): void
+    {
+        $variables = [];
+        $json = json_encode($variables);
+        @IPS_SetProperty($this->InstanceID, 'MotionDetectors', $json);
+        if (@IPS_HasChanges($this->InstanceID)) {
+            @IPS_ApplyChanges($this->InstanceID);
+        }
+        echo 'Alle Bewegungsmelder wurden gelöscht!';
+    }
+
+    /**
      * Updates the motion detectors state.
      *
      * @param bool $UseSignalLamp

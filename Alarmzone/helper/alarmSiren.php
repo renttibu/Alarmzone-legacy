@@ -47,7 +47,7 @@ trait AZON_alarmSiren
         if ($alarmSirenScript != 0 && @IPS_ObjectExists($alarmSirenScript)) {
             // Set alarm siren switch
             $this->SetValue('AlarmSiren', $State);
-            IPS_RunScriptEx($alarmSirenScript, ['Action' => $action]);
+            IPS_RunScriptEx($alarmSirenScript, ['State' => $action]);
         }
 
         // Check configuration of alarm zone control
@@ -72,7 +72,7 @@ trait AZON_alarmSiren
                     // Set alarm siren switch
                     $this->SetValue('AlarmSiren', $State);
                     // Execute script
-                    IPS_RunScriptEx($alarmSirenScript, ['Status' => $action]);
+                    IPS_RunScriptEx($alarmSirenScript, ['State' => $action]);
                 }
             }
         }

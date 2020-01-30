@@ -48,7 +48,7 @@ trait AZON_alarmLight
             // Set alarm light switch
             $this->SetValue('AlarmLight', $State);
             // Execute Script
-            IPS_RunScriptEx($alarmLightScript, ['Action' => $action]);
+            IPS_RunScriptEx($alarmLightScript, ['State' => $action]);
         }
 
         // Check configuration of alarm zone control
@@ -73,7 +73,7 @@ trait AZON_alarmLight
                     // Set alarm light switch
                     $this->SetValue('AlarmLight', $State);
                     // Execute script
-                    IPS_RunScriptEx($alarmLightScript, ['Action' => $action]);
+                    IPS_RunScriptEx($alarmLightScript, ['State' => $action]);
                 }
             }
         }
