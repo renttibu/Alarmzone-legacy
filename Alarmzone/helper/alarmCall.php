@@ -23,7 +23,7 @@ trait AZON_alarmCall
         $alarmCall = $this->ReadPropertyInteger('AlarmCall');
         if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
             // Execute alarm call
-            $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, ' . $SensorName . ');';
+            $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, "' . $SensorName . '");';
             IPS_RunScriptText($scriptText);
         }
 
@@ -44,7 +44,7 @@ trait AZON_alarmCall
                 $alarmCall = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmCall');
                 if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
                     // Execute alarm call
-                    $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, ' . $SensorName . ');';
+                    $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, "' . $SensorName . '");';
                     IPS_RunScriptText($scriptText);
                 }
 
