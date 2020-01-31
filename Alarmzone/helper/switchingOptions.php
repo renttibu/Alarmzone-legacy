@@ -150,6 +150,7 @@ trait AZON_switchingOptions
         if ($State != $this->GetValue('AbsenceMode')) {
             $differentAlarmZoneState = true;
         }
+        $this->SendDebug(__FUNCTION__, 'Modus hat sich geändert: ' . json_encode($differentAlarmZoneState), 0);
         $modeName = $this->ReadPropertyString('AbsenceModeName');
 
         //#################### Disarm
@@ -292,6 +293,7 @@ trait AZON_switchingOptions
         }
         // Tone Acknowledgement
         if ($UseToneAcknowledgement && $differentAlarmZoneState) {
+            $this->SendDebug(__FUNCTION__, 'Quittungston ausführen.', 0);
             $this->ExecuteToneAcknowledgement();
         }
         // Signal lamps

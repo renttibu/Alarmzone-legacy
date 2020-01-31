@@ -24,7 +24,7 @@ trait AZST_alarmCall
         // Alarm call of control center
         $alarmCall = $this->ReadPropertyInteger('AlarmCall');
         if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
-            $scriptText = 'AANR_ExecuteAlarmCall(' . $alarmCall . ', ' . $SensorName . ');';
+            $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, ' . $SensorName . ');';
             IPS_RunScriptText($scriptText);
         }
 
@@ -61,7 +61,7 @@ trait AZST_alarmCall
                 foreach ($activeAlarmCalls as $activeAlarmCall) {
                     $i++;
                     // Execute alarm call
-                    $scriptText = 'AANR_ExecuteAlarmCall(' . $activeAlarmCall . ', ' . $SensorName . ');';
+                    $scriptText = 'AANR_ToggleAlarmCall(' . $activeAlarmCall . ', true, ' . $SensorName . ');';
                     IPS_RunScriptText($scriptText);
                     // Execution delay for next instance
                     if ($count > 1 && $i < $count) {
@@ -99,7 +99,7 @@ trait AZST_alarmCall
     {
         $id = $this->ReadPropertyInteger('AlarmCall');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            $scriptText = 'AANR_CancelAlarmCall(' . $id . ');';
+            $scriptText = 'AANR_ToggleAlarmCall(' . $id . ', false, "");';
             IPS_RunScriptText($scriptText);
         }
     }
