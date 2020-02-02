@@ -82,4 +82,31 @@ trait AZON_notificationCenter
             }
         }
     }
+
+    /**
+     * Confirms the alarm message.
+     */
+    private function ConfirmAlarmNotification(): void
+    {
+        // notification center
+        $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
+        if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
+            $scriptText = 'BENA_ConfirmAlarmNotification(' . $notificationCenter . ');';
+            IPS_RunScriptText($scriptText);
+        }
+
+        // Check configuration of alarm zone control
+        $use = $this->ReadPropertyBoolean('UseAlarmZoneControlNotificationCenter');
+        if ($use) {
+            $alarmZoneControl = $this->ReadPropertyInteger('AlarmZoneControl');
+            if ($alarmZoneControl != 0 && @IPS_ObjectExists($alarmZoneControl)) {
+                // Notification center
+                $notificationCenter = (int) @IPS_GetProperty($alarmZoneControl, 'NotificationCenter');
+                if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
+                    $scriptText = 'BENA_ConfirmAlarmNotification(' . $notificationCenter . ');';
+                    IPS_RunScriptText($scriptText);
+                }
+            }
+        }
+    }
 }

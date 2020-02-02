@@ -181,6 +181,8 @@ trait AZON_switchingOptions
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
             }
+            // Confirm alarm notification
+            $this->ConfirmAlarmNotification();
             // Disable timer
             $this->DeactivateStartActivationTimer();
             // Reset blacklist
@@ -368,6 +370,8 @@ trait AZON_switchingOptions
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
             }
+            // Confirm alarm notification
+            $this->ConfirmAlarmNotification();
             // Disable timer
             $this->DeactivateStartActivationTimer();
             // Reset blacklist
@@ -554,6 +558,8 @@ trait AZON_switchingOptions
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
             }
+            // Confirm alarm notification
+            $this->ConfirmAlarmNotification();
             // Disable timer
             $this->DeactivateStartActivationTimer();
             // Reset blacklist
