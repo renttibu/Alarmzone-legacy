@@ -6,11 +6,7 @@ declare(strict_types=1);
 trait AZST_controlOptions
 {
     /**
-     * Toggles the absence mode.
-     *
-     * @param bool $State
-     * false    = disarmed
-     * true     = armed
+     * Disarms the alarm zones.
      *
      * @param string $SenderID
      *
@@ -18,88 +14,87 @@ trait AZST_controlOptions
      * false    = an error occurred
      * true     = ok
      */
-    public function ToggleAbsenceMode(bool $State, string $SenderID): bool
+    public function DisarmAlarmZones(string $SenderID): bool
     {
-        $result = true;
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
         if (empty($alarmZones)) {
             return false;
         }
-        $this->SetValue('AbsenceMode', $State);
+        $result = true;
+        // Set switches and states
+        $this->SetValue('FullProtectionMode', false);
+        $this->SetValue('HullProtectionMode', false);
+        $this->SetValue('PartialProtectionMode', false);
+        $this->SetValue('AlarmSiren', false);
+        $actualAlarmState = $this->GetValue('AlarmState');
+        $this->SetValue('AlarmState', 0);
         // Check tone acknowledgement
-        $useToneAcknowledgement = false;
+        $useAlarmZoneToneAcknowledgement = false;
         $toneAcknowledgement = $this->ReadPropertyInteger('ToneAcknowledgement');
         $toneAcknowledgementScript = $this->ReadPropertyInteger('ToneAcknowledgementScript');
         if ($toneAcknowledgement == 0 && $toneAcknowledgementScript == 0) {
-            $useToneAcknowledgement = true;
+            $useAlarmZoneToneAcknowledgement = true;
         }
         // Check notification center
-        $useNotification = false;
+        $useAlarmZoneNotification = false;
         $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
         $notificationScript = $this->ReadPropertyInteger('NotificationScript');
         if ($notificationCenter == 0 && $notificationScript == 0) {
-            $useNotification = true;
+            $useAlarmZoneNotification = true;
         }
-        // Alarm light
-        $this->ToggleAlarmLight(false);
-        // Alarm call
-        $this->CancelAlarmCall();
         // Toggle alarm zones
         foreach ($alarmZones as $alarmZone) {
             $id = $alarmZone->ID;
             if ($id != 0 && @IPS_ObjectExists($id)) {
-                $toggle = AZON_ToggleAbsenceMode($id, $State, $SenderID, $useToneAcknowledgement, $useNotification);
+                $toggle = @AZON_DisarmAlarmZone($id, $SenderID, $useAlarmZoneToneAcknowledgement, $useAlarmZoneNotification);
                 if (!$toggle) {
                     $result = false;
                 }
             }
         }
-        // Notification
-        $alarmObjectName = $this->ReadPropertyString('ObjectName');
-        $modeName = $this->ReadPropertyString('AbsenceModeName');
-        switch ($State) {
-            // Disarm
-            case false:
-                if ($result) {
-                    $text = $modeName . ' deaktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' unscharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen deaktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
-            // Arm
-            case true:
-                if ($result) {
-                    $text = $modeName . ' aktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' scharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen aktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
+        // Tone acknowledgement
+        if (!$useAlarmZoneToneAcknowledgement) {
+            $this->TriggerToneAcknowledgement();
         }
-        if ($useNotification) {
+        // Notification
+        if (!$useAlarmZoneNotification) {
             $timeStamp = date('d.m.Y, H:i:s');
-            if (isset($actionText) && isset($text)) {
-                $messageText = $timeStamp . ', ' . $alarmObjectName . ', ' . $text;
-                // Notification Center
-                $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
-                if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
-                    $this->SendNotification($actionText, $messageText, 1);
-                }
+            $objectName = $this->ReadPropertyString('ObjectName');
+            $systemName = $this->ReadPropertyString('SystemName');
+            $location = $this->ReadPropertyString('Location');
+            if ($result) {
+                $actionText = $objectName . ' unscharf!';
+                $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
+                $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' aktiviert';
+            } else {
+                $actionText = $location . ', ' . $objectName . ' Systemfehler!';
+                $messageText = $timeStamp . ' ' . $systemName . 'Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
+                $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
             }
+            // Notification Center
+            $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
+            if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
+                $this->SendNotification($actionText, $messageText, $logText, 1);
+            }
+            // Confirm alarm notification
+            $this->ConfirmAlarmNotification();
+        }
+        // Alarm light off
+        //$this->ToggleAlarmLight(false);
+        // Cancel Alarm call
+        $this->CancelAlarmCall();
+        // Turn off alarm siren
+        if ($actualAlarmState != 0) {
+            $this->ToggleAlarmSiren(false);
         }
         // Update system state
         $this->UpdateStates();
-        // Return result
         return $result;
     }
 
     /**
-     * Toggles the presence mode.
+     * Toggles the full protect mode.
      *
      * @param bool $State
      * false    = disarmed
@@ -111,85 +106,23 @@ trait AZST_controlOptions
      * false    = an error occurred
      * true     = ok
      */
-    public function TogglePresenceMode(bool $State, string $SenderID): bool
+    public function ToggleFullProtectMode(bool $State, string $SenderID): bool
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $result = true;
-        $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
-        if (empty($alarmZones)) {
-            return false;
+        // Disarm
+        if (!$State) {
+            $result = $this->DisarmAlarmZones($SenderID);
         }
-        $this->SetValue('PresenceMode', $State);
-        // Check tone acknowledgement
-        $useToneAcknowledgement = false;
-        $toneAcknowledgement = $this->ReadPropertyInteger('ToneAcknowledgement');
-        $toneAcknowledgementScript = $this->ReadPropertyInteger('ToneAcknowledgementScript');
-        if ($toneAcknowledgement == 0 && $toneAcknowledgementScript == 0) {
-            $useToneAcknowledgement = true;
+        // Arm
+        if ($State) {
+            $result = $this->ArmAlarmZones($SenderID, 1);
         }
-        // Check notification center
-        $useNotification = false;
-        $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
-        $notificationScript = $this->ReadPropertyInteger('NotificationScript');
-        if ($notificationCenter == 0 && $notificationScript == 0) {
-            $useNotification = true;
-        }
-        // Alarm light
-        $this->ToggleAlarmLight(false);
-        // Alarm call
-        $this->CancelAlarmCall();
-        // Toggle alarm zones
-        foreach ($alarmZones as $alarmZone) {
-            $id = $alarmZone->ID;
-            if ($id != 0 && @IPS_ObjectExists($id)) {
-                AZON_TogglePresenceMode($id, $State, $SenderID, $useToneAcknowledgement, $useNotification);
-            }
-        }
-        // Notification
-        $alarmObjectName = $this->ReadPropertyString('ObjectName');
-        $modeName = $this->ReadPropertyString('PresenceModeName');
-        switch ($State) {
-            // Disarm
-            case false:
-                if ($result) {
-                    $text = $modeName . ' deaktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' unscharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen deaktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('PresenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
-            // Arm
-            case true:
-                if ($result) {
-                    $text = $modeName . ' aktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' scharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen aktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('PresenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
-        }
-        if ($useNotification) {
-            $timeStamp = date('d.m.Y, H:i:s');
-            if (isset($actionText) && isset($text)) {
-                $messageText = $timeStamp . ', ' . $alarmObjectName . ', ' . $text;
-                // Notification Center
-                $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
-                if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
-                    $this->SendNotification($actionText, $messageText, 1);
-                }
-            }
-        }
-        // Update system state
-        $this->UpdateStates();
-        // Return result
         return $result;
     }
 
     /**
-     * Toggles the night mode.
+     * Toggles the hull protect mode.
      *
      * @param bool $State
      * false    = disarmed
@@ -201,79 +134,162 @@ trait AZST_controlOptions
      * false    = an error occurred
      * true     = ok
      */
-    public function ToggleNightMode(bool $State, string $SenderID): bool
+    public function ToggleHullProtectMode(bool $State, string $SenderID): bool
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $result = true;
+        // Disarm
+        if (!$State) {
+            $result = $this->DisarmAlarmZones($SenderID);
+        }
+        // Arm
+        if ($State) {
+            $result = $this->ArmAlarmZones($SenderID, 2);
+        }
+        return $result;
+    }
+
+    /**
+     * Toggles the partial protect mode.
+     *
+     * @param bool $State
+     * false    = disarmed
+     * true     = armed
+     *
+     * @param string $SenderID
+     *
+     * @return bool
+     * false    = an error occurred
+     * true     = ok
+     */
+    public function TogglePartialProtectMode(bool $State, string $SenderID): bool
+    {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
+        $result = true;
+        // Disarm
+        if (!$State) {
+            $result = $this->DisarmAlarmZones($SenderID);
+        }
+        // Arm
+        if ($State) {
+            $result = $this->ArmAlarmZones($SenderID, 3);
+        }
+        return $result;
+    }
+
+    //#################### Private
+
+    /**
+     * Arms the alarm zones.
+     *
+     * @param string $SenderID
+     *
+     * @param int $Mode
+     * 1    = Full protection mode
+     * 2    = Hull protection mode
+     * 3    = Partial protection mode
+     *
+     * @return bool
+     * false    = an error occurred
+     * true     = ok
+     */
+    private function ArmAlarmZones(string $SenderID, int $Mode): bool
+    {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
         if (empty($alarmZones)) {
             return false;
         }
-        $this->SetValue('NightMode', $State);
+        $result = true;
+        switch ($Mode) {
+            // Hull protection mode
+            case 2:
+                $identName = 'HullProtectionMode';
+                $modeName = $this->ReadPropertyString('HullProtectionName');
+                break;
+
+            // Partial protection mode
+            case 3:
+                $identName = 'PartialProtectionMode';
+                $modeName = $this->ReadPropertyString('PartialProtectionName');
+                break;
+
+            // Full protection mode
+            default:
+                $identName = 'FullProtectionMode';
+                $modeName = $this->ReadPropertyString('FullProtectionName');
+
+        }
+        // Set switch
+        $this->SetValue($identName, true);
         // Check tone acknowledgement
-        $useToneAcknowledgement = false;
+        $useAlarmZoneToneAcknowledgement = false;
         $toneAcknowledgement = $this->ReadPropertyInteger('ToneAcknowledgement');
         $toneAcknowledgementScript = $this->ReadPropertyInteger('ToneAcknowledgementScript');
         if ($toneAcknowledgement == 0 && $toneAcknowledgementScript == 0) {
-            $useToneAcknowledgement = true;
+            $useAlarmZoneToneAcknowledgement = true;
         }
         // Check notification center
-        $useNotification = false;
+        $useAlarmZoneNotification = false;
         $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
         $notificationScript = $this->ReadPropertyInteger('NotificationScript');
         if ($notificationCenter == 0 && $notificationScript == 0) {
-            $useNotification = true;
+            $useAlarmZoneNotification = true;
         }
-        // Alarm light
-        $this->ToggleAlarmLight(false);
-        // Alarm call
-        $this->CancelAlarmCall();
         // Toggle alarm zones
         foreach ($alarmZones as $alarmZone) {
             $id = $alarmZone->ID;
             if ($id != 0 && @IPS_ObjectExists($id)) {
-                AZON_ToggleNightMode($id, $State, $SenderID, $useToneAcknowledgement, $useNotification);
+                switch ($Mode) {
+                    // Hull protection mode
+                    case 2:
+                        $toggle = @AZON_ToggleHullProtectMode($id, true, $SenderID, $useAlarmZoneToneAcknowledgement, $useAlarmZoneNotification);
+                        break;
+
+                    // Partial protection mode
+                    case 3:
+                        $toggle = @AZON_TogglePartialProtectMode($id, true, $SenderID, $useAlarmZoneToneAcknowledgement, $useAlarmZoneNotification);
+                        break;
+
+                    // Full protection mode
+                    default:
+                        $toggle = @AZON_ToggleFullProtectMode($id, true, $SenderID, $useAlarmZoneToneAcknowledgement, $useAlarmZoneNotification);
+                }
+                if (!$toggle) {
+                    $result = false;
+                }
             }
         }
-        // Notification
-        $alarmObjectName = $this->ReadPropertyString('ObjectName');
-        $modeName = $this->ReadPropertyString('NightModeName');
-        switch ($State) {
-            // Disarm
-            case false:
-                if ($result) {
-                    $text = $modeName . ' deaktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' unscharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen deaktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('NightMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
-            // Arm
-            case true:
-                if ($result) {
-                    $text = $modeName . ' aktiviert. (SID ' . $SenderID . ', ID ' . $this->GetIDForIdent('AbsenceMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' scharf!';
-                } else {
-                    $text = 'Es konnten nicht alle Alarmzonen aktiviert werden. Bitte prüfen! (ID ' . $this->GetIDForIdent('NightMode') . ')';
-                    $actionText = $alarmObjectName . ', ' . $modeName . ' Systemfehler!';
-                }
-                break;
-
+        // Tone acknowledgement
+        if (!$useAlarmZoneToneAcknowledgement && $result) {
+            $this->TriggerToneAcknowledgement();
         }
-        if ($useNotification) {
-            $timeStamp = date('d.m.Y, H:i:s');
-            if (isset($actionText) && isset($text)) {
-                $messageText = $timeStamp . ', ' . $alarmObjectName . ', ' . $text;
-                // Notification Center
-                $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
-                if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
-                    $this->SendNotification($actionText, $messageText, 1);
-                }
+        // Notification
+        $timeStamp = date('d.m.Y, H:i:s');
+        $systemName = $this->ReadPropertyString('SystemName');
+        $objectName = $this->ReadPropertyString('ObjectName');
+        $location = $this->ReadPropertyString('Location');
+        if ($result) {
+            // Set text
+            $actionText = $objectName . ' scharf!';
+            $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
+            $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' aktiviert';
+        } else {
+            // Reset switch
+            $this->SetValue($identName, false);
+            // Set text
+            $actionText = $objectName . ' Systemfehler!';
+            $messageText = $timeStamp . ' ' . $modeName . 'Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
+            $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
+        }
+        if (!$useAlarmZoneNotification) {
+            $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
+            if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
+                $this->SendNotification($actionText, $messageText, $logText, 1);
             }
         }
         // Update system state
-        $this->UpdateStates();
+        //$this->UpdateStates();
         return $result;
     }
 }

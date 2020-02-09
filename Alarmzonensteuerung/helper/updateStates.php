@@ -10,14 +10,15 @@ trait AZST_updateStates
      */
     public function UpdateStates(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
         if (empty($alarmZones)) {
             return;
         }
         // Definitions
-        $newAbsenceModeState = false;
-        $newPresenceModeState = false;
-        $newNightModeState = false;
+        $newFullProtectModeState = false;
+        $newHullProtectModeState = false;
+        $newPartialProtectModeState = false;
         $newAlarmSirenState = false;
         $newAlarmLightState = false;
         $newSystemState = 0;
@@ -27,24 +28,23 @@ trait AZST_updateStates
         $newMotionDetectorState = false;
         $newSmokeDetectorState = false;
         $newWaterSensorState = false;
-
         // Alarm zones
         foreach ($alarmZones as $alarmZone) {
             $id = $alarmZone->ID;
-            // Absence mode
-            $actualAbsenceModeState = GetValue(IPS_GetObjectIDByIdent('AbsenceMode', $id));
-            if ($actualAbsenceModeState) {
-                $newAbsenceModeState = true;
+            // Full protection mode
+            $actualFullProtectModeState = GetValue(IPS_GetObjectIDByIdent('FullProtectionMode', $id));
+            if ($actualFullProtectModeState) {
+                $newFullProtectModeState = true;
             }
-            // Presence mode
-            $actualPresenceModeState = GetValue(IPS_GetObjectIDByIdent('PresenceMode', $id));
-            if ($actualPresenceModeState) {
-                $newPresenceModeState = true;
+            // Hull protection mode
+            $actualHullProtectModeState = GetValue(IPS_GetObjectIDByIdent('HullProtectionMode', $id));
+            if ($actualHullProtectModeState) {
+                $newHullProtectModeState = true;
             }
-            // Night mode
-            $actualNightModeState = GetValue(IPS_GetObjectIDByIdent('NightMode', $id));
-            if ($actualNightModeState) {
-                $newNightModeState = true;
+            // Partial protection mode
+            $actualPartialProtectModeState = GetValue(IPS_GetObjectIDByIdent('PartialProtectionMode', $id));
+            if ($actualPartialProtectModeState) {
+                $newPartialProtectModeState = true;
             }
             // Alarm siren
             $actualAlarmSirenState = GetValue(IPS_GetObjectIDByIdent('AlarmSiren', $id));
@@ -95,12 +95,12 @@ trait AZST_updateStates
             }
         }
         // Control center
-        // Absence mode
-        $this->SetValue('AbsenceMode', $newAbsenceModeState);
+        // Full protection mode
+        $this->SetValue('FullProtectionMode', $newFullProtectModeState);
         // Presence  mode
-        $this->SetValue('PresenceMode', $newPresenceModeState);
-        // Night mode
-        $this->SetValue('NightMode', $newNightModeState);
+        $this->SetValue('HullProtectionMode', $newHullProtectModeState);
+        // Partial protection mode
+        $this->SetValue('PartialProtectionMode', $newPartialProtectModeState);
         // Alarm siren
         $this->SetValue('AlarmSiren', $newAlarmSirenState);
         // Alarm light

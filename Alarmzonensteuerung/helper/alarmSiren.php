@@ -16,35 +16,27 @@ trait AZST_alarmSiren
      */
     public function ToggleAlarmSiren(bool $State): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // State
         switch ($State) {
-            case false:
-                $status = 0;
-                break;
-
             case true:
-                if ($this->ReadPropertyInteger('AlertingDelayDuration') > 0) {
+                $status = 1;
+                if ($this->ReadPropertyInteger('AlertingDelay') > 0) {
                     $status = 2;
-                } else {
-                    $status = 1;
                 }
                 break;
 
             default:
                 $status = 0;
         }
-
         // Alarm siren of control center
         $alarmSiren = $this->ReadPropertyInteger('AlarmSiren');
         if ($alarmSiren != 0 && @IPS_ObjectExists($alarmSiren)) {
             // Set alarm siren switch
             $this->SetValue('AlarmSiren', $State);
             // Toggle alarm siren
-            $scriptText = 'ASIR_ToggleAlarmSiren(' . $alarmSiren . ', ' . (int) $State . ');';
-            IPS_RunScriptText($scriptText);
-            //ASIR_ToggleAlarmSiren($alarmSiren, $State);
+            @ASIR_ToggleAlarmSiren($alarmSiren, $State);
         }
-
         // Alarm siren script of control center
         $alarmSirenScript = $this->ReadPropertyInteger('AlarmSirenScript');
         if ($alarmSirenScript != 0 && @IPS_ObjectExists($alarmSirenScript)) {
@@ -53,7 +45,6 @@ trait AZST_alarmSiren
             // Execute script
             IPS_RunScriptEx($alarmSirenScript, ['State' => $status]);
         }
-
         // Alarm siren and alarm siren script of alarm zones
         if ($alarmSiren == 0 && $alarmSirenScript == 0) {
             // Alarm siren of alarm zones
@@ -83,9 +74,7 @@ trait AZST_alarmSiren
                 foreach ($activeAlarmSirens as $activeAlarmSiren) {
                     $i++;
                     // Toggle alarm siren
-                    $scriptText = 'ASIR_ToggleAlarmSiren(' . $activeAlarmSiren . ', ' . (int) $State . ');';
-                    IPS_RunScriptText($scriptText);
-                    //ASIR_ToggleAlarmSiren($activeAlarmSiren, $State);
+                    @ASIR_ToggleAlarmSiren($activeAlarmSiren, $State);
                     // Execution delay for next instance
                     if ($count > 1 && $i < $count) {
                         IPS_Sleep(500);
@@ -116,36 +105,5 @@ trait AZST_alarmSiren
         }
         // Update system state
         $this->UpdateStates();
-    }
-
-    /**
-     * Displays the registered alarm siren.
-     */
-    public function DisplayRegisteredAlarmSiren(): void
-    {
-        $registeredAlarmSiren = [];
-        $alarmSiren = $this->ReadPropertyInteger('AlarmSiren');
-        if ($alarmSiren != 0 && @IPS_ObjectExists($alarmSiren)) {
-            $alarmSirenSwitch = @IPS_GetObjectIDByIdent('AlarmSiren', $alarmSiren);
-        }
-        if (isset($alarmSirenSwitch)) {
-            if ($alarmSirenSwitch != 0 && IPS_ObjectExists($alarmSirenSwitch)) {
-                $registeredVariables = $this->GetMessageList();
-                foreach ($registeredVariables as $id => $registeredVariable) {
-                    foreach ($registeredVariable as $messageType) {
-                        if ($messageType == VM_UPDATE) {
-                            if ($id == $alarmSirenSwitch) {
-                                $alarmSirenSwitchName = @IPS_GetName($alarmSirenSwitch);
-                                $alarmSirenID = @IPS_GetParent($alarmSirenSwitch);
-                                $alarmSirenName = @IPS_GetName(@IPS_GetParent($alarmSirenSwitch));
-                                array_push($registeredAlarmSiren, ['alarmSirenSwitchID' => $alarmSirenSwitch, 'alarmSirenSwitchName' => $alarmSirenSwitchName, 'alarmSirenInstanceID' => $alarmSirenID, 'alarmSirenInstanceName' => $alarmSirenName]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        echo "\n\nRegistrierte Alarmsirene:\n\n";
-        print_r($registeredAlarmSiren);
     }
 }

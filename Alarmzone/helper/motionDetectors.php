@@ -10,6 +10,7 @@ trait AZON_motionDetectors
      */
     public function DetermineMotionDetectorVariables(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $listedVariables = [];
         $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_MODULE_GUID);
         if (!empty($instanceIDs)) {
@@ -29,8 +30,18 @@ trait AZON_motionDetectors
                             if ($name == false) {
                                 $name = @IPS_GetName($instanceID);
                             }
-                            $deviceAddress = @IPS_GetProperty(IPS_GetParent($childrenID), 'Address');
-                            array_push($variables, ['ID' => $childrenID, 'Name' => $name, 'Address' => $deviceAddress]);
+                            array_push($variables, [
+                                'Name'                                                      => $name,
+                                'ID'                                                        => $childrenID,
+                                'AlertingValue'                                             => 1,
+                                'PermanentMotionDetection'                                  => true,
+                                'FullProtectionModeActive'                                  => true,
+                                'HullProtectionModeActive'                                  => false,
+                                'PartialProtectionModeActive'                               => true,
+                                'UseAlertNotification'                                      => true,
+                                'UseAlarmSiren'                                             => true,
+                                'UseAlarmLight'                                             => true,
+                                'UseAlarmCall'                                              => true]);
                         }
                     }
                 }
@@ -52,8 +63,18 @@ trait AZON_motionDetectors
                 if (!empty($addVariables)) {
                     foreach ($addVariables as $addVariable) {
                         $name = strstr(@IPS_GetName(@IPS_GetParent($addVariable)), ':', true);
-                        $deviceAddress = @IPS_GetProperty(@IPS_GetParent($addVariable), 'Address');
-                        array_push($listedVariables, ['ID' => $addVariable, 'Name' => $name, 'Address' => $deviceAddress]);
+                        array_push($listedVariables, [
+                            'Name'                                                      => $name,
+                            'ID'                                                        => $addVariable,
+                            'AlertingValue'                                             => 1,
+                            'PermanentMotionDetection'                                  => true,
+                            'FullProtectionModeActive'                                  => true,
+                            'HullProtectionModeActive'                                  => false,
+                            'PartialProtectionModeActive'                               => true,
+                            'UseAlertNotification'                                      => true,
+                            'UseAlarmSiren'                                             => true,
+                            'UseAlarmLight'                                             => true,
+                            'UseAlarmCall'                                              => true]);
                     }
                 }
             } else {
@@ -77,69 +98,15 @@ trait AZON_motionDetectors
     }
 
     /**
-     * Deletes all assigned door and window state variables.
-     */
-    public function DeleteAssignedMotionDetectorVariables(): void
-    {
-        $variables = [];
-        $json = json_encode($variables);
-        @IPS_SetProperty($this->InstanceID, 'MotionDetectors', $json);
-        if (@IPS_HasChanges($this->InstanceID)) {
-            @IPS_ApplyChanges($this->InstanceID);
-        }
-        echo 'Alle Bewegungsmelder wurden gelöscht!';
-    }
-
-    /**
-     * Updates the motion detectors state.
-     *
-     * @param bool $UseSignalLamp
-     * false    = don't use
-     * true     = use
-     *
-     * @param bool $UpdateAlarmZoneControlStates
-     * false    = don't use
-     * true     = use
-     */
-    private function UpdateMotionDetectorState(bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
-    {
-        $motionState = false;
-        $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'));
-        if (!empty($motionDetectors)) {
-            foreach ($motionDetectors as $motionDetector) {
-                $id = $motionDetector->ID;
-                // Check actual value and alerting value
-                $actualValue = boolval(GetValue($id));
-                $alertingValue = boolval($motionDetector->AlertingValue);
-                if ($actualValue == $alertingValue) {
-                    $motionState = true;
-                }
-            }
-        }
-
-        // Set motion detector state
-        $this->SetValue('MotionDetectorState', $motionState);
-
-        // Set signal lamp
-        if ($UseSignalLamp) {
-            $this->SetAlarmStateSignalLamp();
-        }
-
-        // Update alarm zone control states
-        if ($UpdateAlarmZoneControlStates) {
-            $this->UpdateAlarmZoneControlStates();
-        }
-    }
-
-    /**
      * Checks the alerting of a motion detector.
      *
      * @param int $SenderID
      */
     public function CheckMotionDetectorAlerting(int $SenderID): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $timeStamp = date('d.m.Y, H:i:s');
-        $objectName = $this->ReadPropertyString('ObjectName');
+        $location = $this->ReadPropertyString('Location');
         $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
         $alarmProtocol = $this->ReadPropertyInteger('AlarmProtocol');
         $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'), true);
@@ -153,26 +120,26 @@ trait AZON_motionDetectors
                 // Check alarm zone state
                 $alarmZoneState = $this->GetValue('AlarmZoneState');
                 switch ($alarmZoneState) {
-                    // 1: Armed
+                    // Armed
                     case 1:
                         // Check alerting value
                         if ($actualValue == $alertingValue) {
                             $alerting = false;
                             // Check if motion detector is activated for absence mode
-                            if ($this->GetValue('AbsenceMode')) {
-                                if ($motionDetectors[$key]['AbsenceModeActive']) {
+                            if ($this->GetValue('FullProtectionMode')) {
+                                if ($motionDetectors[$key]['FullProtectionModeActive']) {
                                     $alerting = true;
                                 }
                             }
                             // Check if motion detector is activated for presence mode
-                            if ($this->GetValue('PresenceMode')) {
-                                if ($motionDetectors[$key]['PresenceModeActive']) {
+                            if ($this->GetValue('HullProtectionMode')) {
+                                if ($motionDetectors[$key]['HullProtectionModeActive']) {
                                     $alerting = true;
                                 }
                             }
                             // Check if motion detector is activated for night mode
-                            if ($this->GetValue('NightMode')) {
-                                if ($motionDetectors[$key]['NightModeActive']) {
+                            if ($this->GetValue('PartialProtectionMode')) {
+                                if ($motionDetectors[$key]['PartialProtectionModeActive']) {
                                     $alerting = true;
                                 }
                             }
@@ -180,7 +147,7 @@ trait AZON_motionDetectors
                             if ($alerting) {
                                 $alarmState = 1;
                                 $alarmName = 'Alarm';
-                                $alertingDelayDuration = $this->ReadPropertyInteger('AlertingDelayDuration');
+                                $alertingDelayDuration = $this->ReadPropertyInteger('AlertingDelay');
                                 if ($alertingDelayDuration > 0) {
                                     $alarmState = 2;
                                     $alarmName = 'Voralarm';
@@ -188,13 +155,14 @@ trait AZON_motionDetectors
                                 }
                                 // Log
                                 $text = $detectorName . ' hat eine Bewegung erkannt und einen ' . $alarmName . ' ausgelöst. Bitte prüfen! (ID ' . $SenderID . ')';
-                                $logText = $timeStamp . ', ' . $objectName . ', ' . $alarmZoneName . ', ' . $text;
+                                $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                                 if ($alarmProtocol != 0 && @IPS_ObjectExists($alarmProtocol)) {
-                                    $scriptText = 'APRO_UpdateMessages(' . $alarmProtocol . ', "' . $logText . '", 2);';
-                                    IPS_RunScriptText($scriptText);
+                                    @APRO_UpdateMessages($alarmProtocol, $logText, 2);
                                 }
                                 // Set alarm state
                                 $this->SetValue('AlarmState', $alarmState);
+                                // Set motion detector state
+                                $this->SetValue('MotionDetectorState', true);
                                 // Set signal lamp
                                 $this->SetAlarmStateSignalLamp();
                                 // Alarm siren
@@ -214,7 +182,7 @@ trait AZON_motionDetectors
                                 }
                                 // Alarm call
                                 if ($motionDetectors[$key]['UseAlarmCall']) {
-                                    $this->ExecuteAlarmCall($detectorName);
+                                    $this->TriggerAlarmCall($detectorName);
                                 }
                             }
                         }
@@ -223,36 +191,48 @@ trait AZON_motionDetectors
                 }
             }
         }
-
         // Update motion detector state
         $this->UpdateMotionDetectorState(true, true);
     }
 
+    //#################### Private
+
     /**
-     * Displays the registered motion detectors.
+     * Updates the motion detectors state.
+     *
+     * @param bool $UseSignalLamp
+     * false    = don't use
+     * true     = use
+     *
+     * @param bool $UpdateAlarmZoneControlStates
+     * false    = don't use
+     * true     = use
      */
-    public function DisplayRegisteredMotionDetectors(): void
+    private function UpdateMotionDetectorState(bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
     {
-        $registeredMotionDetectors = [];
-        $registeredVariables = $this->GetMessageList();
-        foreach ($registeredVariables as $id => $registeredVariable) {
-            foreach ($registeredVariable as $messageType) {
-                if ($messageType == VM_UPDATE) {
-                    // Motion detectors
-                    $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'), true);
-                    if (!empty($motionDetectors)) {
-                        $key = array_search($id, array_column($motionDetectors, 'ID'));
-                        if (is_int($key)) {
-                            $name = $motionDetectors[$key]['Name'];
-                            array_push($registeredMotionDetectors, ['id' => $id, 'name' => $name]);
-                        }
-                    }
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
+        $motionState = false;
+        $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'));
+        if (!empty($motionDetectors)) {
+            foreach ($motionDetectors as $motionDetector) {
+                $id = $motionDetector->ID;
+                // Check actual value and alerting value
+                $actualValue = boolval(GetValue($id));
+                $alertingValue = boolval($motionDetector->AlertingValue);
+                if ($actualValue == $alertingValue) {
+                    $motionState = true;
                 }
             }
         }
-        sort($registeredMotionDetectors);
-
-        echo "\n\nRegistrierte Bewegungsmelder:\n\n";
-        print_r($registeredMotionDetectors);
+        // Set motion detector state
+        $this->SetValue('MotionDetectorState', $motionState);
+        // Set signal lamp
+        if ($UseSignalLamp) {
+            $this->SetAlarmStateSignalLamp();
+        }
+        // Update alarm zone control states
+        if ($UpdateAlarmZoneControlStates) {
+            $this->UpdateAlarmZoneControlStates();
+        }
     }
 }

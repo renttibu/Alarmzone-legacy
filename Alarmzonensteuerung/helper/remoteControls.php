@@ -6,12 +6,13 @@ declare(strict_types=1);
 trait AZST_remoteControls
 {
     /**
-     * Determines the pressed button of a remote control and executes the assigned action.
+     * Triggers a remote control action.
      *
      * @param int $SenderID
      */
-    public function ExecuteRemoteControlCommand(int $SenderID): void
+    public function TriggerRemoteControlAction(int $SenderID): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Remote controls
         $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'));
         if (empty($remoteControls)) {
@@ -22,94 +23,55 @@ trait AZST_remoteControls
                 $action = $remoteControl->Action;
                 $name = $remoteControl->Name;
                 switch ($action) {
-
-                    // 1: Disarm absence mode
+                    // Disarm alarm zones
+                    case 0:
+                        $this->DisarmAlarmZones($name);
+                        break;
+                    // Arm full protection  mode
                     case 1:
-                        $this->ToggleAbsenceMode(false, $name);
+                        $this->ToggleFullProtectMode(true, $name);
                         break;
 
-                    // 2: Arm absence mode
+                    // Arm hull protection mode
                     case 2:
-                        $this->ToggleAbsenceMode(true, $name);
+                        $this->ToggleHullProtectMode(true, $name);
                         break;
 
-                    // 3: Disarm presence mode
+                    // Arm partial protection mode
                     case 3:
-                        $this->TogglePresenceMode(false, $name);
+                        $this->TogglePartialProtectMode(true, $name);
                         break;
 
-                    // 4: Arm presence mode
+                    // Alarm siren off
                     case 4:
-                        $this->TogglePresenceMode(true, $name);
-                        break;
-
-                    // 5: Disarm night mode
-                    case 5:
-                        $this->ToggleNightMode(false, $name);
-                        break;
-
-                    // 6: Arm night mode
-                    case 6:
-                        $this->ToggleNightMode(true, $name);
-                        break;
-
-                    // 7: Turn alarm siren off
-                    case 7:
                         $this->ToggleAlarmSiren(false);
                         break;
 
-                    // 8: Turn alarm siren on
-                    case 8:
+                    // Alarm siren on
+                    case 5:
                         $this->ToggleAlarmSiren(true);
                         break;
 
-                    // 9: Turn alarm light off
-                    case 9:
+                    // Alarm light off
+                    case 6:
                         $this->ToggleAlarmLight(false);
                         break;
 
-                    // 10: Turn alarm light on
-                    case 10:
+                    // Alarm light on
+                    case 7:
                         $this->ToggleAlarmLight(true);
                         break;
 
-                    // 11: Script
-                    case 11:
+                    // Script
+                    case 8:
                         $scriptID = $remoteControl->ScriptID;
                         if ($scriptID != 0 && @IPS_ObjectExists($scriptID)) {
                             IPS_RunScript($scriptID);
                         }
                         break;
-                }
-            }
-        }
-    }
 
-    /**
-     * Displays the registered remote controls.
-     */
-    public function DisplayRegisteredRemoteControls(): void
-    {
-        $registeredRemoteControls = [];
-        $registeredVariables = $this->GetMessageList();
-        foreach ($registeredVariables as $id => $registeredVariable) {
-            foreach ($registeredVariable as $messageType) {
-                if ($messageType == VM_UPDATE) {
-                    // Remote Controls
-                    $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'), true);
-                    if (!empty($remoteControls)) {
-                        $key = array_search($id, array_column($remoteControls, 'ID'));
-                        if (is_int($key)) {
-                            $name = $remoteControls[$key]['Name'];
-                            $action = $remoteControls[$key]['Action'];
-                            array_push($registeredRemoteControls, ['name' => $name, 'id' => $id, 'action' => $action]);
-                        }
-                    }
                 }
             }
         }
-        sort($registeredRemoteControls);
-        echo "\n\nRegistrierte Handsender:\n\n";
-        print_r($registeredRemoteControls);
     }
 }

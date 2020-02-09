@@ -12,6 +12,7 @@ trait AZON_signalLamp
      */
     private function SetSignalLamps(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $this->SetAlarmZoneStateSignalLamp();
         $this->SetDoorWindowStateSignalLamp();
         $this->SetAlarmStateSignalLamp();
@@ -22,15 +23,14 @@ trait AZON_signalLamp
      */
     private function SetAlarmZoneStateSignalLamp(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Signal lamp
         $id = $this->ReadPropertyInteger('AlarmZoneStateSignalLamp');
         $alarmZoneState = (int) $this->GetValue('AlarmZoneState');
         $alarmState = (int) $this->GetValue('AlarmState');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            $scriptText = 'SIGL_SetSystemStateSignalLamp(' . $id . ', ' . $alarmZoneState . ', 0, 0, ' . $alarmState . ');';
-            IPS_RunScriptText($scriptText);
+            @SIGL_SetSystemStateSignalLamp($id, $alarmZoneState, 0, 0, $alarmState);
         }
-
         // Execute script
         $id = $this->ReadPropertyInteger('AlarmZoneStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {
@@ -43,16 +43,15 @@ trait AZON_signalLamp
      */
     private function SetDoorWindowStateSignalLamp(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Signal lamp
         $id = $this->ReadPropertyInteger('DoorWindowStateSignalLamp');
         $doorWindowState = (int) $this->GetValue('DoorWindowState');
         $alarmZoneState = (int) $this->GetValue('AlarmZoneState');
         $alarmState = (int) $this->GetValue('AlarmState');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            $scriptText = 'SIGL_SetDoorWindowStateSignalLamp(' . $id . ', ' . $doorWindowState . ', 0, 0, ' . $alarmZoneState . ', ' . $alarmState . ');';
-            IPS_RunScriptText($scriptText);
+            @SIGL_SetDoorWindowStateSignalLamp($id, $doorWindowState, 0, 0, $alarmZoneState, $alarmState);
         }
-
         // Execute script
         $id = $this->ReadPropertyInteger('DoorWindowStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {
@@ -65,14 +64,13 @@ trait AZON_signalLamp
      */
     private function SetAlarmStateSignalLamp(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Signal lamp
         $id = $this->ReadPropertyInteger('AlarmStateSignalLamp');
         $alarmState = (int) $this->GetValue('AlarmState');
         if ($id != 0 && IPS_ObjectExists($id)) {
-            $scriptText = 'SIGL_SetAlarmStateSignalLamp(' . $id . ', ' . $alarmState . ', 0, 0);';
-            IPS_RunScriptText($scriptText);
+            @SIGL_SetAlarmStateSignalLamp($id, $alarmState, 0, 0);
         }
-
         // Execute script
         $id = $this->ReadPropertyInteger('AlarmStateSignalLampScript');
         if ($id != 0 && @IPS_ObjectExists($id)) {

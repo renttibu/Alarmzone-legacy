@@ -16,17 +16,13 @@ trait AZST_alarmLight
      */
     public function ToggleAlarmLight(bool $State): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // State
         switch ($State) {
-            case false:
-                $status = 0;
-                break;
-
             case true:
-                if ($this->ReadPropertyInteger('AlertingDelayDuration') > 0) {
+                $status = 1;
+                if ($this->ReadPropertyInteger('AlertingDelay') > 0) {
                     $status = 2;
-                } else {
-                    $status = 1;
                 }
                 break;
 
@@ -39,8 +35,7 @@ trait AZST_alarmLight
             // Set alarm light switch
             $this->SetValue('AlarmLight', $State);
             // Toggle alarm light
-            $scriptText = 'ABEL_ToggleAlarmLight(' . $alarmLight . ', ' . (int) $State . ');';
-            IPS_RunScriptText($scriptText);
+            @ABEL_ToggleAlarmLight($alarmLight, $State);
         }
         // Alarm light script of control center
         $alarmLightScript = $this->ReadPropertyInteger('AlarmLightScript');
@@ -80,9 +75,7 @@ trait AZST_alarmLight
                     $i++;
                     // Toggle alarm light
                     if ($activeAlarmLight != 0 && @IPS_ObjectExists($activeAlarmLight)) {
-                        $scriptText = 'ABEL_ToggleAlarmLight(' . $activeAlarmLight . ', ' . (int) $State . ');';
-                        IPS_RunScriptText($scriptText);
-                        //ABEL_ToggleAlarmLight($activeAlarmLight, $State);
+                        @ABEL_ToggleAlarmLight($activeAlarmLight, $State);
                         // Execution delay for next instance
                         if ($count > 1 && $i < $count) {
                             @IPS_Sleep(500);
@@ -114,36 +107,5 @@ trait AZST_alarmLight
         }
         // Update system state
         $this->UpdateStates();
-    }
-
-    /**
-     * Displays the registered alarm light.
-     */
-    public function DisplayRegisteredAlarmLight(): void
-    {
-        $registeredAlarmLight = [];
-        $alarmLight = $this->ReadPropertyInteger('AlarmLight');
-        if ($alarmLight != 0 && @IPS_ObjectExists($alarmLight)) {
-            $alarmLightSwitch = IPS_GetObjectIDByIdent('AlarmLight', $alarmLight);
-        }
-        if (isset($alarmLightSwitch)) {
-            if ($alarmLightSwitch != 0 && IPS_ObjectExists($alarmLightSwitch)) {
-                $registeredVariables = $this->GetMessageList();
-                foreach ($registeredVariables as $id => $registeredVariable) {
-                    foreach ($registeredVariable as $messageType) {
-                        if ($messageType == VM_UPDATE) {
-                            if ($id == $alarmLightSwitch) {
-                                $alarmLightSwitchName = @IPS_GetName($alarmLightSwitch);
-                                $alarmLightID = @IPS_GetParent($alarmLightSwitch);
-                                $alarmLightName = @IPS_GetName(@IPS_GetParent($alarmLightSwitch));
-                                array_push($registeredAlarmLight, ['alarmLightSwitchID' => $alarmLightSwitch, 'alarmLightSwitchName' => $alarmLightSwitchName, 'alarmLightInstanceID' => $alarmLightID, 'alarmLightInstanceName' => $alarmLightName]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        echo "\n\nRegistrierte Alarmbeleuchtung:\n\n";
-        print_r($registeredAlarmLight);
     }
 }

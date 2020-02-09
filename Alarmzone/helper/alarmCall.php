@@ -6,53 +6,41 @@ declare(strict_types=1);
 trait AZON_alarmCall
 {
     /**
-     * Executes an alarm call.
+     * Triggers an alarm call.
      *
      * @param string $SensorName
      */
-    public function ExecuteAlarmCall(string $SensorName): void
+    public function TriggerAlarmCall(string $SensorName): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Check action
-        if ($this->ReadPropertyInteger('AlertingDelayDuration') > 0) {
-            $action = 2;
-        } else {
-            $action = 1;
+        $state = 1;
+        if ($this->ReadPropertyInteger('AlertingDelay') > 0) {
+            $state = 2;
         }
-
         // Alarm call
         $alarmCall = $this->ReadPropertyInteger('AlarmCall');
         if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
-            // Execute alarm call
-            $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, "' . $SensorName . '");';
-            IPS_RunScriptText($scriptText);
+            @AANR_ToggleAlarmCall($alarmCall, true, $SensorName);
         }
-
         // Alarm call script
         $alarmCallScript = $this->ReadPropertyInteger('AlarmCallScript');
         if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
-            // Execute script
-            IPS_RunScriptEx($alarmCallScript, ['State' => $action]);
+            IPS_RunScriptEx($alarmCallScript, ['State' => $state]);
         }
-
         // Check configuration of alarm zone control
-        $use = $this->ReadPropertyBoolean('UseAlarmZoneControlAlarmCall');
-        if ($use) {
+        if ($this->ReadPropertyBoolean('UseAlarmZoneControlAlarmCall')) {
             $alarmZoneControl = $this->ReadPropertyInteger('AlarmZoneControl');
             if ($alarmZoneControl != 0 && @IPS_ObjectExists($alarmZoneControl)) {
-
                 // Alarm call
                 $alarmCall = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmCall');
                 if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
-                    // Execute alarm call
-                    $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, "' . $SensorName . '");';
-                    IPS_RunScriptText($scriptText);
+                    @AANR_ToggleAlarmCall($alarmCall, true, $SensorName);
                 }
-
                 // Alarm call script
                 $alarmCallScript = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmCallScript');
                 if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
-                    // Execute script
-                    IPS_RunScriptEx($alarmCallScript, ['State' => $action]);
+                    IPS_RunScriptEx($alarmCallScript, ['State' => $state]);
                 }
             }
         }
@@ -65,10 +53,10 @@ trait AZON_alarmCall
      */
     private function CancelAlarmCall(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $id = $this->ReadPropertyInteger('AlarmCall');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            $scriptText = 'AANR_ToggleAlarmCall(' . $id . ', false, "");';
-            IPS_RunScriptText($scriptText);
+            @AANR_ToggleAlarmCall($id, false, '');
         }
     }
 }

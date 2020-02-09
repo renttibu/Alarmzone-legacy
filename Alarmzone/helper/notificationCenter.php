@@ -5,12 +5,17 @@ declare(strict_types=1);
 
 trait AZON_notificationCenter
 {
+    //#################### Private
+
     /**
      * Sends a notification.
      *
      * @param string $ActionText
+     *
      * @param string $MessageText
+     *
      * @param string $LogText
+     *
      * @param int $MessageType
      * 0    = Notification
      * 1    = Acknowledgement
@@ -20,14 +25,13 @@ trait AZON_notificationCenter
      */
     private function SendNotification(string $ActionText, string $MessageText, string $LogText, int $MessageType): void
     {
-        $objectName = $this->ReadPropertyString('ObjectName');
-
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
+        $location = $this->ReadPropertyString('Location');
         // Prepare push notification notification
-        $pushTitle = substr($objectName, 0, 32);
+        $pushTitle = substr($location, 0, 32);
         $pushText = "\n" . $ActionText . "\n" . $MessageText;
-
         // Prepare E-Mail notification
-        $eMailSubject = $objectName . ', ' . $ActionText;
+        $eMailSubject = $location . ', ' . $ActionText;
         $alarmProtocol = $this->ReadPropertyInteger('AlarmProtocol');
         if ($alarmProtocol != 0 && @IPS_ObjectExists($alarmProtocol)) {
             $eventMessages = IPS_GetObjectIDByIdent('EventMessages', $alarmProtocol);
@@ -41,38 +45,30 @@ trait AZON_notificationCenter
             $LogText .= "\n\n" . $eventProtocol;
         }
         $eMailText = $LogText;
-
         // Prepare SMS notification
-        $smsText = $objectName . "\n" . $ActionText . "\n" . $MessageText;
-
+        $smsText = $location . "\n" . $ActionText . "\n" . $MessageText;
         // Notification center
         $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
         if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
             // Send notification
-            $scriptText = 'BENA_SendNotification(' . $notificationCenter . ', "' . $pushTitle . '", "' . $pushText . '", "' . $eMailSubject . '", "' . $eMailText . '", "' . $smsText . '", ' . $MessageType . ');';
-            IPS_RunScriptText($scriptText);
+            @BENA_SendNotification($notificationCenter, $pushTitle, $pushText, $eMailSubject, $eMailText, $smsText, $MessageType);
         }
-
         // Notification script
         $notificationScript = $this->ReadPropertyInteger('NotificationScript');
         if ($notificationScript != 0 && @IPS_ObjectExists($notificationScript)) {
             // Execute script
             IPS_RunScriptEx($notificationScript, ['ActionText' => $ActionText, 'MessageText' => $MessageText, 'LogText' => $LogText, 'MessageType' => $MessageType]);
         }
-
         // Check configuration of alarm zone control
-        $use = $this->ReadPropertyBoolean('UseAlarmZoneControlNotificationCenter');
-        if ($use) {
+        if ($this->ReadPropertyBoolean('UseAlarmZoneControlNotificationCenter')) {
             $alarmZoneControl = $this->ReadPropertyInteger('AlarmZoneControl');
             if ($alarmZoneControl != 0 && @IPS_ObjectExists($alarmZoneControl)) {
                 // Notification center
                 $notificationCenter = (int) @IPS_GetProperty($alarmZoneControl, 'NotificationCenter');
                 if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
                     // Send notification
-                    $scriptText = 'BENA_SendNotification(' . $notificationCenter . ', "' . $pushTitle . '", "' . $pushText . '", "' . $eMailSubject . '", "' . $eMailText . '", "' . $smsText . '", ' . $MessageType . ');';
-                    IPS_RunScriptText($scriptText);
+                    @BENA_SendNotification($notificationCenter, $pushTitle, $pushText, $eMailSubject, $eMailText, $smsText, $MessageType);
                 }
-
                 // Notification script
                 $notificationScript = (int) @IPS_GetProperty($alarmZoneControl, 'NotificationScript');
                 if ($notificationScript != 0 && @IPS_ObjectExists($notificationScript)) {
@@ -88,23 +84,20 @@ trait AZON_notificationCenter
      */
     private function ConfirmAlarmNotification(): void
     {
-        // notification center
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
+        // Notification center
         $notificationCenter = $this->ReadPropertyInteger('NotificationCenter');
         if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
-            $scriptText = 'BENA_ConfirmAlarmNotification(' . $notificationCenter . ');';
-            IPS_RunScriptText($scriptText);
+            @BENA_ConfirmAlarmNotification($notificationCenter);
         }
-
         // Check configuration of alarm zone control
-        $use = $this->ReadPropertyBoolean('UseAlarmZoneControlNotificationCenter');
-        if ($use) {
+        if ($this->ReadPropertyBoolean('UseAlarmZoneControlNotificationCenter')) {
             $alarmZoneControl = $this->ReadPropertyInteger('AlarmZoneControl');
             if ($alarmZoneControl != 0 && @IPS_ObjectExists($alarmZoneControl)) {
                 // Notification center
                 $notificationCenter = (int) @IPS_GetProperty($alarmZoneControl, 'NotificationCenter');
                 if ($notificationCenter != 0 && @IPS_ObjectExists($notificationCenter)) {
-                    $scriptText = 'BENA_ConfirmAlarmNotification(' . $notificationCenter . ');';
-                    IPS_RunScriptText($scriptText);
+                    @BENA_ConfirmAlarmNotification($notificationCenter);
                 }
             }
         }

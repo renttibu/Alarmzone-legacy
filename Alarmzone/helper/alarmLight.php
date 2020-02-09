@@ -14,59 +14,47 @@ trait AZON_alarmLight
      */
     public function ToggleAlarmLight(bool $State): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Check action
         switch ($State) {
-            case false:
-                $action = 0;
-                break;
-
             case true:
-                if ($this->ReadPropertyInteger('AlertingDelayDuration') > 0) {
+                $action = 1;
+                if ($this->ReadPropertyInteger('AlertingDelay') > 0) {
                     $action = 2;
-                } else {
-                    $action = 1;
                 }
                 break;
 
             default:
                 $action = 0;
         }
-
         // Alarm light
         $alarmLight = $this->ReadPropertyInteger('AlarmLight');
         if ($alarmLight != 0 && @IPS_ObjectExists($alarmLight)) {
             // Set alarm light switch
             $this->SetValue('AlarmLight', $State);
             // Toggle alarm light
-            $scriptText = 'ABEL_ToggleAlarmLight(' . $alarmLight . ', ' . (int) $State . ');';
-            IPS_RunScriptText($scriptText);
+            @ABEL_ToggleAlarmLight($alarmLight . ', ' . $State);
         }
-
         // Alarm light script
         $alarmLightScript = $this->ReadPropertyInteger('AlarmLightScript');
         if ($alarmLightScript != 0 && IPS_ObjectExists($alarmLightScript)) {
             // Set alarm light switch
             $this->SetValue('AlarmLight', $State);
-            // Execute Script
+            // Execute script
             IPS_RunScriptEx($alarmLightScript, ['State' => $action]);
         }
-
         // Check configuration of alarm zone control
-        $use = $this->ReadPropertyBoolean('UseAlarmZoneControlAlarmLight');
-        if ($use) {
+        if ($this->ReadPropertyBoolean('UseAlarmZoneControlAlarmLight')) {
             $alarmZoneControl = $this->ReadPropertyInteger('AlarmZoneControl');
             if ($alarmZoneControl != 0 && @IPS_ObjectExists($alarmZoneControl)) {
-
                 // Alarm light
                 $alarmLight = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmLight');
                 if ($alarmLight != 0 && @IPS_ObjectExists($alarmLight)) {
                     // Set alarm light switch
                     $this->SetValue('AlarmLight', $State);
                     // Toggle alarm light
-                    $scriptText = 'ABEL_ToggleAlarmLight(' . $alarmLight . ', ' . (int) $State . ');';
-                    IPS_RunScriptText($scriptText);
+                    @ABEL_ToggleAlarmLight($alarmLight . ', ' . $State);
                 }
-
                 // Alarm light script
                 $alarmLightScript = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmLightScript');
                 if ($alarmLightScript != 0 && @IPS_ObjectExists($alarmLightScript)) {
@@ -77,37 +65,5 @@ trait AZON_alarmLight
                 }
             }
         }
-    }
-
-    /**
-     * Displays the registered alarm light.
-     */
-    public function DisplayRegisteredAlarmLight(): void
-    {
-        $registeredAlarmLight = [];
-        $alarmLight = $this->ReadPropertyInteger('AlarmLight');
-        if ($alarmLight != 0 && @IPS_ObjectExists($alarmLight)) {
-            $alarmLightSwitch = IPS_GetObjectIDByIdent('AlarmLight', $alarmLight);
-        }
-        if (isset($alarmLightSwitch)) {
-            if ($alarmLightSwitch != 0 && @IPS_ObjectExists($alarmLightSwitch)) {
-                $registeredVariables = $this->GetMessageList();
-                foreach ($registeredVariables as $id => $registeredVariable) {
-                    foreach ($registeredVariable as $messageType) {
-                        if ($messageType == VM_UPDATE) {
-                            if ($id == $alarmLightSwitch) {
-                                $alarmLightSwitchName = IPS_GetName($alarmLightSwitch);
-                                $alarmLightID = IPS_GetParent($alarmLightSwitch);
-                                $alarmLightName = IPS_GetName(IPS_GetParent($alarmLightSwitch));
-                                array_push($registeredAlarmLight, ['alarmLightSwitchID' => $alarmLightSwitch, 'alarmLightSwitchName' => $alarmLightSwitchName, 'alarmLightInstanceID' => $alarmLightID, 'alarmLightInstanceName' => $alarmLightName]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo "\n\nRegistrierte Alarmbeleuchtung:\n\n";
-        print_r($registeredAlarmLight);
     }
 }

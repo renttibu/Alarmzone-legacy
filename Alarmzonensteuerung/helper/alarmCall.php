@@ -6,34 +6,30 @@ declare(strict_types=1);
 trait AZST_alarmCall
 {
     /**
-     * Executes an alarm call.
+     * Triggers an alarm call.
      * If no alarm call and no alarm call script is defined for the control center,
      * we will use the alarm call and alarm call script of the alarm zones.
      *
      * @param string $SensorName
      */
-    public function ExecuteAlarmCall(string $SensorName): void
+    public function TriggerAlarmCall(string $SensorName): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         // Check action
-        if ($this->ReadPropertyInteger('AlertingDelayDuration') > 0) {
-            $action = 2;
-        } else {
-            $action = 1;
+        $state = 1;
+        if ($this->ReadPropertyInteger('AlertingDelay') > 0) {
+            $state = 2;
         }
-
         // Alarm call of control center
         $alarmCall = $this->ReadPropertyInteger('AlarmCall');
         if ($alarmCall != 0 && @IPS_ObjectExists($alarmCall)) {
-            $scriptText = 'AANR_ToggleAlarmCall(' . $alarmCall . ', true, "' . $SensorName . '");';
-            IPS_RunScriptText($scriptText);
+            @AANR_ToggleAlarmCall($alarmCall, true, $SensorName);
         }
-
         // Alarm call script of control center
         $alarmCallScript = $this->ReadPropertyInteger('AlarmCallScript');
         if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
-            IPS_RunScriptEx($alarmCallScript, ['State' => $action]);
+            IPS_RunScriptEx($alarmCallScript, ['State' => $state]);
         }
-
         // Alarm call and alarm call script of alarm zones
         if ($alarmCall == 0 && $alarmCallScript == 0) {
             // Alarm call of alarm zones
@@ -61,8 +57,7 @@ trait AZST_alarmCall
                 foreach ($activeAlarmCalls as $activeAlarmCall) {
                     $i++;
                     // Execute alarm call
-                    $scriptText = 'AANR_ToggleAlarmCall(' . $activeAlarmCall . ', true, "' . $SensorName . '");';
-                    IPS_RunScriptText($scriptText);
+                    @AANR_ToggleAlarmCall($alarmCall, true, $SensorName);
                     // Execution delay for next instance
                     if ($count > 1 && $i < $count) {
                         @IPS_Sleep(500);
@@ -84,7 +79,7 @@ trait AZST_alarmCall
             if (!empty($activeAlarmCallScripts)) {
                 foreach ($activeAlarmCallScripts as $activeAlarmCallScript) {
                     // Execute script
-                    IPS_RunScriptEx($activeAlarmCallScript, ['State' => $action]);
+                    IPS_RunScriptEx($activeAlarmCallScript, ['State' => $state]);
                 }
             }
         }
@@ -97,10 +92,10 @@ trait AZST_alarmCall
      */
     private function CancelAlarmCall(): void
     {
+        $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $id = $this->ReadPropertyInteger('AlarmCall');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            $scriptText = 'AANR_ToggleAlarmCall(' . $id . ', false, "");';
-            IPS_RunScriptText($scriptText);
+            @AANR_ToggleAlarmCall($id, true, '');
         }
     }
 }
