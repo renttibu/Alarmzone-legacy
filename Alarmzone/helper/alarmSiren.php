@@ -54,7 +54,6 @@ trait AZON_alarmSiren
                     $this->SetValue('AlarmSiren', $State);
                     // Toggle alarm siren
                     @ASIR_ToggleAlarmSiren($alarmSiren, $State);
-
                 }
                 // Alarm siren script
                 $alarmSirenScript = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmSirenScript');
