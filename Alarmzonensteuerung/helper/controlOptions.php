@@ -81,7 +81,9 @@ trait AZST_controlOptions
             $this->ConfirmAlarmNotification();
         }
         // Alarm light off
-        //$this->ToggleAlarmLight(false);
+        if ($this->ReadPropertyBoolean('AutomaticTurnOffAlarmLight')) {
+            $this->ToggleAlarmLight(false);
+        }
         // Cancel Alarm call
         $this->CancelAlarmCall();
         // Turn off alarm siren
@@ -289,7 +291,7 @@ trait AZST_controlOptions
             }
         }
         // Update system state
-        //$this->UpdateStates();
+        $this->UpdateStates();
         return $result;
     }
 }

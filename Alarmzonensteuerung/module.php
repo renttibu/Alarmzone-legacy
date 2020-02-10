@@ -309,6 +309,7 @@ class Alarmzonensteuerung extends IPSModule
         // Alarm light
         $this->RegisterPropertyInteger('AlarmLight', 0);
         $this->RegisterPropertyInteger('AlarmLightScript', 0);
+        $this->RegisterPropertyBoolean('AutomaticTurnOffAlarmLight', false);
 
         // Alarm call
         $this->RegisterPropertyInteger('AlarmCall', 0);

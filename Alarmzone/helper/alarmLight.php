@@ -33,7 +33,7 @@ trait AZON_alarmLight
             // Set alarm light switch
             $this->SetValue('AlarmLight', $State);
             // Toggle alarm light
-            @ABEL_ToggleAlarmLight($alarmLight . ', ' . $State);
+            @ABEL_ToggleAlarmLight($alarmLight, $State);
         }
         // Alarm light script
         $alarmLightScript = $this->ReadPropertyInteger('AlarmLightScript');
@@ -53,7 +53,7 @@ trait AZON_alarmLight
                     // Set alarm light switch
                     $this->SetValue('AlarmLight', $State);
                     // Toggle alarm light
-                    @ABEL_ToggleAlarmLight($alarmLight . ', ' . $State);
+                    @ABEL_ToggleAlarmLight($alarmLight, $State);
                 }
                 // Alarm light script
                 $alarmLightScript = (int) @IPS_GetProperty($alarmZoneControl, 'AlarmLightScript');

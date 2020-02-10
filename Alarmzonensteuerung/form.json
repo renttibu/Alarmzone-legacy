@@ -565,6 +565,15 @@
         {
           "type": "Label",
           "caption": "Wird ein Skript verwendet, so wird der Status dem Skript übergeben:\n\n$_IPS['State']\n\n0\t\t= ausschalten\n1\t\t= einschalten\n2\t\t= verzögert einschalten"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob die Alarmbeleuchtung automatisch ausgeschaltet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "AutomaticTurnOffAlarmLight",
+          "caption": "Alarmbeleuchtung automatisch ausschalten"
         }
       ]
     },

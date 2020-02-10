@@ -1081,6 +1081,15 @@
         },
         {
           "type": "Label",
+          "caption": "\nBitte wählen Sie aus, ob die Alarmbeleuchtung automatisch ausgeschaltet werden soll:"
+        },
+        {
+          "type": "CheckBox",
+          "name": "AutomaticTurnOffAlarmLight",
+          "caption": "Alarmbeleuchtung automatisch ausschalten"
+        },
+        {
+          "type": "Label",
           "caption": "\n\nBitte wählen Sie aus, ob eine übergeordnete Konfiguration der Alarmzonensteuerung verwendet werden soll:"
         },
         {

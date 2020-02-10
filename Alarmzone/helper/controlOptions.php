@@ -175,7 +175,9 @@ trait AZON_controlOptions
         // Reset blacklist
         $this->ResetBlackList();
         // Alarm light
-        //$this->ToggleAlarmLight(false);
+        if ($this->ReadPropertyBoolean('AutomaticTurnOffAlarmLight')) {
+            $this->ToggleAlarmLight(false);
+        }
         // Alarm call
         $this->CancelAlarmCall();
         // Check door and window sensors
