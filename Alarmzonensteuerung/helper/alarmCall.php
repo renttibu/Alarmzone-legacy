@@ -95,7 +95,7 @@ trait AZST_alarmCall
         $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $id = $this->ReadPropertyInteger('AlarmCall');
         if ($id != 0 && @IPS_ObjectExists($id)) {
-            @AANR_ToggleAlarmCall($id, true, '');
+            @AANR_ToggleAlarmCall($id, false, '');
         }
     }
 }
