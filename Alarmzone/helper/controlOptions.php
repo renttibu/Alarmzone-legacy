@@ -93,7 +93,8 @@ trait AZON_controlOptions
                 @APRO_UpdateMessages($alarmProtocol, $logText, 1);
             }
             // Notification
-            $actionText = $alarmZoneName . ' scharf!';
+            $unicode = json_decode('"\ud83d\udd34"'); // red_circle
+            $actionText = $unicode . ' ' . $alarmZoneName . ' scharf!';
             $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
             // Tone acknowledgement
@@ -164,7 +165,8 @@ trait AZON_controlOptions
         }
         // Notification
         if ($UseNotification) {
-            $actionText = $alarmZoneName . ' unscharf!';
+            $unicode = json_decode('"\ud83d\udfe2"'); // green_circle
+            $actionText = $unicode . ' ' . $alarmZoneName . ' unscharf!';
             $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
         }
@@ -356,6 +358,7 @@ trait AZON_controlOptions
                 $fullProtectionState = false;
                 $hullProtectionState = true;
                 $partialProtectionState = false;
+                $unicode = json_decode('"\ud83d\udfe1"'); // yellow_circle
                 break;
 
             // Partial protection mode
@@ -367,6 +370,7 @@ trait AZON_controlOptions
                 $fullProtectionState = false;
                 $hullProtectionState = false;
                 $partialProtectionState = true;
+                $unicode = json_decode('"\ud83d\udd35"'); // blue_circle
                 break;
 
             // Full protection mode
@@ -378,6 +382,7 @@ trait AZON_controlOptions
                 $fullProtectionState = true;
                 $hullProtectionState = false;
                 $partialProtectionState = false;
+                $unicode = json_decode('"\ud83d\udd34"'); // red_circle
         }
         // Set switches and states
         $this->SendDebug(__FUNCTION__, 'Switche gesetzt ' . microtime(true), 0);
@@ -411,7 +416,8 @@ trait AZON_controlOptions
                 @APRO_UpdateMessages($alarmProtocol, $logText, 0);
             }
             // Notification
-            $actionText = $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
+            $alert = json_decode('"\u274c"'); // red X
+            $actionText = $alert . ' ' . $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
             $messageText = $timeStamp . ' ' . $modeName . ' Abbruch.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
             // Disable timer
@@ -442,7 +448,8 @@ trait AZON_controlOptions
                 }
                 // Notification
                 if ($UseNotification) {
-                    $actionText = $alarmZoneName . ' verzögert scharf!';
+                    $symbol = json_decode('"\ud83d\udd57"'); // clock8
+                    $actionText = $symbol . ' ' . $alarmZoneName . ' verzögert scharf!';
                     $messageText = $timeStamp . ' ' . $modeName . ' wird verzögert aktiviert.';
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
@@ -463,7 +470,7 @@ trait AZON_controlOptions
                 }
                 // Notification
                 if ($UseNotification) {
-                    $actionText = $alarmZoneName . ' scharf!';
+                    $actionText = $unicode . ' ' . $alarmZoneName . ' scharf!';
                     $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }

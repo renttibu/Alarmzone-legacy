@@ -64,11 +64,13 @@ trait AZST_controlOptions
             $systemName = $this->ReadPropertyString('SystemName');
             $location = $this->ReadPropertyString('Location');
             if ($result) {
-                $actionText = $objectName . ' unscharf!';
+                $unicode = json_decode('"\ud83d\udfe2"'); // green_circle
+                $actionText = $unicode . ' ' . $objectName . ' unscharf!';
                 $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
-                $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' aktiviert';
+                $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' deaktiviert';
             } else {
-                $actionText = $location . ', ' . $objectName . ' Systemfehler!';
+                $unicode = json_decode('"\u26a0\ufe0f"'); // warning
+                $actionText = $unicode . ' ' . $objectName . ' Systemfehler!';
                 $messageText = $timeStamp . ' ' . $systemName . 'Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
                 $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
             }
@@ -208,18 +210,21 @@ trait AZST_controlOptions
             case 2:
                 $identName = 'HullProtectionMode';
                 $modeName = $this->ReadPropertyString('HullProtectionName');
+                $unicode = json_decode('"\ud83d\udfe1"'); // yellow_circle
                 break;
 
             // Partial protection mode
             case 3:
                 $identName = 'PartialProtectionMode';
                 $modeName = $this->ReadPropertyString('PartialProtectionName');
+                $unicode = json_decode('"\ud83d\udd35"'); // blue_circle
                 break;
 
             // Full protection mode
             default:
                 $identName = 'FullProtectionMode';
                 $modeName = $this->ReadPropertyString('FullProtectionName');
+                $unicode = json_decode('"\ud83d\udd34"'); // red_circle
 
         }
         // Set switch
@@ -273,14 +278,15 @@ trait AZST_controlOptions
         $location = $this->ReadPropertyString('Location');
         if ($result) {
             // Set text
-            $actionText = $objectName . ' scharf!';
+            $actionText = $unicode . ' ' . $objectName . ' scharf!';
             $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
             $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' aktiviert';
         } else {
             // Reset switch
             $this->SetValue($identName, false);
             // Set text
-            $actionText = $objectName . ' Systemfehler!';
+            $unicode = json_decode('"\u26a0\ufe0f"'); // warning
+            $actionText = $unicode . ' ' . $objectName . ' Systemfehler!';
             $messageText = $timeStamp . ' ' . $modeName . 'Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
             $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
         }

@@ -12,9 +12,9 @@
  * @license    	CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @version     4.00-1
- * @date        2020-01-29, 18:00, 1580313100
- * @revision    2020-01-29, 18:00
+ * @version     4.00-15
+ * @date        2020-05-15, 18:00, 1589562000
+ * @revision    2020-05-15, 18:00
  *
  * @see         https://github.com/ubittner/Alarmzone/
  *
