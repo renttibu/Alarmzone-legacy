@@ -4,9 +4,9 @@
     "name": "Alarmzone",
     "url": "https://github.com/ubittner/Alarmzone",
     "compatibility": {
-        "version": "5.2"
+        "version": "5.3"
     },
     "version": "4.0",
-    "build": 15,
-    "date": 1589562000
+    "build": 16,
+    "date": 1589994000
 }

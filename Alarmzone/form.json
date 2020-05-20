@@ -18,7 +18,7 @@
         },
         {
           "type": "Label",
-          "caption": "Symcon Version:\t5.2>"
+          "caption": "Symcon Version:\t5.3>"
         },
         {
           "type": "Label",
@@ -26,11 +26,11 @@
         },
         {
           "type": "Label",
-          "caption": "Version:\t\t\t4.00-15"
+          "caption": "Version:\t\t\t4.00-16"
         },
         {
           "type": "Label",
-          "caption": "Datum:\t\t\t15. Mai 2020"
+          "caption": "Datum:\t\t\t20. Mai 2020"
         },
         {
           "type": "Label",
@@ -117,7 +117,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmZoneControl",
-          "caption": "Alarmzonensteuerung"
+          "caption": "Alarmzonensteuerung",
+          "width": "600px"
         }
       ]
     },
@@ -132,7 +133,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmProtocol",
-          "caption": "Alarmprotokoll"
+          "caption": "Alarmprotokoll",
+          "width": "600px"
         }
       ]
     },
@@ -414,7 +416,8 @@
         {
           "type": "SelectInstance",
           "name": "ToneAcknowledgement",
-          "caption": "Quittungston"
+          "caption": "Quittungston",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -423,7 +426,8 @@
         {
           "type": "SelectScript",
           "name": "ToneAcknowlegementScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -451,7 +455,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmZoneStateSignalLamp",
-          "caption": "Signalleuchte"
+          "caption": "Signalleuchte",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -460,7 +465,8 @@
         {
           "type": "SelectScript",
           "name": "AlarmZoneStateSignalLampScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -479,7 +485,8 @@
         {
           "type": "SelectInstance",
           "name": "DoorWindowStateSignalLamp",
-          "caption": "Signalleuchte"
+          "caption": "Signalleuchte",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -488,7 +495,8 @@
         {
           "type": "SelectScript",
           "name": "DoorWindowStateSignalLampScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -507,7 +515,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmStateSignalLamp",
-          "caption": "Signalleuchte"
+          "caption": "Signalleuchte",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -516,7 +525,8 @@
         {
           "type": "SelectScript",
           "name": "AlarmStateSignalLampScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -535,7 +545,292 @@
         {
           "type": "SelectInstance",
           "name": "NotificationCenter",
-          "caption": "Benachrichtigungszentrale"
+          "caption": "Benachrichtigungszentrale",
+          "width": "600px"
+        },
+        {
+          "type": "Label",
+          "caption": "\nBitte wählen Sie die Symbole aus:"
+        },
+        {
+          "type": "Select",
+          "name": "AlarmZoneDisarmedSymbol",
+          "caption": "Alarmzone unscharf",
+          "options": [
+            {
+              "caption": "Kein Symbol",
+              "value": ""
+            },
+            {
+              "caption": "\ud83d\udd34 Rot",
+              "value": "\ud83d\udd34"
+            },
+            {
+              "caption": "\ud83d\udfe0 Orange",
+              "value": "\ud83d\udfe0"
+            },
+            {
+              "caption": "\ud83d\udfe1 Gelb",
+              "value": "\ud83d\udfe1"
+            },
+            {
+              "caption": "\ud83d\udfe2 Grün",
+              "value": "\ud83d\udfe2"
+            },
+            {
+              "caption": "\ud83d\udd35 Blau",
+              "value": "\ud83d\udd35"
+            },
+            {
+              "caption": "\ud83d\udfe3 Lila",
+              "value": "\ud83d\udfe3"
+            },
+            {
+              "caption": "\ud83d\udfe4 Braun",
+              "value": "\ud83d\udfe4"
+            },
+            {
+              "caption": "\u26ab Schwarz",
+              "value": "\u26ab"
+            },
+            {
+              "caption": "\u26aa Weiß",
+              "value": "\u26aa"
+            }
+          ]
+        },
+        {
+          "type": "Select",
+          "name": "AlarmZoneDelayedArmedSymbol",
+          "caption": "Alarmzone verzögert scharf",
+          "options": [
+            {
+              "caption": "Kein Symbol",
+              "value": ""
+            },
+            {
+              "caption": "\ud83d\udd34 Rot",
+              "value": "\ud83d\udd34"
+            },
+            {
+              "caption": "\ud83d\udfe0 Orange",
+              "value": "\ud83d\udfe0"
+            },
+            {
+              "caption": "\ud83d\udfe1 Gelb",
+              "value": "\ud83d\udfe1"
+            },
+            {
+              "caption": "\ud83d\udfe2 Grün",
+              "value": "\ud83d\udfe2"
+            },
+            {
+              "caption": "\ud83d\udd35 Blau",
+              "value": "\ud83d\udd35"
+            },
+            {
+              "caption": "\ud83d\udfe3 Lila",
+              "value": "\ud83d\udfe3"
+            },
+            {
+              "caption": "\ud83d\udfe4 Braun",
+              "value": "\ud83d\udfe4"
+            },
+            {
+              "caption": "\u26ab Schwarz",
+              "value": "\u26ab"
+            },
+            {
+              "caption": "\u26aa Weiß",
+              "value": "\u26aa"
+            },
+            {
+              "caption": "\uD83D\uDD57 Uhr",
+              "value": "\ud83d\udd57"
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "Select",
+              "name": "FullProtectionModeArmedSymbol",
+              "caption": "Vollschutz scharf",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\ud83d\udd34 Rot",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\ud83d\udfe0 Orange",
+                  "value": "\ud83d\udfe0"
+                },
+                {
+                  "caption": "\ud83d\udfe1 Gelb",
+                  "value": "\ud83d\udfe1"
+                },
+                {
+                  "caption": "\ud83d\udfe2 Grün",
+                  "value": "\ud83d\udfe2"
+                },
+                {
+                  "caption": "\ud83d\udd35 Blau",
+                  "value": "\ud83d\udd35"
+                },
+                {
+                  "caption": "\ud83d\udfe3 Lila",
+                  "value": "\ud83d\udfe3"
+                },
+                {
+                  "caption": "\ud83d\udfe4 Braun",
+                  "value": "\ud83d\udfe4"
+                },
+                {
+                  "caption": "\u26ab Schwarz",
+                  "value": "\u26ab"
+                },
+                {
+                  "caption": "\u26aa Weiß",
+                  "value": "\u26aa"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "caption": " "
+            },
+            {
+              "type": "Select",
+              "name": "HullProtectionModeArmedSymbol",
+              "caption": "Hüllschutz scharf",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\ud83d\udd34 Rot",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\ud83d\udfe0 Orange",
+                  "value": "\ud83d\udfe0"
+                },
+                {
+                  "caption": "\ud83d\udfe1 Gelb",
+                  "value": "\ud83d\udfe1"
+                },
+                {
+                  "caption": "\ud83d\udfe2 Grün",
+                  "value": "\ud83d\udfe2"
+                },
+                {
+                  "caption": "\ud83d\udd35 Blau",
+                  "value": "\ud83d\udd35"
+                },
+                {
+                  "caption": "\ud83d\udfe3 Lila",
+                  "value": "\ud83d\udfe3"
+                },
+                {
+                  "caption": "\ud83d\udfe4 Braun",
+                  "value": "\ud83d\udfe4"
+                },
+                {
+                  "caption": "\u26ab Schwarz",
+                  "value": "\u26ab"
+                },
+                {
+                  "caption": "\u26aa Weiß",
+                  "value": "\u26aa"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "caption": " "
+            },
+            {
+              "type": "Select",
+              "name": "PartialProtectionModeArmedSymbol",
+              "caption": "Teilschutz scharf",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\ud83d\udd34 Rot",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\ud83d\udfe0 Orange",
+                  "value": "\ud83d\udfe0"
+                },
+                {
+                  "caption": "\ud83d\udfe1 Gelb",
+                  "value": "\ud83d\udfe1"
+                },
+                {
+                  "caption": "\ud83d\udfe2 Grün",
+                  "value": "\ud83d\udfe2"
+                },
+                {
+                  "caption": "\ud83d\udd35 Blau",
+                  "value": "\ud83d\udd35"
+                },
+                {
+                  "caption": "\ud83d\udfe3 Lila",
+                  "value": "\ud83d\udfe3"
+                },
+                {
+                  "caption": "\ud83d\udfe4 Braun",
+                  "value": "\ud83d\udfe4"
+                },
+                {
+                  "caption": "\u26ab Schwarz",
+                  "value": "\u26ab"
+                },
+                {
+                  "caption": "\u26aa Weiß",
+                  "value": "\u26aa"
+                },
+                {
+                  "caption": "\ud83c\udf19 Mond",
+                  "value": "\uD83C\uDF19"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "Select",
+              "name": "AlarmZoneSystemFailure",
+              "caption": "Systemfehler",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\u26a0\ufe0f Warnung",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\u2757 Ausrufezeichen",
+                  "value": "\u2757"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "Label",
@@ -544,7 +839,8 @@
         {
           "type": "SelectScript",
           "name": "NotificationScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1027,7 +1323,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmSiren",
-          "caption": "Alarmsirene"
+          "caption": "Alarmsirene",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1036,7 +1333,8 @@
         {
           "type": "SelectScript",
           "name": "AlarmSirenScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1064,7 +1362,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmLight",
-          "caption": "Alarmbeleuchtung"
+          "caption": "Alarmbeleuchtung",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1073,7 +1372,8 @@
         {
           "type": "SelectScript",
           "name": "AlarmLightScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1110,7 +1410,8 @@
         {
           "type": "SelectInstance",
           "name": "AlarmCall",
-          "caption": "Alarmanruf"
+          "caption": "Alarmanruf",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1119,7 +1420,8 @@
         {
           "type": "SelectScript",
           "name": "AlarmCallScript",
-          "caption": "Skript"
+          "caption": "Skript",
+          "width": "600px"
         },
         {
           "type": "Label",
@@ -1135,6 +1437,68 @@
           "caption": "Übergeordnete Konfiguration verwenden"
         }
       ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "ExpansionPanel",
+      "caption": "Konfiguration",
+      "items": [
+        {
+          "type": "Button",
+          "caption": "Neu einlesen",
+          "onClick": "AZON_ReloadConfiguration($id);"
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "SelectCategory",
+              "name": "BackupCategory",
+              "caption": "Kategorie",
+              "width": "600px"
+            },
+            {
+              "type": "Label",
+              "caption": " "
+            },
+            {
+              "type": "Button",
+              "caption": "Sichern",
+              "onClick": "AZON_CreateBackup($id, $BackupCategory);"
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "SelectScript",
+              "name": "ConfigurationScript",
+              "caption": "Konfigurationsskript",
+              "width": "600px"
+            },
+            {
+              "type": "Label",
+              "caption": " "
+            },
+            {
+              "type": "PopupButton",
+              "caption": "Wiederherstellen",
+              "popup": {
+                "caption": "Konfiguration wirklich wiederherstellen?",
+                "items": [
+                  {
+                    "type": "Button",
+                    "caption": "Wiederherstellen",
+                    "onClick": "AZON_RestoreConfiguration($id, $ConfigurationScript);"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "ExpansionPanel",
@@ -1146,49 +1510,36 @@
           "caption": "Registrierte Nachrichten",
           "rowCount": 10,
           "sort": {
-            "column": "MessageDescription",
+            "column": "Description",
             "direction": "ascending"
           },
           "columns": [
             {
+              "name": "Description",
               "caption": "Bezeichnung",
-              "name": "ParentName",
               "width": "350px"
             },
             {
-              "caption": "Sender ID",
               "name": "SenderID",
-              "width": "150px"
+              "caption": "Sender ID",
+              "width": "110px"
             },
             {
-              "caption": "Sender Name",
               "name": "SenderName",
+              "caption": "Sender Name",
               "width": "250px"
             },
             {
-              "caption": "Nachrichten ID",
               "name": "MessageID",
-              "width": "150px"
+              "caption": "Nachrichten ID",
+              "width": "140px"
             },
             {
-              "caption": "Nachrichten Bezeichnung",
               "name": "MessageDescription",
-              "width": "250px"
+              "caption": "Nachrichten Bezeichnung",
+              "width": "220px"
             }
           ]
-        }
-      ]
-    }
-  ],
-  "actions": [
-    {
-      "type": "ExpansionPanel",
-      "caption": "Konfiguration",
-      "items": [
-        {
-          "type": "Button",
-          "caption": "Konfiguration neu einlesen",
-          "onClick": "AZON_ReloadConfiguration($id);"
         }
       ]
     },
@@ -1286,7 +1637,7 @@
     },
     {
       "type": "ExpansionPanel",
-      "caption": "Testzentrum",
+      "caption": "Testbereich",
       "items": [
         {
           "type": "TestCenter"

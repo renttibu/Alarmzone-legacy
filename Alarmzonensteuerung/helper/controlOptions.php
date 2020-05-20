@@ -64,13 +64,21 @@ trait AZST_controlOptions
             $systemName = $this->ReadPropertyString('SystemName');
             $location = $this->ReadPropertyString('Location');
             if ($result) {
-                $unicode = json_decode('"\ud83d\udfe2"'); // green_circle
-                $actionText = $unicode . ' ' . $objectName . ' unscharf!';
+                $disarmedSymbol = $this->ReadPropertyString('AlarmZonesDisarmedSymbol');
+                if (!empty($disarmedSymbol)) {
+                    $actionText = $disarmedSymbol . ' ' . $objectName . ' unscharf!';
+                } else {
+                    $actionText = $objectName . ' unscharf!';
+                }
                 $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
                 $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' deaktiviert';
             } else {
-                $unicode = json_decode('"\u26a0\ufe0f"'); // warning
-                $actionText = $unicode . ' ' . $objectName . ' Systemfehler!';
+                $failureSymbol = $this->ReadPropertyString('AlarmZonesSystemFailure');
+                if (!empty($failureSymbol)) {
+                    $actionText = $failureSymbol . ' ' . $objectName . ' Systemfehler!';
+                } else {
+                    $actionText = $objectName . ' Systemfehler!';
+                }
                 $messageText = $timeStamp . ' ' . $systemName . 'Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
                 $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen deaktiviert werden, bitte prüfen!';
             }
@@ -210,21 +218,21 @@ trait AZST_controlOptions
             case 2:
                 $identName = 'HullProtectionMode';
                 $modeName = $this->ReadPropertyString('HullProtectionName');
-                $unicode = json_decode('"\ud83d\udfe1"'); // yellow_circle
+                $symbol = $this->ReadPropertyString('HullProtectionModeArmedSymbol');
                 break;
 
             // Partial protection mode
             case 3:
                 $identName = 'PartialProtectionMode';
                 $modeName = $this->ReadPropertyString('PartialProtectionName');
-                $unicode = json_decode('"\ud83d\udd35"'); // blue_circle
+                $symbol = $this->ReadPropertyString('PartialProtectionModeArmedSymbol');
                 break;
 
             // Full protection mode
             default:
                 $identName = 'FullProtectionMode';
                 $modeName = $this->ReadPropertyString('FullProtectionName');
-                $unicode = json_decode('"\ud83d\udd34"'); // red_circle
+                $symbol = $this->ReadPropertyString('FullProtectionModeArmedSymbol');
 
         }
         // Set switch
@@ -278,15 +286,23 @@ trait AZST_controlOptions
         $location = $this->ReadPropertyString('Location');
         if ($result) {
             // Set text
-            $actionText = $unicode . ' ' . $objectName . ' scharf!';
+            if (!empty($symbol)) {
+                $actionText = $symbol . ' ' . $objectName . ' scharf!';
+            } else {
+                $actionText = $objectName . ' scharf!';
+            }
             $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
             $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ' aktiviert';
         } else {
             // Reset switch
             $this->SetValue($identName, false);
             // Set text
-            $unicode = json_decode('"\u26a0\ufe0f"'); // warning
-            $actionText = $unicode . ' ' . $objectName . ' Systemfehler!';
+            $failureSymbol = $this->ReadPropertyString('AlarmZonesSystemFailure');
+            if (!empty($failureSymbol)) {
+                $actionText = $failureSymbol . ' ' . $objectName . ' Systemfehler!';
+            } else {
+                $actionText = $objectName . ' Systemfehler!';
+            }
             $messageText = $timeStamp . ' ' . $modeName . 'Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
             $logText = $timeStamp . ', ' . $location . ', ' . $objectName . ', ' . $systemName . ': Es konnten nicht alle Alarmzonen aktiviert werden, bitte prüfen!';
         }

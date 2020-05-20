@@ -12,9 +12,9 @@
  * @license    	CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @version     4.00-15
- * @date        2020-05-15, 18:00, 1589562000
- * @review      2020-01-15, 18:00
+ * @version     4.00-16
+ * @date        2020-05-20, 18:00, 1589994000
+ * @review      2020-01-20, 18:00
  *
  * @see         https://github.com/ubittner/Alarmzone
  *
@@ -44,6 +44,7 @@ class Alarmzonensteuerung extends IPSModule
     use AZST_alarmSiren;
     use AZST_alarmLight;
     use AZST_alarmCall;
+    use AZST_backupRestore;
 
     // Constants
     private const ALARMZONECONTROL_MODULE_GUID = '{E70D37CB-7732-9CC5-B29E-EC567D841B0C}';
@@ -181,15 +182,22 @@ class Alarmzonensteuerung extends IPSModule
 
     public function GetConfigurationForm()
     {
-        $formdata = json_decode(file_get_contents(__DIR__ . '/form.json'));
+        $formData = json_decode(file_get_contents(__DIR__ . '/form.json'));
         // Registered messages
         $registeredVariables = $this->GetMessageList();
         foreach ($registeredVariables as $senderID => $messageID) {
-            $senderName = IPS_GetName($senderID);
-            $parentName = $senderName;
-            $parentID = IPS_GetParent($senderID);
-            if (is_int($parentID) && $parentID != 0 && @IPS_ObjectExists($parentID)) {
-                $parentName = IPS_GetName($parentID);
+            if (!IPS_ObjectExists($senderID)) {
+                foreach ($messageID as $messageType) {
+                    $this->UnregisterMessage($senderID, $messageType);
+                }
+                continue;
+            } else {
+                $senderName = IPS_GetName($senderID);
+                $description = $senderName;
+                $parentID = IPS_GetParent($senderID);
+                if (is_int($parentID) && $parentID != 0 && @IPS_ObjectExists($parentID)) {
+                    $description = IPS_GetName($parentID);
+                }
             }
             switch ($messageID) {
                 case [10001]:
@@ -200,17 +208,26 @@ class Alarmzonensteuerung extends IPSModule
                     $messageDescription = 'VM_UPDATE';
                     break;
 
+                case [10803]:
+                    $messageDescription = 'EM_UPDATE';
+                    break;
+
                 default:
                     $messageDescription = 'keine Bezeichnung';
             }
-            $formdata->elements[17]->items[0]->values[] = [
-                'ParentName'                                            => $parentName,
-                'SenderID'                                              => $senderID,
-                'SenderName'                                            => $senderName,
-                'MessageID'                                             => $messageID,
-                'MessageDescription'                                    => $messageDescription];
+            $formData->actions[1]->items[0]->values[] = [
+                'Description'        => $description,
+                'SenderID'           => $senderID,
+                'SenderName'         => $senderName,
+                'MessageID'          => $messageID,
+                'MessageDescription' => $messageDescription];
         }
-        return json_encode($formdata);
+        return json_encode($formData);
+    }
+
+    public function ReloadConfiguration()
+    {
+        $this->ReloadForm();
     }
 
     //#################### Request Action
@@ -297,9 +314,14 @@ class Alarmzonensteuerung extends IPSModule
 
         // Notification
         $this->RegisterPropertyInteger('NotificationCenter', 0);
+        $this->RegisterPropertyString('AlarmZonesDisarmedSymbol', json_decode('"\ud83d\udfe2"'));
+        $this->RegisterPropertyString('FullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
+        $this->RegisterPropertyString('HullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
+        $this->RegisterPropertyString('PartialProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
+        $this->RegisterPropertyString('AlarmZonesSystemFailure', json_decode('"\ud83d\udd34"'));
         $this->RegisterPropertyInteger('NotificationScript', 0);
 
-        /// Alerting delay
+        // Alerting delay
         $this->RegisterPropertyInteger('AlertingDelay', 0);
 
         // Alarm siren

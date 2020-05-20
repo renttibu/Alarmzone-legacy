@@ -74,14 +74,17 @@ trait AZON_controlOptions
             $modeName = $this->ReadPropertyString('AlarmZoneName');
             if ($this->GetValue('FullProtectionMode')) {
                 $modeName = $this->ReadPropertyString('FullProtectionName');
+                $armedSymbol = $this->ReadPropertyString('FullProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('FullProtectionMode') . ')';
             }
             if ($this->GetValue('HullProtectionMode')) {
                 $modeName = $this->ReadPropertyString('HullProtectionName');
+                $armedSymbol = $this->ReadPropertyString('HullProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('HullProtectionMode') . ')';
             }
             if ($this->GetValue('PartialProtectionMode')) {
                 $modeName = $this->ReadPropertyString('PartialProtectionName');
+                $armedSymbol = $this->ReadPropertyString('PartialProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('PartialProtectionMode') . ')';
             }
             // Log
@@ -93,8 +96,11 @@ trait AZON_controlOptions
                 @APRO_UpdateMessages($alarmProtocol, $logText, 1);
             }
             // Notification
-            $unicode = json_decode('"\ud83d\udd34"'); // red_circle
-            $actionText = $unicode . ' ' . $alarmZoneName . ' scharf!';
+            if (!empty($armedSymbol)) {
+                $actionText = $armedSymbol . ' ' . $alarmZoneName . ' scharf!';
+            } else {
+                $actionText = $alarmZoneName . ' scharf!';
+            }
             $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
             // Tone acknowledgement
@@ -165,8 +171,12 @@ trait AZON_controlOptions
         }
         // Notification
         if ($UseNotification) {
-            $unicode = json_decode('"\ud83d\udfe2"'); // green_circle
-            $actionText = $unicode . ' ' . $alarmZoneName . ' unscharf!';
+            $disarmedSymbol = $this->ReadPropertyString('AlarmZoneDisarmedSymbol');
+            if (!empty($disarmedSymbol)) {
+                $actionText = $disarmedSymbol . ' ' . $alarmZoneName . ' unscharf!';
+            } else {
+                $actionText = $alarmZoneName . ' unscharf!';
+            }
             $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
         }
@@ -358,7 +368,7 @@ trait AZON_controlOptions
                 $fullProtectionState = false;
                 $hullProtectionState = true;
                 $partialProtectionState = false;
-                $unicode = json_decode('"\ud83d\udfe1"'); // yellow_circle
+                $armedSymbol = $this->ReadPropertyString('HullProtectionModeArmedSymbol');
                 break;
 
             // Partial protection mode
@@ -370,7 +380,7 @@ trait AZON_controlOptions
                 $fullProtectionState = false;
                 $hullProtectionState = false;
                 $partialProtectionState = true;
-                $unicode = json_decode('"\ud83d\udd35"'); // blue_circle
+                $armedSymbol = $this->ReadPropertyString('PartialProtectionModeArmedSymbol');
                 break;
 
             // Full protection mode
@@ -382,7 +392,7 @@ trait AZON_controlOptions
                 $fullProtectionState = true;
                 $hullProtectionState = false;
                 $partialProtectionState = false;
-                $unicode = json_decode('"\ud83d\udd34"'); // red_circle
+                $armedSymbol = $this->ReadPropertyString('FullProtectionModeArmedSymbol');
         }
         // Set switches and states
         $this->SendDebug(__FUNCTION__, 'Switche gesetzt ' . microtime(true), 0);
@@ -416,8 +426,12 @@ trait AZON_controlOptions
                 @APRO_UpdateMessages($alarmProtocol, $logText, 0);
             }
             // Notification
-            $alert = json_decode('"\u274c"'); // red X
-            $actionText = $alert . ' ' . $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
+            $failureSymbol = $this->ReadPropertyString('AlarmZoneSystemFailure');
+            if (!empty($failureSymbol)) {
+                $actionText = $failureSymbol . ' ' . $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
+            } else {
+                $actionText = $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
+            }
             $messageText = $timeStamp . ' ' . $modeName . ' Abbruch.';
             $this->SendNotification($actionText, $messageText, $logText, 1);
             // Disable timer
@@ -448,8 +462,12 @@ trait AZON_controlOptions
                 }
                 // Notification
                 if ($UseNotification) {
-                    $symbol = json_decode('"\ud83d\udd57"'); // clock8
-                    $actionText = $symbol . ' ' . $alarmZoneName . ' verzögert scharf!';
+                    $delayedArmedSymbol = $this->ReadPropertyString('AlarmZoneDelayedArmedSymbol');
+                    if (!empty($delayedArmedSymbol)) {
+                        $actionText = $delayedArmedSymbol . ' ' . $alarmZoneName . ' verzögert scharf!';
+                    } else {
+                        $actionText = $alarmZoneName . ' verzögert scharf!';
+                    }
                     $messageText = $timeStamp . ' ' . $modeName . ' wird verzögert aktiviert.';
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
@@ -470,7 +488,11 @@ trait AZON_controlOptions
                 }
                 // Notification
                 if ($UseNotification) {
-                    $actionText = $unicode . ' ' . $alarmZoneName . ' scharf!';
+                    if (!empty($armedSymbol)) {
+                        $actionText = $armedSymbol . ' ' . $alarmZoneName . ' scharf!';
+                    } else {
+                        $actionText = $alarmZoneName . ' scharf!';
+                    }
                     $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
                     $this->SendNotification($actionText, $messageText, $logText, 1);
                 }
