@@ -28,7 +28,7 @@ trait AZST_alarmCall
         // Alarm call script of control center
         $alarmCallScript = $this->ReadPropertyInteger('AlarmCallScript');
         if ($alarmCallScript != 0 && @IPS_ObjectExists($alarmCallScript)) {
-            IPS_RunScriptEx($alarmCallScript, ['State' => $state]);
+            IPS_RunScriptEx($alarmCallScript, ['State' => $state, 'SensorName' => $SensorName]);
         }
         // Alarm call and alarm call script of alarm zones
         if ($alarmCall == 0 && $alarmCallScript == 0) {
@@ -79,7 +79,7 @@ trait AZST_alarmCall
             if (!empty($activeAlarmCallScripts)) {
                 foreach ($activeAlarmCallScripts as $activeAlarmCallScript) {
                     // Execute script
-                    IPS_RunScriptEx($activeAlarmCallScript, ['State' => $state]);
+                    IPS_RunScriptEx($activeAlarmCallScript, ['State' => $state, 'SensorName' => $SensorName]);
                 }
             }
         }
