@@ -1,11 +1,12 @@
 <?php
 
-// Declare
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_signalLamp
 {
-    //#################### Private
+    #################### Private
 
     /**
      * Sets the signal lamp for system state, door and window state, alarm state.

@@ -1,11 +1,13 @@
 <?php
 
-// Declare
+/** @noinspection PhpUnused */
+/** @noinspection DuplicatedCode */
+
 declare(strict_types=1);
 
 trait AZON_backupRestore
 {
-    //#################### Backup
+    #################### Backup
 
     /**
      * Creates a backup of the actual configuration into a script.
@@ -28,7 +30,7 @@ trait AZON_backupRestore
         }
     }
 
-    //#################### Restore
+    #################### Restore
 
     /**
      * Restores a configuration form selected script.

@@ -1,6 +1,9 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_doorWindowSensors
@@ -12,7 +15,7 @@ trait AZON_doorWindowSensors
     {
         $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $listedVariables = [];
-        $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_MODULE_GUID);
+        $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_DEVICE_GUID);
         if (!empty($instanceIDs)) {
             $variables = [];
             foreach ($instanceIDs as $instanceID) {
@@ -99,6 +102,7 @@ trait AZON_doorWindowSensors
      * Checks the alerting of a door and window sensor.
      *
      * @param int $SenderID
+     * @throws Exception
      */
     public function CheckDoorWindowSensorAlerting(int $SenderID): void
     {
@@ -239,7 +243,7 @@ trait AZON_doorWindowSensors
         $this->UpdateDoorWindowState($useNotification, true, true);
     }
 
-    //##################### Blacklist
+    ##################### Blacklist
 
     /**
      * Resets the blacklist.
@@ -250,7 +254,7 @@ trait AZON_doorWindowSensors
         $this->SetBuffer('BlackList', json_encode([]));
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Updates the door and window state.
@@ -266,6 +270,7 @@ trait AZON_doorWindowSensors
      * @param bool $UpdateAlarmZoneControlStates
      * false    = don't use
      * true     = use
+     * @throws Exception
      */
     private function UpdateDoorWindowState(bool $UseNotification, bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
     {

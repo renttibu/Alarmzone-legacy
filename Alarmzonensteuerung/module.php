@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+
 /*
  * @module      Alarmzonensteuerung
  *
@@ -12,21 +15,16 @@
  * @license    	CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @version     4.00-17
- * @date        2020-05-20, 18:00, 1589994000
- * @review      2020-01-20, 18:00
- *
  * @see         https://github.com/ubittner/Alarmzone
  *
  * @guids       Library
- *              {D8971C8D-B954-2A55-EA5D-F56FD46ACEF4}
+ *              {8464371D-1C4E-B070-9884-82DB73545FFA}
  *
  *              Alarmzonensteuerung
  *             	{E70D37CB-7732-9CC5-B29E-EC567D841B0C}
  *
  */
 
-// Declare
 declare(strict_types=1);
 
 // Include
@@ -47,28 +45,31 @@ class Alarmzonensteuerung extends IPSModule
     use AZST_backupRestore;
 
     // Constants
-    private const ALARMZONECONTROL_MODULE_GUID = '{E70D37CB-7732-9CC5-B29E-EC567D841B0C}';
+    private const ALARMZONE_LIBRARY_GUID = '{8464371D-1C4E-B070-9884-82DB73545FFA}';
     private const ALARMZONE_MODULE_GUID = '{6695A2B2-F5F7-321D-B8FE-CB5846837748}';
-    private const ALARMPROTOCOL_MODULE_GUID = '{BC752980-2D17-67B6-9B91-0B4113EECD83}';
-    private const TONEACKNOWLEDGEMENT_MODULE_GUID = '{DAC7CF88-0A1E-23C2-9DB2-0C249364A831}';
-    private const SIGNALLAMP_MODULE_GUID = '{CF6B75A5-C573-7030-0D75-2F50A8A42B73}';
-    private const NOTIFICATIONCENTER_MODULE_GUID = '{D184C522-507F-BED6-6731-728CE156D659}';
-    private const ALARMSIREN_MODULE_GUID = '{118660A6-0784-4AD9-81D3-218BD03B1FF5}';
-    private const ALARMLIGHT_MODULE_GUID = '{9C804D2B-54AF-690E-EC36-31BF41690EBA}';
-    private const ALARMCALL_MODULE_GUID = '{8BB803E5-876D-B342-5CAE-A6A9A0928B61}';
+    private const ALARMZONENSTEUERUNG_MODULE_GUID = '{E70D37CB-7732-9CC5-B29E-EC567D841B0C}';
+    private const ALARMPROTOKOLL_MODULE_GUID = '{BC752980-2D17-67B6-9B91-0B4113EECD83}';
+    private const QUITTUNGSTON_MODULE_GUID = '{DAC7CF88-0A1E-23C2-9DB2-0C249364A831}';
+    private const SIGNALLEUCHTE_MODULE_GUID = '{CF6B75A5-C573-7030-0D75-2F50A8A42B73}';
+    private const BENACHRICHTIGUNGSZENTRALE_MODULE_GUID = '{D184C522-507F-BED6-6731-728CE156D659}';
+    private const ALARMSIRENE_MODULE_GUID = '{118660A6-0784-4AD9-81D3-218BD03B1FF5}';
+    private const ALARMBELEUCHTUNG_MODULE_GUID = '{9C804D2B-54AF-690E-EC36-31BF41690EBA}';
+    private const ALARMANRUF_MODULE_GUID = '{8BB803E5-876D-B342-5CAE-A6A9A0928B61}';
+    private const HOMEMATIC_DEVICE_GUID = '{EE4A81C6-5C90-4DB7-AD2F-F6BBD521412E}';
+
+    public function Destroy()
+    {
+        // Never delete this line!
+        parent::Destroy();
+        $this->DeleteProfiles();
+    }
 
     public function Create()
     {
         // Never delete this line!
         parent::Create();
-
-        // Register properties
         $this->RegisterProperties();
-
-        // Create profiles
         $this->CreateProfiles();
-
-        // Register variables
         $this->RegisterVariables();
     }
 
@@ -76,26 +77,17 @@ class Alarmzonensteuerung extends IPSModule
     {
         // Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
-
         // Never delete this line!
         parent::ApplyChanges();
-
         // Check runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
-
-        // Set options
         $this->SetOptions();
-
-        // Register messages
         $this->RegisterMessages();
-
-        // Update state
         $this->UpdateStates();
-
-        // Validate configuration
         $this->ValidateConfiguration();
+        $this->CheckMaintenanceMode();
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -105,12 +97,20 @@ class Alarmzonensteuerung extends IPSModule
         // $Data[1] = value changed
         // $Data[2] = last value
         $this->SendDebug('MessageSink', 'Message from SenderID ' . $SenderID . ' with Message ' . $Message . "\r\n Data: " . print_r($Data, true), 0);
+        if (!empty($Data)) {
+            foreach ($Data as $key => $value) {
+                $this->SendDebug(__FUNCTION__, 'Data[' . $key . '] = ' . json_encode($value), 0);
+            }
+        }
         switch ($Message) {
             case IPS_KERNELSTARTED:
                 $this->KernelReady();
                 break;
 
             case VM_UPDATE:
+                if ($this->CheckMaintenanceMode()) {
+                    return;
+                }
                 // Remote controls
                 $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'), true);
                 if (!empty($remoteControls)) {
@@ -166,23 +166,24 @@ class Alarmzonensteuerung extends IPSModule
         }
     }
 
-    protected function KernelReady()
-    {
-        $this->ApplyChanges();
-    }
-
-    public function Destroy()
-    {
-        // Never delete this line!
-        parent::Destroy();
-
-        // Delete profiles
-        $this->DeleteProfiles();
-    }
-
     public function GetConfigurationForm()
     {
-        $formData = json_decode(file_get_contents(__DIR__ . '/form.json'));
+        $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $moduleInfo = [];
+        $library = IPS_GetLibrary(self::ALARMZONE_LIBRARY_GUID);
+        $module = IPS_GetModule(self::ALARMZONENSTEUERUNG_MODULE_GUID);
+        $moduleInfo['name'] = $module['ModuleName'];
+        $moduleInfo['version'] = $library['Version'] . '-' . $library['Build'];
+        $moduleInfo['date'] = date('d.m.Y', $library['Date']);
+        $moduleInfo['time'] = date('H:i', $library['Date']);
+        $moduleInfo['developer'] = $library['Author'];
+        $formData['elements'][0]['items'][2]['caption'] = "Instanz ID:\t\t" . $this->InstanceID;
+        $formData['elements'][0]['items'][3]['caption'] = "Modul:\t\t\t" . $moduleInfo['name'];
+        $formData['elements'][0]['items'][4]['caption'] = "Version:\t\t\t" . $moduleInfo['version'];
+        $formData['elements'][0]['items'][5]['caption'] = "Datum:\t\t\t" . $moduleInfo['date'];
+        $formData['elements'][0]['items'][6]['caption'] = "Uhrzeit:\t\t\t" . $moduleInfo['time'];
+        $formData['elements'][0]['items'][7]['caption'] = "Entwickler:\t\t" . $moduleInfo['developer'];
+        $formData['elements'][0]['items'][8]['caption'] = "Präfix:\t\t\tAZST";
         // Registered messages
         $registeredVariables = $this->GetMessageList();
         foreach ($registeredVariables as $senderID => $messageID) {
@@ -215,7 +216,7 @@ class Alarmzonensteuerung extends IPSModule
                 default:
                     $messageDescription = 'keine Bezeichnung';
             }
-            $formData->actions[1]->items[0]->values[] = [
+            $formData['actions'][1]['items'][0]['values'][] = [
                 'Description'        => $description,
                 'SenderID'           => $senderID,
                 'SenderName'         => $senderName,
@@ -230,7 +231,7 @@ class Alarmzonensteuerung extends IPSModule
         $this->ReloadForm();
     }
 
-    //#################### Request Action
+    #################### Request Action
 
     public function RequestAction($Ident, $Value)
     {
@@ -260,10 +261,17 @@ class Alarmzonensteuerung extends IPSModule
         }
     }
 
-    //#################### Private
+    #################### Private
+
+    private function KernelReady()
+    {
+        $this->ApplyChanges();
+    }
 
     private function RegisterProperties(): void
     {
+        $this->RegisterPropertyString('Note', '');
+        $this->RegisterPropertyBoolean('MaintenanceMode', false);
         // Descriptions
         $this->RegisterPropertyString('SystemName', 'Alarmanlage');
         $this->RegisterPropertyString('Location', '');
@@ -271,24 +279,19 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyString('FullProtectionName', 'Vollschutz');
         $this->RegisterPropertyString('HullProtectionName', 'Hüllschutz');
         $this->RegisterPropertyString('PartialProtectionName', 'Teilschutz');
-
         // Alarm zones
         $this->RegisterPropertyString('AlarmZones', '[]');
-
         // Alarm protocol
         $this->RegisterPropertyInteger('AlarmProtocol', 0);
-
         // Information options
         $this->RegisterPropertyBoolean('EnableLocation', true);
         $this->RegisterPropertyBoolean('EnableObjectName', true);
-
         // Control options
         $this->RegisterPropertyBoolean('EnableFullProtectionMode', true);
         $this->RegisterPropertyBoolean('EnableHullProtectionMode', false);
         $this->RegisterPropertyBoolean('EnablePartialProtectionMode', false);
         $this->RegisterPropertyBoolean('EnableAlarmSiren', false);
         $this->RegisterPropertyBoolean('EnableAlarmLight', false);
-
         // State visibility
         $this->RegisterPropertyBoolean('EnableSystemState', true);
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
@@ -296,14 +299,11 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', false);
         $this->RegisterPropertyBoolean('EnableSmokeDetectorState', false);
         $this->RegisterPropertyBoolean('EnableWaterSensorState', false);
-
         // Remote controls
         $this->RegisterPropertyString('RemoteControls', '[]');
-
         // Tone acknowledgement
         $this->RegisterPropertyInteger('ToneAcknowledgement', 0);
         $this->RegisterPropertyInteger('ToneAcknowledgementScript', 0);
-
         // Signal lamp
         $this->RegisterPropertyInteger('SystemStateSignalLamp', 0);
         $this->RegisterPropertyInteger('SystemStateSignalLampScript', 0);
@@ -311,7 +311,6 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyInteger('DoorWindowStateSignalLampScript', 0);
         $this->RegisterPropertyInteger('AlarmStateSignalLamp', 0);
         $this->RegisterPropertyInteger('AlarmStateSignalLampScript', 0);
-
         // Notification
         $this->RegisterPropertyInteger('NotificationCenter', 0);
         $this->RegisterPropertyString('AlarmZonesDisarmedSymbol', json_decode('"\ud83d\udfe2"'));
@@ -320,19 +319,15 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyString('PartialProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
         $this->RegisterPropertyString('AlarmZonesSystemFailure', json_decode('"\ud83d\udd34"'));
         $this->RegisterPropertyInteger('NotificationScript', 0);
-
         // Alerting delay
         $this->RegisterPropertyInteger('AlertingDelay', 0);
-
         // Alarm siren
         $this->RegisterPropertyInteger('AlarmSiren', 0);
         $this->RegisterPropertyInteger('AlarmSirenScript', 0);
-
         // Alarm light
         $this->RegisterPropertyInteger('AlarmLight', 0);
         $this->RegisterPropertyInteger('AlarmLightScript', 0);
         $this->RegisterPropertyBoolean('AutomaticTurnOffAlarmLight', false);
-
         // Alarm call
         $this->RegisterPropertyInteger('AlarmCall', 0);
         $this->RegisterPropertyInteger('AlarmCallScript', 0);
@@ -349,7 +344,6 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 0, 'Unscharf', 'Warning', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Scharf', 'Warning', 0xFF0000);
         IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert', 'Clock', 0xFFFF00);
-
         // Alarm state
         $profile = 'AZST.' . $this->InstanceID . '.AlarmState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -359,7 +353,6 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Alert', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Alarm', 'Alert', 0xFF0000);
         IPS_SetVariableProfileAssociation($profile, 2, 'Voralarm', 'Clock', 0xFFFF00);
-
         // Door and window state
         $profile = 'AZST.' . $this->InstanceID . '.DoorWindowState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -368,7 +361,6 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Window');
         IPS_SetVariableProfileAssociation($profile, 0, 'Geschlossen', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Geöffnet', '', 0xFF0000);
-
         // Motion detector state
         $profile = 'AZST.' . $this->InstanceID . '.MotionDetectorState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -377,7 +369,6 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Motion');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', '', 0xFF0000);
-
         // Smoke detector state
         $profile = 'AZST.' . $this->InstanceID . '.SmokeDetectorState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -386,7 +377,6 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Flame');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Rauch erkannt', '', 0xFF0000);
-
         // Water sensor state
         $profile = 'AZST.' . $this->InstanceID . '.WaterSensorState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -413,73 +403,61 @@ class Alarmzonensteuerung extends IPSModule
     private function RegisterVariables(): void
     {
         // Location
-        $this->RegisterVariableString('Location', 'Standortbezeichnung', '', 1);
+        $this->RegisterVariableString('Location', 'Standortbezeichnung', '', 10);
         $this->SetValue('Location', $this->ReadPropertyString('Location'));
         $id = $this->GetIDForIdent('Location');
         IPS_SetIcon($id, 'IPS');
-
         // Object name
-        $this->RegisterVariableString('ObjectName', 'Objektbezeichnung', '', 2);
+        $this->RegisterVariableString('ObjectName', 'Objektbezeichnung', '', 20);
         $this->SetValue('Location', $this->ReadPropertyString('ObjectName'));
         $id = $this->GetIDForIdent('ObjectName');
         IPS_SetIcon($id, 'Information');
-
         // Full protection mode
         $name = $this->ReadPropertyString('FullProtectionName');
-        $this->RegisterVariableBoolean('FullProtectionMode', $name, '~Switch', 3);
+        $this->RegisterVariableBoolean('FullProtectionMode', $name, '~Switch', 30);
         $this->EnableAction('FullProtectionMode');
         $id = $this->GetIDForIdent('FullProtectionMode');
         IPS_SetIcon($id, 'Basement');
-
         // Hull protection mode
         $name = $this->ReadPropertyString('HullProtectionName');
-        $this->RegisterVariableBoolean('HullProtectionMode', $name, '~Switch', 4);
+        $this->RegisterVariableBoolean('HullProtectionMode', $name, '~Switch', 40);
         $this->EnableAction('HullProtectionMode');
         $id = $this->GetIDForIdent('HullProtectionMode');
         IPS_SetIcon($id, 'GroundFloor');
-
         // Partial protection mode
         $name = $this->ReadPropertyString('PartialProtectionName');
-        $this->RegisterVariableBoolean('PartialProtectionMode', $name, '~Switch', 5);
+        $this->RegisterVariableBoolean('PartialProtectionMode', $name, '~Switch', 50);
         $this->EnableAction('PartialProtectionMode');
         $id = $this->GetIDForIdent('PartialProtectionMode');
         IPS_SetIcon($id, 'Moon');
-
         // Alarm siren
-        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', '~Switch', 6);
+        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', '~Switch', 60);
         $this->EnableAction('AlarmSiren');
         $id = $this->GetIDForIdent('AlarmSiren');
         IPS_SetIcon($id, 'Alert');
-
         // Alarm light
-        $this->RegisterVariableBoolean('AlarmLight', 'Alarm- / Außenbeleuchtung', '~Switch', 7);
+        $this->RegisterVariableBoolean('AlarmLight', 'Alarm- / Außenbeleuchtung', '~Switch', 70);
         $this->EnableAction('AlarmLight');
         $id = $this->GetIDForIdent('AlarmLight');
         IPS_SetIcon($id, 'Bulb');
-
         // System state
         $profile = 'AZST.' . $this->InstanceID . '.SystemState';
-        $this->RegisterVariableInteger('SystemState', 'Systemstatus', $profile, 8);
-
+        $this->RegisterVariableInteger('SystemState', 'Systemstatus', $profile, 80);
         // Alarm state
         $profile = 'AZST.' . $this->InstanceID . '.AlarmState';
-        $this->RegisterVariableInteger('AlarmState', 'Alarmstatus', $profile, 9);
-
+        $this->RegisterVariableInteger('AlarmState', 'Alarmstatus', $profile, 90);
         // Door and window state
         $profile = 'AZST.' . $this->InstanceID . '.DoorWindowState';
-        $this->RegisterVariableBoolean('DoorWindowState', 'Türen- und Fenster', $profile, 10);
-
+        $this->RegisterVariableBoolean('DoorWindowState', 'Türen- und Fenster', $profile, 100);
         // Motion detector state
         $profile = 'AZST.' . $this->InstanceID . '.MotionDetectorState';
-        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 11);
-
+        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 110);
         // Smoke detector state
         $profile = 'AZST.' . $this->InstanceID . '.SmokeDetectorState';
-        $this->RegisterVariableBoolean('SmokeDetectorState', 'Rauchmelder', $profile, 12);
-
+        $this->RegisterVariableBoolean('SmokeDetectorState', 'Rauchmelder', $profile, 120);
         // Water sensor state
         $profile = 'AZST.' . $this->InstanceID . '.WaterSensorState';
-        $this->RegisterVariableBoolean('WaterSensorState', 'Wassersensoren', $profile, 13);
+        $this->RegisterVariableBoolean('WaterSensorState', 'Wassersensoren', $profile, 130);
     }
 
     private function SetOptions(): void
@@ -489,69 +467,57 @@ class Alarmzonensteuerung extends IPSModule
         $this->SetValue('Location', $name);
         $use = $this->ReadPropertyBoolean('EnableLocation');
         IPS_SetHidden($this->GetIDForIdent('Location'), !$use);
-
         // Object name
         $name = $this->ReadPropertyString('ObjectName');
         $this->SetValue('ObjectName', $name);
         $use = $this->ReadPropertyBoolean('EnableObjectName');
         IPS_SetHidden($this->GetIDForIdent('ObjectName'), !$use);
-
         // Full protection mode
         $id = $this->GetIDForIdent('FullProtectionMode');
         $name = $this->ReadPropertyString('FullProtectionName');
         IPS_SetName($id, $name);
         $use = $this->ReadPropertyBoolean('EnableFullProtectionMode');
         IPS_SetHidden($id, !$use);
-
         // Hull protection mode
         $id = $this->GetIDForIdent('HullProtectionMode');
         $name = $this->ReadPropertyString('HullProtectionName');
         IPS_SetName($id, $name);
         $use = $this->ReadPropertyBoolean('EnableHullProtectionMode');
         IPS_SetHidden($id, !$use);
-
         // Partial protection mode
         $id = $this->GetIDForIdent('PartialProtectionMode');
         $name = $this->ReadPropertyString('PartialProtectionName');
         IPS_SetName($id, $name);
         $use = $this->ReadPropertyBoolean('EnablePartialProtectionMode');
         IPS_SetHidden($id, !$use);
-
         // Alarm siren
         $id = $this->GetIDForIdent('AlarmSiren');
         $use = $this->ReadPropertyBoolean('EnableAlarmSiren');
         IPS_SetHidden($id, !$use);
-
         // Alarm light
         $id = $this->GetIDForIdent('AlarmLight');
         $use = $this->ReadPropertyBoolean('EnableAlarmLight');
         IPS_SetHidden($id, !$use);
-
         // System state
         $id = $this->GetIDForIdent('SystemState');
         $use = $this->ReadPropertyBoolean('EnableSystemState');
         IPS_SetHidden($id, !$use);
-
         // Alarm state
         $id = $this->GetIDForIdent('AlarmState');
         $use = $this->ReadPropertyBoolean('EnableAlarmState');
         IPS_SetHidden($id, !$use);
-
         // Door and window state
         $id = $this->GetIDForIdent('DoorWindowState');
         $use = $this->ReadPropertyBoolean('EnableDoorWindowState');
         IPS_SetHidden($id, !$use);
-
         // Motion detector state
         $id = $this->GetIDForIdent('MotionDetectorState');
         $use = $this->ReadPropertyBoolean('EnableMotionDetectorState');
         IPS_SetHidden($id, !$use);
-
         // Smoke detector state
         $id = $this->GetIDForIdent('SmokeDetectorState');
         $use = $this->ReadPropertyBoolean('EnableSmokeDetectorState');
         IPS_SetHidden($id, !$use);
-
         // Water sensor state
         $id = $this->GetIDForIdent('WaterSensorState');
         $use = $this->ReadPropertyBoolean('EnableWaterSensorState');
@@ -633,7 +599,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::ALARMPROTOCOL_MODULE_GUID) {
+                if ($moduleID !== self::ALARMPROTOKOLL_MODULE_GUID) {
                     $this->LogMessage('Alarmprotokoll GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -648,7 +614,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::TONEACKNOWLEDGEMENT_MODULE_GUID) {
+                if ($moduleID !== self::QUITTUNGSTON_MODULE_GUID) {
                     $this->LogMessage('Quittungston GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -663,7 +629,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::SIGNALLAMP_MODULE_GUID) {
+                if ($moduleID !== self::SIGNALLEUCHTE_MODULE_GUID) {
                     $this->LogMessage('Systemstatus Signalleuchte GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -678,7 +644,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::SIGNALLAMP_MODULE_GUID) {
+                if ($moduleID !== self::SIGNALLEUCHTE_MODULE_GUID) {
                     $this->LogMessage('Tür- / Fensterstatus Signalleuchte GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -693,7 +659,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::SIGNALLAMP_MODULE_GUID) {
+                if ($moduleID !== self::SIGNALLEUCHTE_MODULE_GUID) {
                     $this->LogMessage('Alarmstatus Signalleuchte GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -708,7 +674,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::NOTIFICATIONCENTER_MODULE_GUID) {
+                if ($moduleID !== self::BENACHRICHTIGUNGSZENTRALE_MODULE_GUID) {
                     $this->LogMessage('Benachrichtigungszentrale GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -723,7 +689,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::ALARMSIREN_MODULE_GUID) {
+                if ($moduleID !== self::ALARMSIRENE_MODULE_GUID) {
                     $this->LogMessage('Alarmsirene GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -738,7 +704,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::ALARMLIGHT_MODULE_GUID) {
+                if ($moduleID !== self::ALARMBELEUCHTUNG_MODULE_GUID) {
                     $this->LogMessage('Alarmbeleuchtung GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -753,7 +719,7 @@ class Alarmzonensteuerung extends IPSModule
             } else {
                 $instance = IPS_GetInstance($id);
                 $moduleID = $instance['ModuleInfo']['ModuleID'];
-                if ($moduleID !== self::ALARMCALL_MODULE_GUID) {
+                if ($moduleID !== self::ALARMANRUF_MODULE_GUID) {
                     $this->LogMessage('Alarmanruf GUID ungültig!', KL_ERROR);
                     $state = 200;
                 }
@@ -761,5 +727,20 @@ class Alarmzonensteuerung extends IPSModule
         }
         // Set state
         $this->SetStatus($state);
+    }
+
+    private function CheckMaintenanceMode(): bool
+    {
+        $result = false;
+        $status = 102;
+        if ($this->ReadPropertyBoolean('MaintenanceMode')) {
+            $result = true;
+            $status = 104;
+            $this->SendDebug(__FUNCTION__, 'Abbruch, der Wartungsmodus ist aktiv!', 0);
+            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', Abbruch, der Wartungsmodus ist aktiv!', KL_WARNING);
+        }
+        $this->SetStatus($status);
+        IPS_SetDisabled($this->InstanceID, $result);
+        return $result;
     }
 }

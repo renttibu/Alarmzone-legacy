@@ -1,11 +1,13 @@
 <?php
 
-// Declare
+/** @noinspection PhpUndefinedFunctionInspection */
+/** @noinspection PhpUnusedPrivateMethodInspection */
+
 declare(strict_types=1);
 
 trait AZST_signalLamp
 {
-    //#################### Private
+    #################### Private
 
     /**
      * Sets the signal lamp for system state, door and window state, alarm state.

@@ -1,6 +1,9 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_motionDetectors
@@ -12,7 +15,7 @@ trait AZON_motionDetectors
     {
         $this->SendDebug(__FUNCTION__, 'wird ausgeführt: ' . microtime(true), 0);
         $listedVariables = [];
-        $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_MODULE_GUID);
+        $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_DEVICE_GUID);
         if (!empty($instanceIDs)) {
             $variables = [];
             foreach ($instanceIDs as $instanceID) {
@@ -101,6 +104,7 @@ trait AZON_motionDetectors
      * Checks the alerting of a motion detector.
      *
      * @param int $SenderID
+     * @throws Exception
      */
     public function CheckMotionDetectorAlerting(int $SenderID): void
     {
@@ -195,7 +199,7 @@ trait AZON_motionDetectors
         $this->UpdateMotionDetectorState(true, true);
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Updates the motion detectors state.
@@ -207,6 +211,7 @@ trait AZON_motionDetectors
      * @param bool $UpdateAlarmZoneControlStates
      * false    = don't use
      * true     = use
+     * @throws Exception
      */
     private function UpdateMotionDetectorState(bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
     {

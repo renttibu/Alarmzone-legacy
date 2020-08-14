@@ -1,6 +1,8 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_toneAcknowledgement

@@ -1,6 +1,9 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_smokeDetectors
@@ -9,6 +12,7 @@ trait AZON_smokeDetectors
      * Checks the alerting of a smoke detector.
      *
      * @param int $SenderID
+     * @throws Exception
      */
     public function CheckSmokeDetectorAlerting(int $SenderID): void
     {
@@ -68,7 +72,7 @@ trait AZON_smokeDetectors
         $this->UpdateSmokeDetectorState(true, true);
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Updates the smoke detectors state.
@@ -80,6 +84,7 @@ trait AZON_smokeDetectors
      * @param bool $UpdateAlarmZoneControlStates
      * false    = don't use
      * true     = use
+     * @throws Exception
      */
     private function UpdateSmokeDetectorState(bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
     {

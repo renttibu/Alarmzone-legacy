@@ -1,6 +1,9 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnusedPrivateMethodInspection */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_alarmCall
@@ -46,7 +49,7 @@ trait AZON_alarmCall
         }
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Cancels an alarm call.

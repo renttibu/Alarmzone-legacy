@@ -1,6 +1,8 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZST_controlOptions
@@ -189,7 +191,7 @@ trait AZST_controlOptions
         return $result;
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Arms the alarm zones.

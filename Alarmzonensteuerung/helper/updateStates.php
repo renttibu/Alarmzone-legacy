@@ -1,6 +1,5 @@
 <?php
 
-// Declare
 declare(strict_types=1);
 
 trait AZST_updateStates

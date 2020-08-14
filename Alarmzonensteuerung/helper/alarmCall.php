@@ -1,6 +1,10 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUnusedPrivateMethodInspection */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZST_alarmCall
@@ -57,7 +61,7 @@ trait AZST_alarmCall
                 foreach ($activeAlarmCalls as $activeAlarmCall) {
                     $i++;
                     // Execute alarm call
-                    @AANR_ToggleAlarmCall($alarmCall, true, $SensorName);
+                    @AANR_ToggleAlarmCall($activeAlarmCall, true, $SensorName);
                     // Execution delay for next instance
                     if ($count > 1 && $i < $count) {
                         @IPS_Sleep(500);
@@ -85,7 +89,7 @@ trait AZST_alarmCall
         }
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Cancels an alarm call.

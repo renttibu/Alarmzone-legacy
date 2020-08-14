@@ -1,11 +1,14 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUndefinedFunctionInspection */
+/** @noinspection PhpUnusedPrivateMethodInspection */
+
 declare(strict_types=1);
 
 trait AZON_notificationCenter
 {
-    //#################### Private
+    #################### Private
 
     /**
      * Sends a notification.
@@ -22,6 +25,7 @@ trait AZON_notificationCenter
      * 2    = Alert
      * 3    = Sabotage
      * 4    = Battery
+     * @throws Exception
      */
     private function SendNotification(string $ActionText, string $MessageText, string $LogText, int $MessageType): void
     {

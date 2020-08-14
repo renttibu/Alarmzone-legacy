@@ -1,6 +1,9 @@
 <?php
 
-// Declare
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_waterSensors
@@ -9,6 +12,7 @@ trait AZON_waterSensors
      * Checks the alerting of a water sensor.
      *
      * @param int $SenderID
+     * @throws Exception
      */
     public function CheckWaterSensorAlerting(int $SenderID): void
     {
@@ -68,7 +72,7 @@ trait AZON_waterSensors
         $this->UpdateWaterSensorState(true, true);
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Updates the motion detectors state.
@@ -80,6 +84,7 @@ trait AZON_waterSensors
      * @param bool $UpdateAlarmZoneControlStates
      * false    = don't use
      * true     = use
+     * @throws Exception
      */
     private function UpdateWaterSensorState(bool $UseSignalLamp, bool $UpdateAlarmZoneControlStates): void
     {

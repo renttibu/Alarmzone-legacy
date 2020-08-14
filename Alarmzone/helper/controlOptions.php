@@ -1,6 +1,8 @@
 <?php
 
-// Declare
+/** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedFunctionInspection */
+
 declare(strict_types=1);
 
 trait AZON_controlOptions
@@ -16,6 +18,8 @@ trait AZON_controlOptions
      * @return bool
      * false    = no activation
      * true     = activate
+     * @throws Exception
+     * @throws Exception
      */
     public function CheckActivation(int $Mode): bool
     {
@@ -225,6 +229,8 @@ trait AZON_controlOptions
      * @return bool
      * false    = an error occurred
      * true     = ok
+     * @throws Exception
+     * @throws Exception
      */
     public function ToggleFullProtectMode(bool $State, string $SenderID, bool $UseToneAcknowledgement, bool $UseNotification): bool
     {
@@ -261,6 +267,8 @@ trait AZON_controlOptions
      * @return bool
      * false    = an error occurred
      * true     = ok
+     * @throws Exception
+     * @throws Exception
      */
     public function ToggleHullProtectMode(bool $State, string $SenderID, bool $UseToneAcknowledgement, bool $UseNotification): bool
     {
@@ -297,6 +305,8 @@ trait AZON_controlOptions
      * @return bool
      * false    = an error occurred
      * true     = ok
+     * @throws Exception
+     * @throws Exception
      */
     public function TogglePartialProtectMode(bool $State, string $SenderID, bool $UseToneAcknowledgement, bool $UseNotification): bool
     {
@@ -330,7 +340,7 @@ trait AZON_controlOptions
         $this->SetSignalLamps();
     }
 
-    //#################### Private
+    #################### Private
 
     /**
      * Arms the alarm zone.
@@ -353,6 +363,8 @@ trait AZON_controlOptions
      * @return bool
      * false    = an error occurred
      * true     = ok
+     * @throws Exception
+     * @throws Exception
      */
     private function ArmAlarmZone(string $SenderID, int $Mode, bool $UseToneAcknowledgement, bool $UseNotification): bool
     {
@@ -503,5 +515,61 @@ trait AZON_controlOptions
         // Update alarm zone control states
         $this->UpdateAlarmZoneControlStates();
         return $result;
+    }
+
+    private function ToggleSignalLamp(bool $State)
+    {
+        $this->SetValue('SignalLamp', $State);
+
+        // Off
+        if (!$State) {
+            $instances = [];
+            // System state
+            $signalLamps = json_decode($this->ReadPropertyString('AlarmZoneStateSignalLamp'));
+            if (!empty($signalLamps)) {
+                foreach ($signalLamps as $signalLamp) {
+                    if ($signalLamp->Use) {
+                        array_push($instances, $signalLamp->ID);
+                    }
+                }
+            }
+            // Door window state
+            $signalLamps = json_decode($this->ReadPropertyString('DoorWindowStateSignalLamp'));
+            if (!empty($signalLamps)) {
+                foreach ($signalLamps as $signalLamp) {
+                    if ($signalLamp->Use) {
+                        array_push($instances, $signalLamp->ID);
+                    }
+                }
+            }
+            // Alarm state
+            $signalLamps = json_decode($this->ReadPropertyString('AlarmStateSignalLamp'));
+            if (!empty($signalLamps)) {
+                foreach ($signalLamps as $signalLamp) {
+                    if ($signalLamp->Use) {
+                        array_push($instances, $signalLamp->ID);
+                    }
+                }
+            }
+            if (empty($instances)) {
+                return;
+            }
+            $instances = array_unique($instances);
+            $count = count($instances);
+            $i = 0;
+            foreach ($instances as $instance) {
+                $i++;
+                @SIGL_ToggleNightMode($instance, true);
+                // Execution delay for next instance
+                if ($count > 1 && $i < $count) {
+                    IPS_Sleep(self::DELAY_MILLISECONDS);
+                }
+            }
+        }
+
+        // On
+        if ($State) {
+            $this->SetSignalLamps();
+        }
     }
 }

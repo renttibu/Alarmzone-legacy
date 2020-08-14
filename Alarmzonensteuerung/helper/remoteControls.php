@@ -1,6 +1,7 @@
 <?php
 
-// Declare
+/** @noinspection PhpUnused */
+
 declare(strict_types=1);
 
 trait AZST_remoteControls
