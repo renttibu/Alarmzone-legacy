@@ -1,8 +1,8 @@
 {
-  "id": "{6695A2B2-F5F7-321D-B8FE-CB5846837748}",
+  "id": "{CA80C88F-1CC4-8865-959B-3215FC5B1320}",
   "name": "Alarmzone",
   "type": 3,
-  "vendor": "NTUB",
+  "vendor": "Ulrich Bittner",
   "aliases": [
     "Alarmzone"
   ],
@@ -10,5 +10,5 @@
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
-  "prefix": "AZON"
+  "prefix": "AZ"
 }

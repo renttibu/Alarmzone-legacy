@@ -1,8 +1,8 @@
 {
-  "id": "{E70D37CB-7732-9CC5-B29E-EC567D841B0C}",
+  "id": "{9FB5FA4F-EC49-9481-8F3B-3DAC63D4CA11}",
   "name": "Alarmzonensteuerung",
   "type": 3,
-  "vendor": "NTUB",
+  "vendor": "Ulrich Bittner",
   "aliases": [
     "Alarmzonensteuerung"
   ],
@@ -10,5 +10,5 @@
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
-  "prefix": "AZST"
+  "prefix": "AZS"
 }
