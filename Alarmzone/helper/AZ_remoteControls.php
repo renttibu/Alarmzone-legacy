@@ -41,7 +41,7 @@ trait AZ_remoteControls
         foreach ($remoteControls as $remoteControl) {
             if ($remoteControl->ID == $SenderID && $remoteControl->Use) {
                 $action = $remoteControl->Action;
-                $name = $remoteControl->Name;
+                $name = $SenderID . ', ' . $remoteControl->Name;
                 switch ($action) {
                     case 1: # disarm alarm zone
                         $this->DisarmAlarmZone($name);

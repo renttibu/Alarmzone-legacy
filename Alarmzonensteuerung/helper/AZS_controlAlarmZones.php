@@ -124,14 +124,24 @@ trait AZS_controlAlarmZones
     public function DisarmAlarmZones(string $Sender): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
+        $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
+        if (empty($alarmZones)) {
+            return false;
+        }
         $result = true;
-        $mode1 = $this->ToggleFullProtectionMode(false, $Sender);
-        $mode2 = $this->ToggleHullProtectionMode(false, $Sender);
-        $mode3 = $this->TogglePartialProtectionMode(false, $Sender);
-        if (!$mode1 ||
-            !$mode2 ||
-            !$mode3) {
-            $result = false;
+        foreach ($alarmZones as $alarmZone) {
+            $id = $alarmZone->ID;
+            if ($id == 0 || @!IPS_ObjectExists($id)) {
+                return false;
+            }
+            /*
+            $scriptText = 'AZ_DisarmAlarmZone(' . $id . ', "' . $Sender . '");';
+            $response = @IPS_RunScriptText($scriptText);
+             */
+            $response = @AZ_DisarmAlarmZone($id, $Sender);
+            if (!$response) {
+                $result = false;
+            }
         }
         return $result;
     }

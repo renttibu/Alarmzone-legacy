@@ -30,6 +30,10 @@ trait AZS_remoteControls
     public function TriggerRemoteControlAction(int $SenderID): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
+        if ($this->CheckMaintenanceMode()) {
+            return;
+        }
+        //Remote controls
         $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'));
         if (empty($remoteControls)) {
             return;
@@ -37,11 +41,12 @@ trait AZS_remoteControls
         foreach ($remoteControls as $remoteControl) {
             if ($remoteControl->ID == $SenderID && $remoteControl->Use) {
                 $action = $remoteControl->Action;
-                $name = $remoteControl->Name;
+                $name = $SenderID . ', ' . $remoteControl->Name;
                 switch ($action) {
                     case 1: # disarm
                         $this->DisarmAlarmZones($name);
                         break;
+
                     case 2: # arm full protection mode
                         $this->ToggleFullProtectionMode(true, $name);
                         break;
