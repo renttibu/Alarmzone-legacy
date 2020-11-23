@@ -451,6 +451,74 @@
           "items": [
             {
               "type": "Select",
+              "name": "PreAlarmSymbol",
+              "caption": "Voralarm",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\ud83d\udd34 Rot",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\ud83d\udfe0 Orange",
+                  "value": "\ud83d\udfe0"
+                },
+                {
+                  "caption": "\ud83d\udfe1 Gelb",
+                  "value": "\ud83d\udfe1"
+                },
+                {
+                  "caption": "\uD83D\uDD57 Uhr",
+                  "value": "\ud83d\udd57"
+                },
+                {
+                  "caption": "\u26a0\ufe0f Warnung",
+                  "value": "\u26a0\ufe0f"
+                },
+                {
+                  "caption": "\u2757 Ausrufezeichen",
+                  "value": "\u2757"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "Select",
+              "name": "AlarmSymbol",
+              "caption": "Alarm",
+              "options": [
+                {
+                  "caption": "Kein Symbol",
+                  "value": ""
+                },
+                {
+                  "caption": "\ud83d\udd34 Rot",
+                  "value": "\ud83d\udd34"
+                },
+                {
+                  "caption": "\u26a0\ufe0f Warnung",
+                  "value": "\u26a0\ufe0f"
+                },
+                {
+                  "caption": "\u2757 Ausrufezeichen",
+                  "value": "\u2757"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "Select",
               "name": "AlarmZoneSystemFailure",
               "caption": "Systemfehler",
               "options": [
@@ -460,7 +528,7 @@
                 },
                 {
                   "caption": "\u26a0\ufe0f Warnung",
-                  "value": "\ud83d\udd34"
+                  "value": "\u26a0\ufe0f"
                 },
                 {
                   "caption": "\u2757 Ausrufezeichen",

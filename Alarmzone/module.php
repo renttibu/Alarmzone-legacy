@@ -898,7 +898,9 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyString('FullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
         $this->RegisterPropertyString('HullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
         $this->RegisterPropertyString('PartialProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
-        $this->RegisterPropertyString('AlarmZoneSystemFailure', json_decode('"\ud83d\udd34"'));
+        $this->RegisterPropertyString('PreAlarmSymbol', json_decode('"\u26a0\ufe0f"'));
+        $this->RegisterPropertyString('AlarmSymbol', json_decode('"\u2757"'));
+        $this->RegisterPropertyString('AlarmZoneSystemFailure', json_decode('"\u26a0\ufe0f"'));
         //Alarm protocol
         $this->RegisterPropertyInteger('AlarmProtocol', 0);
         //Remote controls

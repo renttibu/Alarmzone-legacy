@@ -54,7 +54,8 @@ trait AZ_motionDetectors
                                 'AlertingValue'               => 1,
                                 'FullProtectionModeActive'    => true,
                                 'HullProtectionModeActive'    => false,
-                                'PartialProtectionModeActive' => true]);
+                                'PartialProtectionModeActive' => true,
+                                'SilentAlarm'                 => false]);
                         }
                     }
                 }
@@ -83,7 +84,8 @@ trait AZ_motionDetectors
                             'AlertingValue'               => 1,
                             'FullProtectionModeActive'    => true,
                             'HullProtectionModeActive'    => false,
-                            'PartialProtectionModeActive' => true]);
+                            'PartialProtectionModeActive' => true,
+                            'SilentAlarm'                 => false]);
                     }
                 }
             } else {

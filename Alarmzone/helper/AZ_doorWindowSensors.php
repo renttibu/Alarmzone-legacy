@@ -55,7 +55,8 @@ trait AZ_doorWindowSensors
                                 'AlertingValue'                 => 1,
                                 'FullProtectionModeActive'      => true,
                                 'HullProtectionModeActive'      => true,
-                                'PartialProtectionModeActive'   => true]);
+                                'PartialProtectionModeActive'   => true,
+                                'SilentAlarm'                   => false]);
                         }
                     }
                 }
@@ -84,7 +85,8 @@ trait AZ_doorWindowSensors
                             'AlertingValue'                 => 1,
                             'FullProtectionModeActive'      => true,
                             'HullProtectionModeActive'      => true,
-                            'PartialProtectionModeActive'   => true]);
+                            'PartialProtectionModeActive'   => true,
+                            'SilentAlarm'                   => false]);
                     }
                 }
             } else {
@@ -123,6 +125,7 @@ trait AZ_doorWindowSensors
         $location = $this->ReadPropertyString('Location');
         $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
         $useNotification = false;
+        $preAlarm = false;
         $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
         if (!empty($doorWindowSensors)) {
             //Check if sensor is listed
@@ -209,6 +212,7 @@ trait AZ_doorWindowSensors
                             $alarmName = 'Alarm';
                             if ($alerting) {
                                 if ($alertingDelayDuration > 0) {
+                                    $preAlarm = true;
                                     $alarmName = 'Voralarm';
                                 }
                             }
@@ -241,8 +245,22 @@ trait AZ_doorWindowSensors
                             $this->SetValue('AlarmState', $alarmState);
                             $this->SetValue('DoorWindowState', true);
                             //Notification
-                            $actionText = $alarmZoneName . ', Alarm ' . $sensorName . '!';
+                            $alarmSymbol = $this->ReadPropertyString('AlarmSymbol');
+                            if (!empty($alarmSymbol)) {
+                                $actionText = $alarmSymbol . ' ' . $alarmZoneName . ', Alarm ' . $sensorName . '!';
+                            } else {
+                                $actionText = $alarmZoneName . ', Alarm ' . $sensorName . '!';
+                            }
                             $messageText = $timeStamp . ' ' . $sensorName . ' hat einen Alarm ausgelöst.';
+                            if ($preAlarm) {
+                                $alarmSymbol = $this->ReadPropertyString('PreAlarmSymbol');
+                                if (!empty($alarmSymbol)) {
+                                    $actionText = $alarmSymbol . ' ' . $alarmZoneName . ', Voralarm ' . $sensorName . '!';
+                                } else {
+                                    $actionText = $alarmZoneName . ', Alarm ' . $sensorName . '!';
+                                }
+                                $messageText = $timeStamp . ' ' . $sensorName . ' hat einen Voralarm ausgelöst.';
+                            }
                             $this->SendNotification($actionText, $messageText, $logText, 2);
                         }
                         break;

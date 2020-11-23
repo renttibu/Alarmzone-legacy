@@ -352,6 +352,7 @@ trait AZ_controlAlarmZone
         $this->SetValue('PartialProtectionMode', $partialProtectionState);
         $this->SetValue('AlarmState', 0);
         //Always check doors and windows and inform user about open doors and windows
+        $this->ResetBlacklist();
         $this->CheckDoorWindowState(true);
         //Check for activation mode
         $alarmZoneActivation = true;
@@ -367,6 +368,7 @@ trait AZ_controlAlarmZone
             $this->SetValue('FullProtectionMode', false);
             $this->SetValue('HullProtectionMode', false);
             $this->SetValue('PartialProtectionMode', false);
+            $this->ResetBlacklist();
             //Log
             $text = 'Die Aktivierung wurde durch die Sensorenprüfung abgebrochen! (ID ' . $this->GetIDForIdent($identName) . ')';
             $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
