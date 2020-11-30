@@ -135,8 +135,8 @@ trait AZ_doorWindowSensors
                     return;
                 }
                 $sensorName = $doorWindowSensors[$key]['Name'];
-                $actualValue = boolval(GetValue($SenderID));
-                $alertingValue = boolval($doorWindowSensors[$key]['AlertingValue']);
+                $actualValue = intval(GetValue($SenderID));
+                $alertingValue = intval($doorWindowSensors[$key]['AlertingValue']);
                 $stateText = 'geschlossen';
                 if ($actualValue == $alertingValue) {
                     $stateText = 'geöffnet';

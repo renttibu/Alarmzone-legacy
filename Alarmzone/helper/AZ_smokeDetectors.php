@@ -52,7 +52,7 @@ trait AZ_smokeDetectors
             return false;
         }
         $result = false;
-        if (boolval(GetValue($SenderID)) == boolval($vars[$key]['AlertingValue'])) {
+        if (intval(GetValue($SenderID)) == intval($vars[$key]['AlertingValue'])) {
             $result = true;
             $alarmState = 1;
             $alarmName = 'Alarm';

@@ -144,7 +144,7 @@ trait AZ_motionDetectors
                 $alarmState = 0;
                 $alertingDelayDuration = 0;
                 //Check alerting value
-                if (boolval(GetValue($SenderID)) == boolval($vars[$key]['AlertingValue'])) {
+                if (intval(GetValue($SenderID)) == intval($vars[$key]['AlertingValue'])) {
                     //Check if motion detector is activated for absence mode
                     if ($this->GetValue('FullProtectionMode')) {
                         if ($vars[$key]['FullProtectionModeActive']) {
