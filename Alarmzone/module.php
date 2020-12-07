@@ -103,7 +103,12 @@ class Alarmzone extends IPSModule
                 $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'), true);
                 if (!empty($remoteControls)) {
                     if (array_search($SenderID, array_column($remoteControls, 'ID')) !== false) {
-                        $scriptText = 'AZ_TriggerRemoteControlAction(' . $this->InstanceID . ', ' . $SenderID . ');';
+                        //Trigger action
+                        $valueChanged = 'false';
+                        if ($Data[1]) {
+                            $valueChanged = 'true';
+                        }
+                        $scriptText = 'AZ_TriggerRemoteControlAction(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
                         IPS_RunScriptText($scriptText);
                     }
                 }

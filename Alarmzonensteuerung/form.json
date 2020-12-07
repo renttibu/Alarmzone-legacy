@@ -555,6 +555,60 @@
               }
             },
             {
+              "caption": "Auslöser",
+              "name": "TriggerType",
+              "width": "230px",
+              "add": 2,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "Bei Änderung",
+                    "value": 0
+                  },
+                  {
+                    "caption": "Bei Aktualisierung",
+                    "value": 1
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "value": 2
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "value": 3
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Auslösender Wert",
+              "name": "TriggerValue",
+              "width": "180px",
+              "add": 1,
+              "edit": {
+                "type": "Select",
+                "options": [
+                  {
+                    "caption": "0 | false",
+                    "value": 0
+                  },
+                  {
+                    "caption": "1 | true",
+                    "value": 1
+                  },
+                  {
+                    "caption": "2",
+                    "value": 2
+                  },
+                  {
+                    "caption": "3",
+                    "value": 3
+                  }
+                ]
+              }
+            },
+            {
               "caption": "Aktion",
               "name": "Action",
               "width": "200px",

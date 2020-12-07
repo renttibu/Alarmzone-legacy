@@ -105,7 +105,12 @@ class Alarmzonensteuerung extends IPSModule
                     if (!empty($variables)) {
                         if (array_search($SenderID, array_column($variables, 'ID')) !== false) {
                             if ($property == 'RemoteControls') {
-                                $scriptText = 'AZS_TriggerRemoteControlAction(' . $this->InstanceID . ', ' . $SenderID . ');';
+                                //Trigger action
+                                $valueChanged = 'false';
+                                if ($Data[1]) {
+                                    $valueChanged = 'true';
+                                }
+                                $scriptText = 'AZS_TriggerRemoteControlAction(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
                             } else {
                                 $scriptText = 'AZS_Update' . $property . '(' . $this->InstanceID . ');';
                             }
