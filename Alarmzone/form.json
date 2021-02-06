@@ -67,14 +67,23 @@
           "caption": "Bewegungsmelderstatus"
         },
         {
-          "type": "CheckBox",
-          "name": "EnableSmokeDetectorState",
-          "caption": "Rauchmelderstatus"
+          "type": "Label",
+          "caption": " "
         },
         {
           "type": "CheckBox",
-          "name": "EnableWaterSensorState",
-          "caption": "Wassersensorenstatus"
+          "name": "EnableAlarmSirenState",
+          "caption": "Alarmsirene"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmLightState",
+          "caption": "Alarmbeleuchtung"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmCallState",
+          "caption": "Alarmanruf"
         }
       ]
     },
@@ -195,6 +204,19 @@
     },
     {
       "type": "ExpansionPanel",
+      "caption": "Alarmprotokoll",
+      "items": [
+        {
+          "type": "SelectModule",
+          "name": "AlarmProtocol",
+          "caption": "Alarmprotokoll",
+          "moduleID": "{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}",
+          "width": "600px"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
       "caption": "Benachrichtigungszentrale",
       "items": [
         {
@@ -214,39 +236,39 @@
               "value": ""
             },
             {
-              "caption": "\ud83d\udd34 Rot",
+              "caption": "\ud83d\udd34",
               "value": "\ud83d\udd34"
             },
             {
-              "caption": "\ud83d\udfe0 Orange",
+              "caption": "\ud83d\udfe0",
               "value": "\ud83d\udfe0"
             },
             {
-              "caption": "\ud83d\udfe1 Gelb",
+              "caption": "\ud83d\udfe1",
               "value": "\ud83d\udfe1"
             },
             {
-              "caption": "\ud83d\udfe2 Grün",
+              "caption": "\ud83d\udfe2",
               "value": "\ud83d\udfe2"
             },
             {
-              "caption": "\ud83d\udd35 Blau",
+              "caption": "\ud83d\udd35",
               "value": "\ud83d\udd35"
             },
             {
-              "caption": "\ud83d\udfe3 Lila",
+              "caption": "\ud83d\udfe3",
               "value": "\ud83d\udfe3"
             },
             {
-              "caption": "\ud83d\udfe4 Braun",
+              "caption": "\ud83d\udfe4",
               "value": "\ud83d\udfe4"
             },
             {
-              "caption": "\u26ab Schwarz",
+              "caption": "\u26ab",
               "value": "\u26ab"
             },
             {
-              "caption": "\u26aa Weiß",
+              "caption": "\u26aa",
               "value": "\u26aa"
             }
           ]
@@ -261,43 +283,43 @@
               "value": ""
             },
             {
-              "caption": "\ud83d\udd34 Rot",
+              "caption": "\ud83d\udd34",
               "value": "\ud83d\udd34"
             },
             {
-              "caption": "\ud83d\udfe0 Orange",
+              "caption": "\ud83d\udfe0",
               "value": "\ud83d\udfe0"
             },
             {
-              "caption": "\ud83d\udfe1 Gelb",
+              "caption": "\ud83d\udfe1",
               "value": "\ud83d\udfe1"
             },
             {
-              "caption": "\ud83d\udfe2 Grün",
+              "caption": "\ud83d\udfe2",
               "value": "\ud83d\udfe2"
             },
             {
-              "caption": "\ud83d\udd35 Blau",
+              "caption": "\ud83d\udd35",
               "value": "\ud83d\udd35"
             },
             {
-              "caption": "\ud83d\udfe3 Lila",
+              "caption": "\ud83d\udfe3",
               "value": "\ud83d\udfe3"
             },
             {
-              "caption": "\ud83d\udfe4 Braun",
+              "caption": "\ud83d\udfe4",
               "value": "\ud83d\udfe4"
             },
             {
-              "caption": "\u26ab Schwarz",
+              "caption": "\u26ab",
               "value": "\u26ab"
             },
             {
-              "caption": "\u26aa Weiß",
+              "caption": "\u26aa",
               "value": "\u26aa"
             },
             {
-              "caption": "\uD83D\uDD57 Uhr",
+              "caption": "\uD83D\uDD57",
               "value": "\ud83d\udd57"
             }
           ]
@@ -312,39 +334,39 @@
               "value": ""
             },
             {
-              "caption": "\ud83d\udd34 Rot",
+              "caption": "\ud83d\udd34",
               "value": "\ud83d\udd34"
             },
             {
-              "caption": "\ud83d\udfe0 Orange",
+              "caption": "\ud83d\udfe0",
               "value": "\ud83d\udfe0"
             },
             {
-              "caption": "\ud83d\udfe1 Gelb",
+              "caption": "\ud83d\udfe1",
               "value": "\ud83d\udfe1"
             },
             {
-              "caption": "\ud83d\udfe2 Grün",
+              "caption": "\ud83d\udfe2",
               "value": "\ud83d\udfe2"
             },
             {
-              "caption": "\ud83d\udd35 Blau",
+              "caption": "\ud83d\udd35",
               "value": "\ud83d\udd35"
             },
             {
-              "caption": "\ud83d\udfe3 Lila",
+              "caption": "\ud83d\udfe3",
               "value": "\ud83d\udfe3"
             },
             {
-              "caption": "\ud83d\udfe4 Braun",
+              "caption": "\ud83d\udfe4",
               "value": "\ud83d\udfe4"
             },
             {
-              "caption": "\u26ab Schwarz",
+              "caption": "\u26ab",
               "value": "\u26ab"
             },
             {
-              "caption": "\u26aa Weiß",
+              "caption": "\u26aa",
               "value": "\u26aa"
             }
           ]
@@ -359,39 +381,39 @@
               "value": ""
             },
             {
-              "caption": "\ud83d\udd34 Rot",
+              "caption": "\ud83d\udd34",
               "value": "\ud83d\udd34"
             },
             {
-              "caption": "\ud83d\udfe0 Orange",
+              "caption": "\ud83d\udfe0",
               "value": "\ud83d\udfe0"
             },
             {
-              "caption": "\ud83d\udfe1 Gelb",
+              "caption": "\ud83d\udfe1",
               "value": "\ud83d\udfe1"
             },
             {
-              "caption": "\ud83d\udfe2 Grün",
+              "caption": "\ud83d\udfe2",
               "value": "\ud83d\udfe2"
             },
             {
-              "caption": "\ud83d\udd35 Blau",
+              "caption": "\ud83d\udd35",
               "value": "\ud83d\udd35"
             },
             {
-              "caption": "\ud83d\udfe3 Lila",
+              "caption": "\ud83d\udfe3",
               "value": "\ud83d\udfe3"
             },
             {
-              "caption": "\ud83d\udfe4 Braun",
+              "caption": "\ud83d\udfe4",
               "value": "\ud83d\udfe4"
             },
             {
-              "caption": "\u26ab Schwarz",
+              "caption": "\u26ab",
               "value": "\u26ab"
             },
             {
-              "caption": "\u26aa Weiß",
+              "caption": "\u26aa",
               "value": "\u26aa"
             }
           ]
@@ -406,43 +428,43 @@
               "value": ""
             },
             {
-              "caption": "\ud83d\udd34 Rot",
+              "caption": "\ud83d\udd34",
               "value": "\ud83d\udd34"
             },
             {
-              "caption": "\ud83d\udfe0 Orange",
+              "caption": "\ud83d\udfe0",
               "value": "\ud83d\udfe0"
             },
             {
-              "caption": "\ud83d\udfe1 Gelb",
+              "caption": "\ud83d\udfe1",
               "value": "\ud83d\udfe1"
             },
             {
-              "caption": "\ud83d\udfe2 Grün",
+              "caption": "\ud83d\udfe2",
               "value": "\ud83d\udfe2"
             },
             {
-              "caption": "\ud83d\udd35 Blau",
+              "caption": "\ud83d\udd35",
               "value": "\ud83d\udd35"
             },
             {
-              "caption": "\ud83d\udfe3 Lila",
+              "caption": "\ud83d\udfe3",
               "value": "\ud83d\udfe3"
             },
             {
-              "caption": "\ud83d\udfe4 Braun",
+              "caption": "\ud83d\udfe4",
               "value": "\ud83d\udfe4"
             },
             {
-              "caption": "\u26ab Schwarz",
+              "caption": "\u26ab",
               "value": "\u26ab"
             },
             {
-              "caption": "\u26aa Weiß",
+              "caption": "\u26aa",
               "value": "\u26aa"
             },
             {
-              "caption": "\ud83c\udf19 Mond",
+              "caption": "\ud83c\udf19",
               "value": "\uD83C\uDF19"
             }
           ]
@@ -460,27 +482,27 @@
                   "value": ""
                 },
                 {
-                  "caption": "\ud83d\udd34 Rot",
+                  "caption": "\ud83d\udd34",
                   "value": "\ud83d\udd34"
                 },
                 {
-                  "caption": "\ud83d\udfe0 Orange",
+                  "caption": "\ud83d\udfe0",
                   "value": "\ud83d\udfe0"
                 },
                 {
-                  "caption": "\ud83d\udfe1 Gelb",
+                  "caption": "\ud83d\udfe1",
                   "value": "\ud83d\udfe1"
                 },
                 {
-                  "caption": "\uD83D\uDD57 Uhr",
+                  "caption": "\uD83D\uDD57",
                   "value": "\ud83d\udd57"
                 },
                 {
-                  "caption": "\u26a0\ufe0f Warnung",
+                  "caption": "\u26a0\ufe0f",
                   "value": "\u26a0\ufe0f"
                 },
                 {
-                  "caption": "\u2757 Ausrufezeichen",
+                  "caption": "\u2757",
                   "value": "\u2757"
                 }
               ]
@@ -500,15 +522,15 @@
                   "value": ""
                 },
                 {
-                  "caption": "\ud83d\udd34 Rot",
+                  "caption": "\ud83d\udd34",
                   "value": "\ud83d\udd34"
                 },
                 {
-                  "caption": "\u26a0\ufe0f Warnung",
+                  "caption": "\u26a0\ufe0f",
                   "value": "\u26a0\ufe0f"
                 },
                 {
-                  "caption": "\u2757 Ausrufezeichen",
+                  "caption": "\u2757",
                   "value": "\u2757"
                 }
               ]
@@ -528,29 +550,16 @@
                   "value": ""
                 },
                 {
-                  "caption": "\u26a0\ufe0f Warnung",
+                  "caption": "\u26a0\ufe0f",
                   "value": "\u26a0\ufe0f"
                 },
                 {
-                  "caption": "\u2757 Ausrufezeichen",
+                  "caption": "\u2757",
                   "value": "\u2757"
                 }
               ]
             }
           ]
-        }
-      ]
-    },
-    {
-      "type": "ExpansionPanel",
-      "caption": "Alarmprotokoll",
-      "items": [
-        {
-          "type": "SelectModule",
-          "name": "AlarmProtocol",
-          "caption": "Alarmprotokoll",
-          "moduleID": "{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}",
-          "width": "600px"
         }
       ]
     },
@@ -594,9 +603,9 @@
             },
             {
               "caption": "Auslöser",
-              "name": "TriggerType",
-              "width": "230px",
-              "add": 2,
+              "name": "Trigger",
+              "width": "250px",
+              "add": 7,
               "edit": {
                 "type": "Select",
                 "options": [
@@ -609,41 +618,39 @@
                     "value": 1
                   },
                   {
-                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "caption": "Bei Grenzunterschreitung (einmalig)",
                     "value": 2
                   },
                   {
-                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "caption": "Bei Grenzunterschreitung (mehrmalig)",
                     "value": 3
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (einmalig)",
+                    "value": 4
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (mehrmalig)",
+                    "value": 5
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "value": 6
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "value": 7
                   }
                 ]
               }
             },
             {
               "caption": "Auslösender Wert",
-              "name": "TriggerValue",
-              "width": "180px",
-              "add": 1,
+              "name": "Value",
+              "width": "140px",
+              "add": "true",
               "edit": {
-                "type": "Select",
-                "options": [
-                  {
-                    "caption": "0 | false",
-                    "value": 0
-                  },
-                  {
-                    "caption": "1 | true",
-                    "value": 1
-                  },
-                  {
-                    "caption": "2",
-                    "value": 2
-                  },
-                  {
-                    "caption": "3",
-                    "value": 3
-                  }
-                ]
+                "type": "ValidationTextBox"
               }
             },
             {
@@ -708,7 +715,7 @@
             {
               "caption": "Aktiviert",
               "name": "Use",
-              "width": "100px",
+              "width": "80px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
@@ -733,32 +740,61 @@
               }
             },
             {
-              "caption": "Auslösender Wert",
-              "name": "AlertingValue",
-              "width": "150px",
-              "add": 1,
+              "caption": "Auslöser",
+              "name": "Trigger",
+              "width": "250px",
+              "add": 6,
               "edit": {
                 "type": "Select",
                 "options": [
                   {
-                    "caption": "0 | false",
+                    "caption": "Bei Änderung",
                     "value": 0
                   },
                   {
-                    "caption": "1 | true",
+                    "caption": "Bei Aktualisierung",
                     "value": 1
                   },
                   {
-                    "caption": "2",
+                    "caption": "Bei Grenzunterschreitung (einmalig)",
                     "value": 2
+                  },
+                  {
+                    "caption": "Bei Grenzunterschreitung (mehrmalig)",
+                    "value": 3
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (einmalig)",
+                    "value": 4
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (mehrmalig)",
+                    "value": 5
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "value": 6
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "value": 7
                   }
                 ]
               }
             },
             {
+              "caption": "Auslösender Wert",
+              "name": "Value",
+              "width": "140px",
+              "add": "true",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
               "caption": "Vollschutz",
               "name": "FullProtectionModeActive",
-              "width": "200px",
+              "width": "100px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
@@ -767,7 +803,7 @@
             {
               "caption": "Hüllschutz",
               "name": "HullProtectionModeActive",
-              "width": "200px",
+              "width": "100px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
@@ -776,17 +812,44 @@
             {
               "caption": "Teilschutz",
               "name": "PartialProtectionModeActive",
-              "width": "200px",
+              "width": "100px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
               }
             },
             {
-              "caption": "Stummer Alarm",
-              "name": "SilentAlarm",
-              "width": "150px",
-              "add": false,
+              "caption": "Benachrichtigung",
+              "name": "UseNotification",
+              "width": "140px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "140px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLight",
+              "width": "140px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "140px",
+              "add": true,
               "edit": {
                 "type": "CheckBox"
               }
@@ -795,7 +858,7 @@
         },
         {
           "type": "Label",
-          "caption": "\ngrün\t\t= geschlossen\nviolett\t\t= geöffnet\ngrau\t\t= gesperrt\nrot\t\t\t= Fehler"
+          "caption": "\nFarbwerte:\ngrün\t\t= Tür / Fenster geschlossen\nviolett\t\t= Tür / Fenster geöffnet\ngrau\t\t= Tür / Fenster inaktiv\nrot\t\t\t= Fehler"
         }
       ]
     },
@@ -838,32 +901,61 @@
               }
             },
             {
-              "caption": "Auslösender Wert",
-              "name": "AlertingValue",
-              "width": "150px",
-              "add": 1,
+              "caption": "Auslöser",
+              "name": "Trigger",
+              "width": "250px",
+              "add": 6,
               "edit": {
                 "type": "Select",
                 "options": [
                   {
-                    "caption": "0 | false",
+                    "caption": "Bei Änderung",
                     "value": 0
                   },
                   {
-                    "caption": "1 | true",
+                    "caption": "Bei Aktualisierung",
                     "value": 1
                   },
                   {
-                    "caption": "2",
+                    "caption": "Bei Grenzunterschreitung (einmalig)",
                     "value": 2
+                  },
+                  {
+                    "caption": "Bei Grenzunterschreitung (mehrmalig)",
+                    "value": 3
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (einmalig)",
+                    "value": 4
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (mehrmalig)",
+                    "value": 5
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "value": 6
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "value": 7
                   }
                 ]
               }
             },
             {
+              "caption": "Auslösender Wert",
+              "name": "Value",
+              "width": "140px",
+              "add": "true",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            },
+            {
               "caption": "Vollschutz",
               "name": "FullProtectionModeActive",
-              "width": "200px",
+              "width": "100px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
@@ -872,8 +964,8 @@
             {
               "caption": "Hüllschutz",
               "name": "HullProtectionModeActive",
-              "width": "200px",
-              "add": false,
+              "width": "100px",
+              "add": true,
               "edit": {
                 "type": "CheckBox"
               }
@@ -881,39 +973,6 @@
             {
               "caption": "Teilschutz",
               "name": "PartialProtectionModeActive",
-              "width": "202px",
-              "add": false,
-              "edit": {
-                "type": "CheckBox"
-              }
-            },
-            {
-              "caption": "Stummer Alarm",
-              "name": "SilentAlarm",
-              "width": "150px",
-              "add": false,
-              "edit": {
-                "type": "CheckBox"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "ExpansionPanel",
-      "caption": "Rauchmelder",
-      "items": [
-        {
-          "type": "List",
-          "name": "SmokeDetectors",
-          "rowCount": 5,
-          "add": true,
-          "delete": true,
-          "columns": [
-            {
-              "caption": "Aktiviert",
-              "name": "Use",
               "width": "100px",
               "add": true,
               "edit": {
@@ -921,125 +980,37 @@
               }
             },
             {
-              "caption": "Bezeichnung",
-              "name": "Name",
-              "width": "350px",
-              "add": "",
-              "edit": {
-                "type": "ValidationTextBox"
-              }
-            },
-            {
-              "caption": "Variable",
-              "name": "ID",
-              "width": "350px",
-              "add": 0,
-              "edit": {
-                "type": "SelectVariable"
-              }
-            },
-            {
-              "caption": "Auslösender Wert",
-              "name": "AlertingValue",
-              "width": "150px",
-              "add": 1,
-              "edit": {
-                "type": "Select",
-                "options": [
-                  {
-                    "caption": "0 | false",
-                    "value": 0
-                  },
-                  {
-                    "caption": "1 | true",
-                    "value": 1
-                  },
-                  {
-                    "caption": "2",
-                    "value": 2
-                  }
-                ]
-              }
-            },
-            {
-              "caption": "Stummer Alarm",
-              "name": "SilentAlarm",
-              "width": "150px",
-              "add": false,
-              "edit": {
-                "type": "CheckBox"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "ExpansionPanel",
-      "caption": "Wassersensoren",
-      "items": [
-        {
-          "type": "List",
-          "name": "WaterSensors",
-          "rowCount": 3,
-          "add": true,
-          "delete": true,
-          "columns": [
-            {
-              "caption": "Aktiviert",
-              "name": "Use",
-              "width": "100px",
+              "caption": "Benachrichtigung",
+              "name": "UseNotification",
+              "width": "140px",
               "add": true,
               "edit": {
                 "type": "CheckBox"
               }
             },
             {
-              "caption": "Bezeichnung",
-              "name": "Name",
-              "width": "350px",
-              "add": "",
+              "caption": "Alarmsirene",
+              "name": "UseAlarmSiren",
+              "width": "140px",
+              "add": true,
               "edit": {
-                "type": "ValidationTextBox"
+                "type": "CheckBox"
               }
             },
             {
-              "caption": "Variable",
-              "name": "ID",
-              "width": "350px",
-              "add": 0,
+              "caption": "Alarmbeleuchtung",
+              "name": "UseAlarmLight",
+              "width": "140px",
+              "add": true,
               "edit": {
-                "type": "SelectVariable"
+                "type": "CheckBox"
               }
             },
             {
-              "caption": "Auslösender Wert",
-              "name": "AlertingValue",
-              "width": "150px",
-              "add": 1,
-              "edit": {
-                "type": "Select",
-                "options": [
-                  {
-                    "caption": "0  | false",
-                    "value": 0
-                  },
-                  {
-                    "caption": "1 | true",
-                    "value": 1
-                  },
-                  {
-                    "caption": "2",
-                    "value": 2
-                  }
-                ]
-              }
-            },
-            {
-              "caption": "Stummer Alarm",
-              "name": "SilentAlarm",
-              "width": "150px",
-              "add": false,
+              "caption": "Alarmanruf",
+              "name": "UseAlarmCall",
+              "width": "140px",
+              "add": true,
               "edit": {
                 "type": "CheckBox"
               }
@@ -1149,7 +1120,7 @@
     },
     {
       "type": "ExpansionPanel",
-      "caption": "Alarmsensoren",
+      "caption": "Homematic Alarmsensoren",
       "items": [
         {
           "type": "PopupButton",

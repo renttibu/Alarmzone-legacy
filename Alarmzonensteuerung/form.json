@@ -62,14 +62,23 @@
           "caption": "Bewegungsmelderstatus"
         },
         {
-          "type": "CheckBox",
-          "name": "EnableSmokeDetectorState",
-          "caption": "Rauchmelderstatus"
+          "type": "Label",
+          "caption": " "
         },
         {
           "type": "CheckBox",
-          "name": "EnableWaterSensorState",
-          "caption": "Wassersensorenstatus"
+          "name": "EnableAlarmSirenState",
+          "caption": "Alarmsirene"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmLightState",
+          "caption": "Alarmbeleuchtung"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmCallState",
+          "caption": "Alarmanruf"
         }
       ]
     },
@@ -350,6 +359,48 @@
     },
     {
       "type": "ExpansionPanel",
+      "caption": "Auslösender Alarmsensor",
+      "items": [
+        {
+          "type": "List",
+          "name": "AlertingSensor",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Aktiviert",
+              "name": "Use",
+              "width": "100px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Variable der Alarmzone",
+              "name": "ID",
+              "width": "500px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Description",
+              "width": "300px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
       "caption": "Tür- und Fensterstatus",
       "items": [
         {
@@ -434,90 +485,6 @@
     },
     {
       "type": "ExpansionPanel",
-      "caption": "Rauchmelderstatus",
-      "items": [
-        {
-          "type": "List",
-          "name": "SmokeDetectorState",
-          "rowCount": 5,
-          "add": true,
-          "delete": true,
-          "columns": [
-            {
-              "caption": "Aktiviert",
-              "name": "Use",
-              "width": "100px",
-              "add": true,
-              "edit": {
-                "type": "CheckBox"
-              }
-            },
-            {
-              "caption": "Variable der Alarmzone",
-              "name": "ID",
-              "width": "500px",
-              "add": 0,
-              "edit": {
-                "type": "SelectVariable"
-              }
-            },
-            {
-              "caption": "Bezeichnung",
-              "name": "Description",
-              "width": "300px",
-              "add": "",
-              "edit": {
-                "type": "ValidationTextBox"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "ExpansionPanel",
-      "caption": "Wassersensorenstatus",
-      "items": [
-        {
-          "type": "List",
-          "name": "WaterSensorState",
-          "rowCount": 5,
-          "add": true,
-          "delete": true,
-          "columns": [
-            {
-              "caption": "Aktiviert",
-              "name": "Use",
-              "width": "100px",
-              "add": true,
-              "edit": {
-                "type": "CheckBox"
-              }
-            },
-            {
-              "caption": "Variable der Alarmzone",
-              "name": "ID",
-              "width": "500px",
-              "add": 0,
-              "edit": {
-                "type": "SelectVariable"
-              }
-            },
-            {
-              "caption": "Bezeichnung",
-              "name": "Description",
-              "width": "300px",
-              "add": "",
-              "edit": {
-                "type": "ValidationTextBox"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "ExpansionPanel",
       "caption": "Fernbedienungen",
       "items": [
         {
@@ -556,9 +523,9 @@
             },
             {
               "caption": "Auslöser",
-              "name": "TriggerType",
-              "width": "230px",
-              "add": 2,
+              "name": "Trigger",
+              "width": "250px",
+              "add": 7,
               "edit": {
                 "type": "Select",
                 "options": [
@@ -571,41 +538,39 @@
                     "value": 1
                   },
                   {
-                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "caption": "Bei Grenzunterschreitung (einmalig)",
                     "value": 2
                   },
                   {
-                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "caption": "Bei Grenzunterschreitung (mehrmalig)",
                     "value": 3
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (einmalig)",
+                    "value": 4
+                  },
+                  {
+                    "caption": "Bei Grenzüberschreitung (mehrmalig)",
+                    "value": 5
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (einmalig)",
+                    "value": 6
+                  },
+                  {
+                    "caption": "Bei bestimmtem Wert (mehrmalig)",
+                    "value": 7
                   }
                 ]
               }
             },
             {
               "caption": "Auslösender Wert",
-              "name": "TriggerValue",
-              "width": "180px",
-              "add": 1,
+              "name": "Value",
+              "width": "140px",
+              "add": "true",
               "edit": {
-                "type": "Select",
-                "options": [
-                  {
-                    "caption": "0 | false",
-                    "value": 0
-                  },
-                  {
-                    "caption": "1 | true",
-                    "value": 1
-                  },
-                  {
-                    "caption": "2",
-                    "value": 2
-                  },
-                  {
-                    "caption": "3",
-                    "value": 3
-                  }
-                ]
+                "type": "ValidationTextBox"
               }
             },
             {
@@ -650,6 +615,132 @@
               "add": 0,
               "edit": {
                 "type": "SelectScript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmsirene",
+      "items": [
+        {
+          "type": "List",
+          "name": "AlarmSiren",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Aktiviert",
+              "name": "Use",
+              "width": "100px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Variable der Alarmzone",
+              "name": "ID",
+              "width": "500px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Description",
+              "width": "300px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmbeleuchtung",
+      "items": [
+        {
+          "type": "List",
+          "name": "AlarmLight",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Aktiviert",
+              "name": "Use",
+              "width": "100px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Variable der Alarmzone",
+              "name": "ID",
+              "width": "500px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Description",
+              "width": "300px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Alarmanruf",
+      "items": [
+        {
+          "type": "List",
+          "name": "Alarmanruf",
+          "rowCount": 5,
+          "add": true,
+          "delete": true,
+          "columns": [
+            {
+              "caption": "Aktiviert",
+              "name": "Use",
+              "width": "100px",
+              "add": true,
+              "edit": {
+                "type": "CheckBox"
+              }
+            },
+            {
+              "caption": "Variable der Alarmzone",
+              "name": "ID",
+              "width": "500px",
+              "add": 0,
+              "edit": {
+                "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Bezeichnung",
+              "name": "Description",
+              "width": "300px",
+              "add": "",
+              "edit": {
+                "type": "ValidationTextBox"
               }
             }
           ]

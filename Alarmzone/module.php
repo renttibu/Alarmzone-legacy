@@ -1,24 +1,15 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone
+ */
+
 /** @noinspection PhpUndefinedFunctionInspection */
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
-
-/*
- * @module      Alarmzone (20201120-0737)
- *
- * @prefix      AZ
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license    	CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/Alarmzone
- *
- */
 
 declare(strict_types=1);
 
@@ -29,13 +20,12 @@ class Alarmzone extends IPSModule
     //Helper
     use AZ_alarmProtocol;
     use AZ_backupRestore;
+    use AZ_blacklist;
     use AZ_controlAlarmZone;
     use AZ_doorWindowSensors;
     use AZ_motionDetectors;
     use AZ_notificationCenter;
     use AZ_remoteControls;
-    use AZ_smokeDetectors;
-    use AZ_waterSensors;
 
     //Constants
     private const HOMEMATIC_DEVICE_GUID = '{EE4A81C6-5C90-4DB7-AD2F-F6BBD521412E}';
@@ -70,6 +60,7 @@ class Alarmzone extends IPSModule
         }
         $this->SetOptions();
         $this->DeactivateTimers();
+        $this->SetBuffer('LastAlertingSensor', '[]');
         $this->RegisterMessages();
         $this->ResetBlacklist();
         $this->UpdateStates();
@@ -116,44 +107,24 @@ class Alarmzone extends IPSModule
                 $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
                 if (!empty($doorWindowSensors)) {
                     if (array_search($SenderID, array_column($doorWindowSensors, 'ID')) !== false) {
-                        // Only if status has changed
+                        $valueChanged = 'false';
                         if ($Data[1]) {
-                            $scriptText = 'AZ_CheckDoorWindowSensorAlerting(' . $this->InstanceID . ', ' . $SenderID . ');';
-                            IPS_RunScriptText($scriptText);
+                            $valueChanged = 'true';
                         }
+                        $scriptText = 'AZ_CheckDoorWindowSensorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
+                        IPS_RunScriptText($scriptText);
                     }
                 }
                 //Motion detectors
                 $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'), true);
                 if (!empty($motionDetectors)) {
                     if (array_search($SenderID, array_column($motionDetectors, 'ID')) !== false) {
-                        // Only if status has changed
+                        $valueChanged = 'false';
                         if ($Data[1]) {
-                            $scriptText = 'AZ_CheckMotionDetectorAlerting(' . $this->InstanceID . ', ' . $SenderID . ');';
-                            IPS_RunScriptText($scriptText);
+                            $valueChanged = 'true';
                         }
-                    }
-                }
-                //Smoke detectors
-                $smokeDetectors = json_decode($this->ReadPropertyString('SmokeDetectors'), true);
-                if (!empty($smokeDetectors)) {
-                    if (array_search($SenderID, array_column($smokeDetectors, 'ID')) !== false) {
-                        // Only if status has changed
-                        if ($Data[1]) {
-                            $scriptText = 'AZ_ExecuteSmokeDetectorAlerting(' . $this->InstanceID . ', ' . $SenderID . ');';
-                            IPS_RunScriptText($scriptText);
-                        }
-                    }
-                }
-                //Water sensors
-                $waterSensors = json_decode($this->ReadPropertyString('WaterSensors'), true);
-                if (!empty($waterSensors)) {
-                    if (array_search($SenderID, array_column($waterSensors, 'ID')) !== false) {
-                        // Only if status has changed
-                        if ($Data[1]) {
-                            $scriptText = 'AZ_ExecuteWaterSensorAlerting(' . $this->InstanceID . ', ' . $SenderID . ');';
-                            IPS_RunScriptText($scriptText);
-                        }
+                        $scriptText = 'AZ_CheckMotionDetectorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
+                        IPS_RunScriptText($scriptText);
                     }
                 }
                 break;
@@ -178,6 +149,10 @@ class Alarmzone extends IPSModule
                         $rowColor = '#FFC0C0'; # red
                         $result = false;
                     }
+                } else {
+                    if (!$var->Use) {
+                        $rowColor = '#DFDFDF'; # grey
+                    }
                 }
                 if ($action == 5) { # script
                     if ($scriptID == 0 || !@IPS_ObjectExists($scriptID)) {
@@ -188,12 +163,14 @@ class Alarmzone extends IPSModule
                     }
                 }
                 $formData['elements'][7]['items'][0]['values'][] = [
-                    'Use'      => $var->Use,
-                    'Name'     => $var->Name,
-                    'ID'       => $id,
-                    'Action'   => $var->Action,
-                    'ScriptID' => $var->ScriptID,
-                    'rowColor' => $rowColor];
+                    'Use'       => $var->Use,
+                    'Name'      => $var->Name,
+                    'ID'        => $id,
+                    'Trigger'   => $var->Trigger,
+                    'Value'     => $var->Value,
+                    'Action'    => $var->Action,
+                    'ScriptID'  => $var->ScriptID,
+                    'rowColor'  => $rowColor];
             }
         }
         //Door and window sensors
@@ -215,9 +192,81 @@ class Alarmzone extends IPSModule
                         }
                     }
                     if (!$blacklisted) {
-                        $alertingValue = $doorWindowSensor['AlertingValue'];
-                        if (GetValue($doorWindowSensor['ID']) == $alertingValue) {
-                            $rowColor = '#C0C0FF'; # violett
+                        $type = IPS_GetVariable($id)['VariableType'];
+                        $value = $doorWindowSensor['Value'];
+                        switch ($doorWindowSensor['Trigger']) {
+                            case 2: #on limit drop, once (integer, float)
+                            case 3: #on limit drop, every time (integer, float)
+                                switch ($type) {
+                                    case 1: #integer
+                                        if (GetValueInteger($id) < intval($value)) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                    case 2: #float
+                                        if (GetValueFloat($id) < floatval(str_replace(',', '.', $value))) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                }
+                                break;
+
+                            case 4: #on limit exceed, once (integer, float)
+                            case 5: #on limit exceed, every time (integer, float)
+                                switch ($type) {
+                                    case 1: #integer
+                                        if (GetValueInteger($id) > intval($value)) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                    case 2: #float
+                                        if (GetValueFloat($id) > floatval(str_replace(',', '.', $value))) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                }
+                                break;
+
+                            case 6: #on specific value, once (bool, integer, float, string)
+                            case 7: #on specific value, every time (bool, integer, float, string)
+                                switch ($type) {
+                                    case 0: #bool
+                                        if ($value == 'false') {
+                                            $value = '0';
+                                        }
+                                        if (GetValueBoolean($id) == boolval($value)) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                    case 1: #integer
+                                        if (GetValueInteger($id) == intval($value)) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                    case 2: #float
+                                        if (GetValueFloat($id) == floatval(str_replace(',', '.', $value))) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                    case 3: #string
+                                        if (GetValueString($id) == (string) $value) {
+                                            $rowColor = '#C0C0FF'; # violett
+                                        }
+                                        break;
+
+                                }
+                                break;
+
+                        }
+                        if (!$doorWindowSensor['Use']) {
+                            $rowColor = '#DFDFDF'; # grey
                         }
                     }
                 } else {
@@ -230,19 +279,21 @@ class Alarmzone extends IPSModule
                     'Use'                           => $doorWindowSensor['Use'],
                     'Name'                          => $doorWindowSensor['Name'],
                     'ID'                            => $doorWindowSensor['ID'],
-                    'AlertingValue'                 => $doorWindowSensor['AlertingValue'],
+                    'Trigger'                       => $doorWindowSensor['Trigger'],
+                    'Value'                         => $doorWindowSensor['Value'],
                     'FullProtectionModeActive'      => $doorWindowSensor['FullProtectionModeActive'],
                     'HullProtectionModeActive'      => $doorWindowSensor['HullProtectionModeActive'],
                     'PartialProtectionModeActive'   => $doorWindowSensor['PartialProtectionModeActive'],
-                    'SilentAlarm'                   => $doorWindowSensor['SilentAlarm'],
+                    'UseNotification'               => $doorWindowSensor['UseNotification'],
+                    'UseAlarmSiren'                 => $doorWindowSensor['UseAlarmSiren'],
+                    'UseAlarmLight'                 => $doorWindowSensor['UseAlarmLight'],
+                    'UseAlarmCall'                  => $doorWindowSensor['UseAlarmCall'],
                     'rowColor'                      => $rowColor];
             }
         }
         //Properties
         $properties = [];
         array_push($properties, ['name' => 'MotionDetectors', 'position' => 9]);
-        array_push($properties, ['name' => 'SmokeDetectors', 'position' => 10]);
-        array_push($properties, ['name' => 'WaterSensors', 'position' => 11]);
         if (!empty($properties)) {
             foreach ($properties as $property) {
                 $propertyName = $property['name'];
@@ -253,31 +304,28 @@ class Alarmzone extends IPSModule
                         $rowColor = '';
                         $id = $var->ID;
                         if ($id == 0 || !@IPS_ObjectExists($id)) {
-                            if ($var->Use) {
-                                $rowColor = '#FFC0C0'; # red
-                                $result = false;
+                            $rowColor = '#FFC0C0'; # red
+                            $result = false;
+                        } else {
+                            if (!$var->Use) {
+                                $rowColor = '#DFDFDF'; # grey
                             }
                         }
-                        if ($propertyName == 'SmokeDetectors' || $propertyName == 'WaterSensors') {
-                            $formData['elements'][$propertyPosition]['items'][0]['values'][] = [
-                                'Use'           => $var->Use,
-                                'Name'          => $var->Name,
-                                'ID'            => $id,
-                                'AlertingValue' => $var->AlertingValue,
-                                'SilentAlarm'   => $var->SilentAlarm,
-                                'rowColor'      => $rowColor];
-                        } else { # motion detectors
-                            $formData['elements'][$propertyPosition]['items'][0]['values'][] = [
-                                'Use'                         => $var->Use,
-                                'Name'                        => $var->Name,
-                                'ID'                          => $id,
-                                'AlertingValue'               => $var->AlertingValue,
-                                'FullProtectionModeActive'    => $var->FullProtectionModeActive,
-                                'HullProtectionModeActive'    => $var->HullProtectionModeActive,
-                                'PartialProtectionModeActive' => $var->PartialProtectionModeActive,
-                                'SilentAlarm'                 => $var->SilentAlarm,
-                                'rowColor'                    => $rowColor];
-                        }
+                        # motion detectors
+                        $formData['elements'][$propertyPosition]['items'][0]['values'][] = [
+                            'Use'                           => $var->Use,
+                            'Name'                          => $var->Name,
+                            'ID'                            => $id,
+                            'Trigger'                       => $var->Trigger,
+                            'Value'                         => $var->Value,
+                            'FullProtectionModeActive'      => $var->FullProtectionModeActive,
+                            'HullProtectionModeActive'      => $var->HullProtectionModeActive,
+                            'PartialProtectionModeActive'   => $var->PartialProtectionModeActive,
+                            'UseNotification'               => $var->UseNotification,
+                            'UseAlarmSiren'                 => $var->UseAlarmSiren,
+                            'UseAlarmLight'                 => $var->UseAlarmLight,
+                            'UseAlarmCall'                  => $var->UseAlarmCall,
+                            'rowColor'                      => $rowColor];
                     }
                 }
             }
@@ -363,7 +411,7 @@ class Alarmzone extends IPSModule
                     if ($object == 2) {
                         //Get variable type
                         $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $doorWindowSensor->AlertingValue;
+                        $profile = $doorWindowSensor->Value;
                         switch ($variable) {
                             //0: Boolean, 1: Integer, 2: Float, 3: String
                             case 0:
@@ -428,98 +476,6 @@ class Alarmzone extends IPSModule
 
                                     case 1:
                                         $profileName = 'AZ.MotionDetector.Bool';
-                                        break;
-
-                                }
-                                break;
-
-                            default:
-                                $profileName = '';
-                        }
-                        if (!empty($profileName)) {
-                            IPS_SetVariableCustomProfile($id, $profileName);
-                            IPS_SetVariableCustomAction($id, 1);
-                        }
-                    }
-                }
-            }
-        }
-        //Smoke detectors
-        $smokeDetectors = json_decode($this->ReadPropertyString('SmokeDetectors'));
-        if (!empty($smokeDetectors)) {
-            foreach ($smokeDetectors as $smokeDetector) {
-                $id = $smokeDetector->ID;
-                if ($id != 0 && IPS_ObjectExists($id)) {
-                    $object = IPS_GetObject($id)['ObjectType'];
-                    //Check if object is a variable
-                    if ($object == 2) {
-                        //Get variable type
-                        $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $smokeDetector->AlertingValue;
-                        switch ($variable) {
-                            //0: Boolean, 1: Integer, 2: Float, 3: String
-                            case 0:
-                                switch ($profile) {
-                                    //0: Reversed, 1: Standard
-                                    case 0:
-                                        // not necessary yet
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.SmokeDetector.Bool';
-                                        break;
-
-                                }
-                                break;
-
-                            case 1:
-                                switch ($profile) {
-                                    //0: Reversed, 1: Standard
-                                    case 0:
-                                        //not necessary yet
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.SmokeDetector.Integer';
-                                        break;
-
-                                }
-                                break;
-
-                            default:
-                                $profileName = '';
-                        }
-                        if (!empty($profileName)) {
-                            IPS_SetVariableCustomProfile($id, $profileName);
-                            IPS_SetVariableCustomAction($id, 1);
-                        }
-                    }
-                }
-            }
-        }
-        //Water sensors
-        $waterSensors = json_decode($this->ReadPropertyString('WaterSensors'));
-        if (!empty($waterSensors)) {
-            foreach ($waterSensors as $waterSensor) {
-                $id = $waterSensor->ID;
-                if ($id != 0 && IPS_ObjectExists($id)) {
-                    $object = IPS_GetObject($id)['ObjectType'];
-                    //Check if object is a variable
-                    if ($object == 2) {
-                        //Get variable type
-                        $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $waterSensor->AlertingValue;
-                        switch ($variable) {
-                            //0: Boolean, 1: Integer, 2: Float, 3: String
-                            case 0:
-                                switch ($profile) {
-                                    //0: Reversed, 1: Standard
-                                    case 0:
-                                        //not necessary yet
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.WaterSensor.Bool';
                                         break;
 
                                 }
@@ -698,160 +654,6 @@ class Alarmzone extends IPSModule
                 }
             }
         }
-        //Smoke Detectors
-        $categoryID = @IPS_GetObjectIDByIdent('SmokeDetectorsCategory', $this->InstanceID);
-        //Get all monitored variables
-        $variables = json_decode($this->ReadPropertyString('SmokeDetectors'));
-        if (!empty($variables)) {
-            if ($categoryID === false) {
-                $categoryID = IPS_CreateCategory();
-            }
-            IPS_SetIdent($categoryID, 'SmokeDetectorsCategory');
-            IPS_SetName($categoryID, 'Rauchmelder');
-            IPS_SetParent($categoryID, $this->InstanceID);
-            IPS_SetIcon($categoryID, 'Flame');
-            IPS_SetPosition($categoryID, 220);
-            IPS_SetHidden($categoryID, true);
-            //Get variables
-            $targetIDs = [];
-            $i = 0;
-            foreach ($variables as $variable) {
-                $targetIDs[$i] = ['name' => $variable->Name, 'targetID' => $variable->ID];
-                $i++;
-            }
-            //Sort array alphabetically by device name
-            sort($targetIDs);
-            // Get all existing links
-            $existingTargetIDs = [];
-            $childrenIDs = IPS_GetChildrenIDs($categoryID);
-            $i = 0;
-            foreach ($childrenIDs as $childID) {
-                //Check if children is a link
-                $objectType = IPS_GetObject($childID)['ObjectType'];
-                if ($objectType == 6) {
-                    //Get target id
-                    $existingTargetID = IPS_GetLink($childID)['TargetID'];
-                    $existingTargetIDs[$i] = ['linkID' => $childID, 'targetID' => $existingTargetID];
-                    $i++;
-                }
-            }
-            //Delete dead links
-            $deadLinks = array_diff(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($deadLinks)) {
-                foreach ($deadLinks as $targetID) {
-                    $position = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$position]['linkID'];
-                    if (IPS_LinkExists($linkID)) {
-                        IPS_DeleteLink($linkID);
-                    }
-                }
-            }
-            //Create new links
-            $newLinks = array_diff(array_column($targetIDs, 'targetID'), array_column($existingTargetIDs, 'targetID'));
-            if (!empty($newLinks)) {
-                foreach ($newLinks as $targetID) {
-                    $linkID = IPS_CreateLink();
-                    IPS_SetParent($linkID, $categoryID);
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetLinkTargetID($linkID, $targetID);
-                    IPS_SetIcon($linkID, 'Flame');
-                }
-            }
-            //Edit existing links
-            $existingLinks = array_intersect(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($existingLinks)) {
-                foreach ($existingLinks as $targetID) {
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    $targetID = $targetIDs[$position]['targetID'];
-                    $index = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$index]['linkID'];
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetIcon($linkID, 'Flame');
-                }
-            }
-        }
-        //Water sensors
-        $categoryID = @IPS_GetObjectIDByIdent('WaterSensorsCategory', $this->InstanceID);
-        //Get all monitored variables
-        $variables = json_decode($this->ReadPropertyString('WaterSensors'));
-        if (!empty($variables)) {
-            if ($categoryID === false) {
-                $categoryID = IPS_CreateCategory();
-            }
-            IPS_SetIdent($categoryID, 'WaterSensorCategory');
-            IPS_SetName($categoryID, 'Wassersensoren');
-            IPS_SetParent($categoryID, $this->InstanceID);
-            IPS_SetIcon($categoryID, 'Tap');
-            IPS_SetPosition($categoryID, 240);
-            IPS_SetHidden($categoryID, true);
-            //Get variables
-            $targetIDs = [];
-            $i = 0;
-            foreach ($variables as $variable) {
-                $targetIDs[$i] = ['name' => $variable->Name, 'targetID' => $variable->ID];
-                $i++;
-            }
-            //Sort array alphabetically by device name
-            sort($targetIDs);
-            //Get all existing links
-            $existingTargetIDs = [];
-            $childrenIDs = IPS_GetChildrenIDs($categoryID);
-            $i = 0;
-            foreach ($childrenIDs as $childID) {
-                //Check if children is a link
-                $objectType = IPS_GetObject($childID)['ObjectType'];
-                if ($objectType == 6) {
-                    //Get target id
-                    $existingTargetID = IPS_GetLink($childID)['TargetID'];
-                    $existingTargetIDs[$i] = ['linkID' => $childID, 'targetID' => $existingTargetID];
-                    $i++;
-                }
-            }
-            //Delete dead links
-            $deadLinks = array_diff(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($deadLinks)) {
-                foreach ($deadLinks as $targetID) {
-                    $position = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$position]['linkID'];
-                    if (IPS_LinkExists($linkID)) {
-                        IPS_DeleteLink($linkID);
-                    }
-                }
-            }
-            //Create new links
-            $newLinks = array_diff(array_column($targetIDs, 'targetID'), array_column($existingTargetIDs, 'targetID'));
-            if (!empty($newLinks)) {
-                foreach ($newLinks as $targetID) {
-                    $linkID = IPS_CreateLink();
-                    IPS_SetParent($linkID, $categoryID);
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetLinkTargetID($linkID, $targetID);
-                    IPS_SetIcon($linkID, 'Tap');
-                }
-            }
-            //Edit existing links
-            $existingLinks = array_intersect(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($existingLinks)) {
-                foreach ($existingLinks as $targetID) {
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    $targetID = $targetIDs[$position]['targetID'];
-                    $index = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$index]['linkID'];
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetIcon($linkID, 'Tap');
-                }
-            }
-        }
         echo 'Die Verknüpfungen wurde erfolgreich angelegt!';
     }
 
@@ -875,8 +677,9 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', false);
-        $this->RegisterPropertyBoolean('EnableSmokeDetectorState', false);
-        $this->RegisterPropertyBoolean('EnableWaterSensorState', false);
+        $this->RegisterPropertyBoolean('EnableAlarmSirenState', true);
+        $this->RegisterPropertyBoolean('EnableAlarmLightState', true);
+        $this->RegisterPropertyBoolean('EnableAlarmCallState', true);
         //Descriptions
         $this->RegisterPropertyString('SystemName', 'Alarmzone');
         $this->RegisterPropertyString('Location', '');
@@ -896,6 +699,8 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyInteger('AlertingDelayFullProtectionMode', 0);
         $this->RegisterPropertyInteger('AlertingDelayHullProtectionMode', 0);
         $this->RegisterPropertyInteger('AlertingDelayPartialProtectionMode', 0);
+        //Alarm protocol
+        $this->RegisterPropertyInteger('AlarmProtocol', 0);
         //Notification center
         $this->RegisterPropertyInteger('NotificationCenter', 0);
         $this->RegisterPropertyString('AlarmZoneDisarmedSymbol', json_decode('"\ud83d\udfe2"'));
@@ -906,15 +711,11 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyString('PreAlarmSymbol', json_decode('"\u26a0\ufe0f"'));
         $this->RegisterPropertyString('AlarmSymbol', json_decode('"\u2757"'));
         $this->RegisterPropertyString('AlarmZoneSystemFailure', json_decode('"\u26a0\ufe0f"'));
-        //Alarm protocol
-        $this->RegisterPropertyInteger('AlarmProtocol', 0);
         //Remote controls
         $this->RegisterPropertyString('RemoteControls', '[]');
         //Alarm sensors
         $this->RegisterPropertyString('DoorWindowSensors', '[]');
         $this->RegisterPropertyString('MotionDetectors', '[]');
-        $this->RegisterPropertyString('SmokeDetectors', '[]');
-        $this->RegisterPropertyString('WaterSensors', '[]');
     }
 
     private function CreateProfiles(): void
@@ -937,7 +738,6 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Information', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Alarm', 'Alert', 0xFF0000);
         IPS_SetVariableProfileAssociation($profile, 2, 'Voralarm', 'Clock', 0xFFFF00);
-        IPS_SetVariableProfileAssociation($profile, 3, 'Stummer Alarm', 'Warning', 0xFF9300);
         //Door and window state
         $profile = 'AZ.' . $this->InstanceID . '.DoorWindowState';
         if (!IPS_VariableProfileExists($profile)) {
@@ -954,22 +754,6 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Motion');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', '', 0xFF0000);
-        //Smoke detector state
-        $profile = 'AZ.' . $this->InstanceID . '.SmokeDetectorState';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Flame');
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Rauch erkannt', '', 0xFF0000);
-        //Water sensor state
-        $profile = 'AZ.' . $this->InstanceID . '.WaterSensorState';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Tap');
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Wasser erkannt', '', 0xFF0000);
 
         ########## HomeMatic & Homematic IP devices
 
@@ -1009,31 +793,11 @@ class Alarmzone extends IPSModule
         }
         IPS_SetVariableProfileAssociation($profile, 0, 'Untätig', 'Information', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', 'Motion', 0xFF0000);
-        //Smoke detectors
-        $profile = 'AZ.SmokeDetector.Bool';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Information', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Rauch erkannt', 'Flame', 0xFF0000);
-        $profile = 'AZ.SmokeDetector.Integer';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 1);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Information', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Rauch erkannt', 'Flame', 0xFF0000);
-        //Water sensors
-        $profile = 'AZ.WaterSensor.Bool';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Information', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Wasser erkannt', 'Tap', 0xFF0000);
     }
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['AlarmZoneState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState', 'SmokeDetectorState', 'WaterSensorState'];
+        $profiles = ['AlarmZoneState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState'];
         if (!empty($profiles)) {
             foreach ($profiles as $profile) {
                 $profileName = 'AZ.' . $this->InstanceID . '.' . $profile;
@@ -1089,21 +853,37 @@ class Alarmzone extends IPSModule
         //Alarm zone state
         $profile = 'AZ.' . $this->InstanceID . '.AlarmZoneState';
         $this->RegisterVariableInteger('AlarmZoneState', 'Alarmzonenstatus', $profile, 60);
-        //Alarm state
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmState';
-        $this->RegisterVariableInteger('AlarmState', 'Alarm', $profile, 70);
         //Door and window state
         $profile = 'AZ.' . $this->InstanceID . '.DoorWindowState';
-        $this->RegisterVariableBoolean('DoorWindowState', 'Türen und Fenster', $profile, 80);
+        $this->RegisterVariableBoolean('DoorWindowState', 'Türen und Fenster', $profile, 70);
         //Motion detector state
         $profile = 'AZ.' . $this->InstanceID . '.MotionDetectorState';
-        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 90);
-        //Smoke detector state
-        $profile = 'AZ.' . $this->InstanceID . '.SmokeDetectorState';
-        $this->RegisterVariableBoolean('SmokeDetectorState', 'Rauchmelder', $profile, 100);
-        //Water sensor state
-        $profile = 'AZ.' . $this->InstanceID . '.WaterSensorState';
-        $this->RegisterVariableBoolean('WaterSensorState', 'Wassersensoren', $profile, 110);
+        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 80);
+        //Alarm state
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmState';
+        $this->RegisterVariableInteger('AlarmState', 'Alarm', $profile, 90);
+        //Alerting sensor
+        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 100);
+        $this->SetValue('AlertingSensor', '-');
+        IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
+        //Alarm siren
+        $id = @$this->GetIDForIdent('AlarmSiren');
+        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', 'Switch', 110);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmSiren'), 'Alert');
+        }
+        //Alarm light
+        $id = @$this->GetIDForIdent('AlarmLight');
+        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', 'Switch', 120);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmLight'), 'Bulb');
+        }
+        //Alarm call
+        $id = @$this->GetIDForIdent('AlarmCall');
+        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', 'Switch', 130);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmCall'), 'Mobile');
+        }
     }
 
     private function SetOptions(): void
@@ -1134,10 +914,12 @@ class Alarmzone extends IPSModule
         IPS_SetHidden($this->GetIDForIdent('DoorWindowState'), !$this->ReadPropertyBoolean('EnableDoorWindowState'));
         //Motion detector state
         IPS_SetHidden($this->GetIDForIdent('MotionDetectorState'), !$this->ReadPropertyBoolean('EnableMotionDetectorState'));
-        //Smoke detector state
-        IPS_SetHidden($this->GetIDForIdent('SmokeDetectorState'), !$this->ReadPropertyBoolean('EnableSmokeDetectorState'));
-        //Water sensor state
-        IPS_SetHidden($this->GetIDForIdent('WaterSensorState'), !$this->ReadPropertyBoolean('EnableWaterSensorState'));
+        //Alarm siren state
+        IPS_SetHidden($this->GetIDForIdent('AlarmSiren'), !$this->ReadPropertyBoolean('EnableAlarmSirenState'));
+        //Alarm light state
+        IPS_SetHidden($this->GetIDForIdent('AlarmLight'), !$this->ReadPropertyBoolean('EnableAlarmLightState'));
+        //Alarm call state
+        IPS_SetHidden($this->GetIDForIdent('AlarmCall'), !$this->ReadPropertyBoolean('EnableAlarmCallState'));
     }
 
     private function RegisterMessages(): void
@@ -1186,36 +968,12 @@ class Alarmzone extends IPSModule
                 }
             }
         }
-        //Smoke detectors
-        $variables = json_decode($this->ReadPropertyString('SmokeDetectors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
-        //Water Sensors
-        $variables = json_decode($this->ReadPropertyString('WaterSensors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
     }
 
     private function UpdateStates(): void
     {
         $this->CheckDoorWindowState(false);
         $this->CheckMotionDetectorState();
-        $this->CheckSmokeDetectorState();
-        $this->CheckWaterSensorState();
     }
 
     private function ValidateConfiguration(): bool

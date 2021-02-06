@@ -1,23 +1,14 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone
+ */
+
 /** @noinspection PhpUnused */
 /** @noinspection DuplicatedCode */
-
-/*
- * @module      Alarmzonensteuerung (20201120-0737)
- *
- * @prefix      AZS
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license    	CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/Alarmzone
- *
- */
 
 declare(strict_types=1);
 
@@ -95,11 +86,13 @@ class Alarmzonensteuerung extends IPSModule
                     'PartialProtectionMode',
                     'SystemState',
                     'AlarmState',
+                    'AlertingSensor',
                     'DoorWindowState',
                     'MotionDetectorState',
-                    'SmokeDetectorState',
-                    'WaterSensorState',
-                    'RemoteControls'];
+                    'RemoteControls',
+                    'AlarmSiren',
+                    'AlarmLight',
+                    'AlarmCall'];
                 foreach ($properties as $property) {
                     $variables = json_decode($this->ReadPropertyString($property), true);
                     if (!empty($variables)) {
@@ -151,10 +144,12 @@ class Alarmzonensteuerung extends IPSModule
         array_push($properties, ['name' => 'PartialProtectionMode', 'position' => 5]);
         array_push($properties, ['name' => 'SystemState', 'position' => 6]);
         array_push($properties, ['name' => 'AlarmState', 'position' => 7]);
-        array_push($properties, ['name' => 'DoorWindowState', 'position' => 8]);
-        array_push($properties, ['name' => 'MotionDetectorState', 'position' => 9]);
-        array_push($properties, ['name' => 'SmokeDetectorState', 'position' => 10]);
-        array_push($properties, ['name' => 'WaterSensorState', 'position' => 11]);
+        array_push($properties, ['name' => 'AlertingSensor', 'position' => 8]);
+        array_push($properties, ['name' => 'DoorWindowState', 'position' => 9]);
+        array_push($properties, ['name' => 'MotionDetectorState', 'position' => 10]);
+        array_push($properties, ['name' => 'AlarmSiren', 'position' => 11]);
+        array_push($properties, ['name' => 'AlarmLight', 'position' => 12]);
+        array_push($properties, ['name' => 'AlarmCall', 'position' => 13]);
         if (!empty($properties)) {
             foreach ($properties as $property) {
                 $propertyName = $property['name'];
@@ -201,7 +196,7 @@ class Alarmzonensteuerung extends IPSModule
                         }
                     }
                 }
-                $formData['elements'][12]['items'][0]['values'][] = [
+                $formData['elements'][13]['items'][0]['values'][] = [
                     'Use'      => $var->Use,
                     'Name'     => $var->Name,
                     'ID'       => $id,
@@ -293,8 +288,9 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', false);
-        $this->RegisterPropertyBoolean('EnableSmokeDetectorState', false);
-        $this->RegisterPropertyBoolean('EnableWaterSensorState', false);
+        $this->RegisterPropertyBoolean('EnableAlarmSirenState', true);
+        $this->RegisterPropertyBoolean('EnableAlarmLightState', true);
+        $this->RegisterPropertyBoolean('EnableAlarmCallState', true);
         //Description
         $this->RegisterPropertyString('Location', '');
         $this->RegisterPropertyString('FullProtectionName', 'Vollschutz');
@@ -308,12 +304,17 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyString('PartialProtectionMode', '[]');
         $this->RegisterPropertyString('SystemState', '[]');
         $this->RegisterPropertyString('AlarmState', '[]');
+        $this->RegisterPropertyString('AlertingSensor', '[]');
         $this->RegisterPropertyString('DoorWindowState', '[]');
         $this->RegisterPropertyString('MotionDetectorState', '[]');
-        $this->RegisterPropertyString('SmokeDetectorState', '[]');
-        $this->RegisterPropertyString('WaterSensorState', '[]');
         //Remote controls
         $this->RegisterPropertyString('RemoteControls', '[]');
+        //Alarm siren
+        $this->RegisterPropertyString('AlarmSiren', '[]');
+        //Alarm light
+        $this->RegisterPropertyString('AlarmLight', '[]');
+        //Alarm call
+        $this->RegisterPropertyString('AlarmCall', '[]');
     }
 
     private function CreateProfiles(): void
@@ -353,27 +354,11 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Motion');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', '', 0xFF0000);
-        //Smoke detector state
-        $profile = 'AZS.' . $this->InstanceID . '.SmokeDetectorState';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Flame');
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Rauch erkannt', '', 0xFF0000);
-        //Water sensor state
-        $profile = 'AZS.' . $this->InstanceID . '.WaterSensorState';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Tap');
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Wasser erkannt', '', 0xFF0000);
     }
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['SystemState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState', 'SmokeDetectorState', 'WaterSensorState'];
+        $profiles = ['SystemState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState'];
         if (!empty($profiles)) {
             foreach ($profiles as $profile) {
                 $profileName = 'AZS.' . $this->InstanceID . '.' . $profile;
@@ -408,21 +393,37 @@ class Alarmzonensteuerung extends IPSModule
         //System state
         $profile = 'AZS.' . $this->InstanceID . '.SystemState';
         $this->RegisterVariableInteger('SystemState', 'Systemstatus', $profile, 60);
-        //Alarm state
-        $profile = 'AZS.' . $this->InstanceID . '.AlarmState';
-        $this->RegisterVariableInteger('AlarmState', 'Alarmstatus', $profile, 70);
         //Door and window state
         $profile = 'AZS.' . $this->InstanceID . '.DoorWindowState';
-        $this->RegisterVariableBoolean('DoorWindowState', 'Türen- und Fenster', $profile, 80);
+        $this->RegisterVariableBoolean('DoorWindowState', 'Türen- und Fenster', $profile, 70);
         //Motion detector state
         $profile = 'AZS.' . $this->InstanceID . '.MotionDetectorState';
-        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 90);
-        //Smoke detector state
-        $profile = 'AZS.' . $this->InstanceID . '.SmokeDetectorState';
-        $this->RegisterVariableBoolean('SmokeDetectorState', 'Rauchmelder', $profile, 100);
-        //Water sensor state
-        $profile = 'AZS.' . $this->InstanceID . '.WaterSensorState';
-        $this->RegisterVariableBoolean('WaterSensorState', 'Wassersensoren', $profile, 110);
+        $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 80);
+        //Alarm state
+        $profile = 'AZS.' . $this->InstanceID . '.AlarmState';
+        $this->RegisterVariableInteger('AlarmState', 'Alarmstatus', $profile, 90);
+        //Alerting sensor
+        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 100);
+        $this->SetValue('AlertingSensor', $this->ReadPropertyString('AlertingSensor'));
+        IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
+        //Alarm siren
+        $id = @$this->GetIDForIdent('AlarmSiren');
+        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', 'Switch', 110);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmSiren'), 'Alert');
+        }
+        //Alarm light
+        $id = @$this->GetIDForIdent('AlarmLight');
+        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', 'Switch', 120);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmLight'), 'Bulb');
+        }
+        //Alarm call
+        $id = @$this->GetIDForIdent('AlarmCall');
+        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', 'Switch', 130);
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlarmCall'), 'Mobile');
+        }
     }
 
     private function SetOptions(): void
@@ -450,10 +451,12 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetHidden($this->GetIDForIdent('DoorWindowState'), !$this->ReadPropertyBoolean('EnableDoorWindowState'));
         //Motion detector state
         IPS_SetHidden($this->GetIDForIdent('MotionDetectorState'), !$this->ReadPropertyBoolean('EnableMotionDetectorState'));
-        //Smoke detector state
-        IPS_SetHidden($this->GetIDForIdent('SmokeDetectorState'), !$this->ReadPropertyBoolean('EnableSmokeDetectorState'));
-        //Water sensor state
-        IPS_SetHidden($this->GetIDForIdent('WaterSensorState'), !$this->ReadPropertyBoolean('EnableWaterSensorState'));
+        //Alarm siren state
+        IPS_SetHidden($this->GetIDForIdent('AlarmSiren'), !$this->ReadPropertyBoolean('EnableAlarmSirenState'));
+        //Alarm light state
+        IPS_SetHidden($this->GetIDForIdent('AlarmLight'), !$this->ReadPropertyBoolean('EnableAlarmLightState'));
+        //Alarm call state
+        IPS_SetHidden($this->GetIDForIdent('AlarmCall'), !$this->ReadPropertyBoolean('EnableAlarmCallState'));
     }
 
     private function RegisterMessages(): void
@@ -475,11 +478,13 @@ class Alarmzonensteuerung extends IPSModule
             'PartialProtectionMode',
             'SystemState',
             'AlarmState',
+            'AlertingSensor',
             'DoorWindowState',
             'MotionDetectorState',
-            'SmokeDetectorState',
-            'WaterSensorState',
-            'RemoteControls'];
+            'RemoteControls',
+            'AlarmSiren',
+            'AlarmLight',
+            'AlarmCall'];
         //Register
         foreach ($properties as $property) {
             $variables = json_decode($this->ReadPropertyString($property));

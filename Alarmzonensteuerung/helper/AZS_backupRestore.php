@@ -3,22 +3,6 @@
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
-/*
- * @module      Alarmzonensteuerung
- *
- * @prefix      AZS
- *
- * @file        AZS_backupRestore.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license    	CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/Alarmzone
- *
- */
-
 declare(strict_types=1);
 
 trait AZS_backupRestore

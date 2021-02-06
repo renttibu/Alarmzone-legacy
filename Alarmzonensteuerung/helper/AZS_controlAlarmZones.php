@@ -3,22 +3,6 @@
 /** @noinspection PhpUndefinedFunctionInspection */
 /** @noinspection PhpUnused */
 
-/*
- * @module      Alarmzonensteuerung
- *
- * @prefix      AZS
- *
- * @file        AZS_controlAlarmZones.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license    	CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/Alarmzone
- *
- */
-
 declare(strict_types=1);
 
 trait AZS_controlAlarmZones
@@ -38,10 +22,12 @@ trait AZS_controlAlarmZones
         $partialProtectionMode = [];
         $systemState = [];
         $alarmState = [];
+        $alertingSensor = [];
         $doorWindowState = [];
         $motionDetectorState = [];
-        $smokeDetectorState = [];
-        $waterSensorState = [];
+        $alarmSiren = [];
+        $alarmLight = [];
+        $alarmCall = [];
         foreach ($alarmZones as $alarmZone) {
             $id = $alarmZone->ID;
             $description = $alarmZone->Description;
@@ -78,6 +64,10 @@ trait AZS_controlAlarmZones
                         array_push($alarmState, ['Use' => true, 'ID' => $child, 'Description' => $description]);
                         break;
 
+                    case 'AlertingSensor':
+                        array_push($alertingSensor, ['Use' => true, 'ID' => $child, 'Description' => $description]);
+                        break;
+
                     case 'DoorWindowState':
                         array_push($doorWindowState, ['Use' => true, 'ID' => $child, 'Description' => $description]);
                         break;
@@ -86,12 +76,16 @@ trait AZS_controlAlarmZones
                         array_push($motionDetectorState, ['Use' => true, 'ID' => $child, 'Description' => $description]);
                         break;
 
-                    case 'SmokeDetectorState':
-                        array_push($smokeDetectorState, ['Use' => true, 'ID' => $child, 'Description' => $description]);
+                    case 'AlarmSiren':
+                        array_push($alarmSiren, ['Use' => true, 'ID' => $child, 'Description' => $description]);
                         break;
 
-                    case 'WaterSensorState':
-                        array_push($waterSensorState, ['Use' => true, 'ID' => $child, 'Description' => $description]);
+                    case 'AlarmLight':
+                        array_push($alarmLight, ['Use' => true, 'ID' => $child, 'Description' => $description]);
+                        break;
+
+                    case 'AlarmCall':
+                        array_push($alarmCall, ['Use' => true, 'ID' => $child, 'Description' => $description]);
                         break;
 
                 }
@@ -102,10 +96,12 @@ trait AZS_controlAlarmZones
         @IPS_SetProperty($this->InstanceID, 'PartialProtectionMode', json_encode($partialProtectionMode));
         @IPS_SetProperty($this->InstanceID, 'SystemState', json_encode($systemState));
         @IPS_SetProperty($this->InstanceID, 'AlarmState', json_encode($alarmState));
+        @IPS_SetProperty($this->InstanceID, 'AlertingSensor', json_encode($alertingSensor));
         @IPS_SetProperty($this->InstanceID, 'DoorWindowState', json_encode($doorWindowState));
         @IPS_SetProperty($this->InstanceID, 'MotionDetectorState', json_encode($motionDetectorState));
-        @IPS_SetProperty($this->InstanceID, 'SmokeDetectorState', json_encode($smokeDetectorState));
-        @IPS_SetProperty($this->InstanceID, 'WaterSensorState', json_encode($waterSensorState));
+        @IPS_SetProperty($this->InstanceID, 'AlarmSiren', json_encode($alarmSiren));
+        @IPS_SetProperty($this->InstanceID, 'AlarmLight', json_encode($alarmLight));
+        @IPS_SetProperty($this->InstanceID, 'AlarmCall', json_encode($alarmCall));
         if (@IPS_HasChanges($this->InstanceID)) {
             @IPS_ApplyChanges($this->InstanceID);
         }

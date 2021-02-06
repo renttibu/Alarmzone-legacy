@@ -2,22 +2,6 @@
 
 /** @noinspection DuplicatedCode */
 
-/*
- * @module      Alarmzonensteuerung
- *
- * @prefix      AZS
- *
- * @file        AZS_updateStates.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license    	CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/Alarmzone
- *
- */
-
 declare(strict_types=1);
 
 trait AZS_updateStates
@@ -40,10 +24,12 @@ trait AZS_updateStates
         $update3 = $this->UpdatePartialProtectionMode();
         $update4 = $this->UpdateSystemState();
         $update5 = $this->UpdateAlarmState();
-        $update6 = $this->UpdateDoorWindowState();
-        $update7 = $this->UpdateMotionDetectorState();
-        $update8 = $this->UpdateSmokeDetectorState();
-        $update9 = $this->UpdateWaterSensorState();
+        $update6 = $this->UpdateAlertingSensor();
+        $update7 = $this->UpdateDoorWindowState();
+        $update8 = $this->UpdateMotionDetectorState();
+        $update9 = $this->UpdateAlarmSiren();
+        $update10 = $this->UpdateAlarmLight();
+        $update11 = $this->UpdateAlarmCall();
         if (!$update1 ||
             !$update2 ||
             !$update3 ||
@@ -52,7 +38,9 @@ trait AZS_updateStates
             !$update6 ||
             !$update7 ||
             !$update8 ||
-            !$update9) {
+            !$update9 ||
+            !$update10 ||
+            !$update11) {
             $result = false;
         }
         return $result;
@@ -242,7 +230,6 @@ trait AZS_updateStates
         $state = 0; # no alarm
         $alarm = false;
         $preAlarm = false;
-        $mutedAlarm = false;
         foreach ($vars as $var) {
             if ($var['Use']) {
                 $id = $var['ID'];
@@ -255,22 +242,50 @@ trait AZS_updateStates
                     if ($actualValue == 2) { # pre alarm
                         $preAlarm = true;
                     }
-                    if ($actualValue == 3) { # muted alarm
-                        $mutedAlarm = true;
-                    }
                 }
             }
         }
         if ($preAlarm) {
             $state = 2;
         }
-        if ($mutedAlarm) {
-            $state = 3;
-        }
         if ($alarm) {
             $state = 1;
         }
         $this->SetValue('AlarmState', $state);
+        return $result;
+    }
+
+    /**
+     * Updates the alerting sensor.
+     *
+     * @return bool
+     * false    = an error occurred
+     * true     = ok
+     */
+    public function UpdateAlertingSensor(): bool
+    {
+        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
+        if ($this->CheckMaintenanceMode()) {
+            return false;
+        }
+        $result = false;
+        $sensorName = '-';
+        $vars = json_decode($this->ReadPropertyString('AlertingSensor'), true);
+        if (!empty($vars)) {
+            foreach ($vars as $var) {
+                if ($var['Use']) {
+                    $id = $var['ID'];
+                    if ($id != 0 && @IPS_ObjectExists($id)) {
+                        $result = true;
+                        $actualValue = GetValueString($id);
+                        if ($actualValue != '-') {
+                            $sensorName = $actualValue;
+                        }
+                    }
+                }
+            }
+        }
+        $this->SetValue('AlertingSensor', $sensorName);
         return $result;
     }
 
@@ -348,77 +363,87 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the smoke detector state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
-    public function UpdateSmokeDetectorState(): bool
+    public function UpdateAlarmSiren(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
-        $vars = json_decode($this->ReadPropertyString('SmokeDetectorState'), true);
+        $vars = json_decode($this->ReadPropertyString('AlarmSiren'), true);
         if (empty($vars)) {
             return false;
         }
         $result = false;
-        $state = false;
+        $state = 0; # off
         foreach ($vars as $var) {
             if ($var['Use']) {
                 $id = $var['ID'];
                 if ($id != 0 && @IPS_ObjectExists($id)) {
                     $result = true;
                     $actualValue = GetValueBoolean($var['ID']);
-                    if ($actualValue) {
+                    if ($actualValue) { # on
                         $state = true;
                     }
                 }
             }
         }
-        $this->SetValue('SmokeDetectorState', $state);
+        $this->SetValue('AlarmSiren', $state);
         return $result;
     }
 
-    /**
-     * Updates the water sensor state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
-    public function UpdateWaterSensorState(): bool
+    public function UpdateAlarmLight(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
-        $vars = json_decode($this->ReadPropertyString('WaterSensorState'), true);
+        $vars = json_decode($this->ReadPropertyString('AlarmLight'), true);
         if (empty($vars)) {
             return false;
         }
         $result = false;
-        $state = false;
+        $state = 0; # off
         foreach ($vars as $var) {
             if ($var['Use']) {
                 $id = $var['ID'];
                 if ($id != 0 && @IPS_ObjectExists($id)) {
                     $result = true;
                     $actualValue = GetValueBoolean($var['ID']);
-                    if ($actualValue) {
+                    if ($actualValue) { # on
                         $state = true;
                     }
                 }
             }
         }
-        $this->SetValue('WaterSensorState', $state);
+        $this->SetValue('AlarmLight', $state);
+        return $result;
+    }
+
+    public function UpdateAlarmCall(): bool
+    {
+        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
+        if ($this->CheckMaintenanceMode()) {
+            return false;
+        }
+        $vars = json_decode($this->ReadPropertyString('AlarmCall'), true);
+        if (empty($vars)) {
+            return false;
+        }
+        $result = false;
+        $state = 0; # off
+        foreach ($vars as $var) {
+            if ($var['Use']) {
+                $id = $var['ID'];
+                if ($id != 0 && @IPS_ObjectExists($id)) {
+                    $result = true;
+                    $actualValue = GetValueBoolean($var['ID']);
+                    if ($actualValue) { # on
+                        $state = true;
+                    }
+                }
+            }
+        }
+        $this->SetValue('AlarmCall', $state);
         return $result;
     }
 }
