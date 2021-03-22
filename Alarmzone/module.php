@@ -464,7 +464,7 @@ class Alarmzone extends IPSModule
                     if ($object == 2) {
                         //Get variable type
                         $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $motionDetector->AlertingValue;
+                        $profile = $motionDetector->Value;
                         switch ($variable) {
                             //0: Boolean, 1: Integer, 2: Float, 3: String
                             case 0:
