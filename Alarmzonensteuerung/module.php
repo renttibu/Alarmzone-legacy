@@ -147,9 +147,9 @@ class Alarmzonensteuerung extends IPSModule
         array_push($properties, ['name' => 'AlertingSensor', 'position' => 8]);
         array_push($properties, ['name' => 'DoorWindowState', 'position' => 9]);
         array_push($properties, ['name' => 'MotionDetectorState', 'position' => 10]);
-        array_push($properties, ['name' => 'AlarmSiren', 'position' => 11]);
-        array_push($properties, ['name' => 'AlarmLight', 'position' => 12]);
-        array_push($properties, ['name' => 'AlarmCall', 'position' => 13]);
+        array_push($properties, ['name' => 'AlarmSiren', 'position' => 12]);
+        array_push($properties, ['name' => 'AlarmLight', 'position' => 13]);
+        array_push($properties, ['name' => 'AlarmCall', 'position' => 14]);
         if (!empty($properties)) {
             foreach ($properties as $property) {
                 $propertyName = $property['name'];
