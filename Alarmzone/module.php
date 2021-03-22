@@ -671,12 +671,12 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('EnableLocation', true);
         $this->RegisterPropertyBoolean('EnableAlarmZoneName', true);
         $this->RegisterPropertyBoolean('EnableFullProtectionMode', true);
-        $this->RegisterPropertyBoolean('EnableHullProtectionMode', false);
-        $this->RegisterPropertyBoolean('EnablePartialProtectionMode', false);
+        $this->RegisterPropertyBoolean('EnableHullProtectionMode', true);
+        $this->RegisterPropertyBoolean('EnablePartialProtectionMode', true);
         $this->RegisterPropertyBoolean('EnableAlarmZoneState', true);
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
-        $this->RegisterPropertyBoolean('EnableMotionDetectorState', false);
+        $this->RegisterPropertyBoolean('EnableMotionDetectorState', true);
         $this->RegisterPropertyBoolean('EnableAlarmSirenState', true);
         $this->RegisterPropertyBoolean('EnableAlarmLightState', true);
         $this->RegisterPropertyBoolean('EnableAlarmCallState', true);
@@ -726,7 +726,7 @@ class Alarmzone extends IPSModule
             IPS_CreateVariableProfile($profile, 1);
         }
         IPS_SetVariableProfileIcon($profile, '');
-        IPS_SetVariableProfileAssociation($profile, 0, 'Unscharf', 'Information', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 0, 'Unscharf', 'IPS', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Scharf', 'Warning', 0xFF0000);
         IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert', 'Clock', 0xFFFF00);
         //Alarm state
@@ -735,7 +735,7 @@ class Alarmzone extends IPSModule
             IPS_CreateVariableProfile($profile, 1);
         }
         IPS_SetVariableProfileIcon($profile, '');
-        IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Information', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Warning', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Alarm', 'Alert', 0xFF0000);
         IPS_SetVariableProfileAssociation($profile, 2, 'Voralarm', 'Clock', 0xFFFF00);
         //Door and window state
@@ -754,6 +754,30 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileIcon($profile, 'Motion');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', '', 0xFF0000);
+        // Alarm siren
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmSirenStatus';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Alert');
+        IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
+        // Alarm light
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmLightStatus';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Bulb');
+        IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
+        // Alarm call
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmCallStatus';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Mobile');
+        IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
 
         ########## HomeMatic & Homematic IP devices
 
@@ -797,7 +821,7 @@ class Alarmzone extends IPSModule
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['AlarmZoneState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState'];
+        $profiles = ['AlarmZoneState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState', 'AlarmSirenStatus', 'AlarmLightStatus', 'AlarmCallStatus'];
         if (!empty($profiles)) {
             foreach ($profiles as $profile) {
                 $profileName = 'AZ.' . $this->InstanceID . '.' . $profile;
@@ -834,7 +858,7 @@ class Alarmzone extends IPSModule
         //Alarm zone name
         $this->RegisterVariableString('AlarmZoneName', 'Alarmzonenbezeichnung', '', 20);
         $this->SetValue('AlarmZoneName', $this->ReadPropertyString('AlarmZoneName'));
-        IPS_SetIcon($this->GetIDForIdent('AlarmZoneName'), 'Information');
+        IPS_SetIcon($this->GetIDForIdent('AlarmZoneName'), 'IPS');
         //Full protection mode
         $name = $this->ReadPropertyString('FullProtectionName');
         $this->RegisterVariableBoolean('FullProtectionMode', $name, '~Switch', 30);
@@ -852,7 +876,7 @@ class Alarmzone extends IPSModule
         IPS_SetIcon($this->GetIDForIdent('PartialProtectionMode'), 'Moon');
         //Alarm zone state
         $profile = 'AZ.' . $this->InstanceID . '.AlarmZoneState';
-        $this->RegisterVariableInteger('AlarmZoneState', 'Alarmzonenstatus', $profile, 60);
+        $this->RegisterVariableInteger('AlarmZoneState', 'Alarmzone', $profile, 60);
         //Door and window state
         $profile = 'AZ.' . $this->InstanceID . '.DoorWindowState';
         $this->RegisterVariableBoolean('DoorWindowState', 'Türen und Fenster', $profile, 70);
@@ -862,28 +886,19 @@ class Alarmzone extends IPSModule
         //Alarm state
         $profile = 'AZ.' . $this->InstanceID . '.AlarmState';
         $this->RegisterVariableInteger('AlarmState', 'Alarm', $profile, 90);
-        //Alerting sensor
-        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 100);
-        $this->SetValue('AlertingSensor', '-');
-        IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
         //Alarm siren
-        $id = @$this->GetIDForIdent('AlarmSiren');
-        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', 'Switch', 110);
-        if ($id == false) {
-            IPS_SetIcon($this->GetIDForIdent('AlarmSiren'), 'Alert');
-        }
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmSirenStatus';
+        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', $profile, 100);
         //Alarm light
-        $id = @$this->GetIDForIdent('AlarmLight');
-        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', 'Switch', 120);
-        if ($id == false) {
-            IPS_SetIcon($this->GetIDForIdent('AlarmLight'), 'Bulb');
-        }
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmLightStatus';
+        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', $profile, 110);
         //Alarm call
-        $id = @$this->GetIDForIdent('AlarmCall');
-        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', 'Switch', 130);
-        if ($id == false) {
-            IPS_SetIcon($this->GetIDForIdent('AlarmCall'), 'Mobile');
-        }
+        $profile = 'AZ.' . $this->InstanceID . '.AlarmCallStatus';
+        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', $profile, 120);
+        //Alerting sensor
+        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 130);
+        $this->SetValue('AlertingSensor', 'OK');
+        IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
     }
 
     private function SetOptions(): void

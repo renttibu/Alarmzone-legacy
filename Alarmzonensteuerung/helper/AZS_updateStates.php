@@ -269,7 +269,7 @@ trait AZS_updateStates
             return false;
         }
         $result = false;
-        $sensorName = '-';
+        $sensorName = 'OK';
         $vars = json_decode($this->ReadPropertyString('AlertingSensor'), true);
         if (!empty($vars)) {
             foreach ($vars as $var) {
@@ -278,7 +278,7 @@ trait AZS_updateStates
                     if ($id != 0 && @IPS_ObjectExists($id)) {
                         $result = true;
                         $actualValue = GetValueString($id);
-                        if ($actualValue != '-') {
+                        if ($actualValue != 'OK') {
                             $sensorName = $actualValue;
                         }
                     }

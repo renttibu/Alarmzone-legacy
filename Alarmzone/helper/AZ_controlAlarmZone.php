@@ -224,7 +224,7 @@ trait AZ_controlAlarmZone
         $this->SetValue('PartialProtectionMode', false);
         $this->SetValue('AlarmZoneState', 0);
         $this->SetValue('AlarmState', 0);
-        $this->SetValue('AlertingSensor', '-');
+        $this->SetValue('AlertingSensor', 'OK');
         $this->SetValue('AlarmSiren', false);
         $this->SetValue('AlarmLight', false);
         $this->SetValue('AlarmCall', false);
@@ -484,7 +484,7 @@ trait AZ_controlAlarmZone
         $this->SetValue('HullProtectionMode', $hullProtectionState);
         $this->SetValue('PartialProtectionMode', $partialProtectionState);
         $this->SetValue('AlarmState', 0);
-        $this->SetValue('AlertingSensor', '-');
+        $this->SetValue('AlertingSensor', 'OK');
         //Always check doors and windows and inform user about open doors and windows
         $this->ResetBlacklist();
         $this->CheckDoorWindowState(true);
