@@ -127,7 +127,7 @@
             {
               "caption": "Alarmzone",
               "name": "ID",
-              "width": "120px",
+              "width": "450px",
               "add": 0,
               "edit": {
                 "type": "SelectModule",
@@ -137,7 +137,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "430px",
+              "width": "450px",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
