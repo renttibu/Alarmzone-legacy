@@ -53,11 +53,6 @@
         },
         {
           "type": "CheckBox",
-          "name": "EnableAlarmState",
-          "caption": "Alarmstatus"
-        },
-        {
-          "type": "CheckBox",
           "name": "EnableDoorWindowState",
           "caption": "Türen- und Fensterstatus"
         },
@@ -69,6 +64,11 @@
         {
           "type": "Label",
           "caption": " "
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlarmState",
+          "caption": "Alarmstatus"
         },
         {
           "type": "CheckBox",
@@ -84,6 +84,11 @@
           "type": "CheckBox",
           "name": "EnableAlarmCallState",
           "caption": "Alarmanruf"
+        },
+        {
+          "type": "CheckBox",
+          "name": "EnableAlertingSensor",
+          "caption": "Auslösender Alarmsensor"
         }
       ]
     },

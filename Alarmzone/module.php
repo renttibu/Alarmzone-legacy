@@ -674,12 +674,13 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('EnableHullProtectionMode', true);
         $this->RegisterPropertyBoolean('EnablePartialProtectionMode', true);
         $this->RegisterPropertyBoolean('EnableAlarmZoneState', true);
-        $this->RegisterPropertyBoolean('EnableAlarmState', true);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', true);
+        $this->RegisterPropertyBoolean('EnableAlarmState', true);
         $this->RegisterPropertyBoolean('EnableAlarmSirenState', true);
         $this->RegisterPropertyBoolean('EnableAlarmLightState', true);
         $this->RegisterPropertyBoolean('EnableAlarmCallState', true);
+        $this->RegisterPropertyBoolean('EnableAlertingSensor', true);
         //Descriptions
         $this->RegisterPropertyString('SystemName', 'Alarmzone');
         $this->RegisterPropertyString('Location', '');
@@ -923,18 +924,20 @@ class Alarmzone extends IPSModule
         IPS_SetHidden($id, !$this->ReadPropertyBoolean('EnablePartialProtectionMode'));
         //Alarm zone state
         IPS_SetHidden($this->GetIDForIdent('AlarmZoneState'), !$this->ReadPropertyBoolean('EnableAlarmZoneState'));
-        //Alarm state
-        IPS_SetHidden($this->GetIDForIdent('AlarmState'), !$this->ReadPropertyBoolean('EnableAlarmState'));
         //Door and window state
         IPS_SetHidden($this->GetIDForIdent('DoorWindowState'), !$this->ReadPropertyBoolean('EnableDoorWindowState'));
         //Motion detector state
         IPS_SetHidden($this->GetIDForIdent('MotionDetectorState'), !$this->ReadPropertyBoolean('EnableMotionDetectorState'));
+        //Alarm state
+        IPS_SetHidden($this->GetIDForIdent('AlarmState'), !$this->ReadPropertyBoolean('EnableAlarmState'));
         //Alarm siren state
         IPS_SetHidden($this->GetIDForIdent('AlarmSiren'), !$this->ReadPropertyBoolean('EnableAlarmSirenState'));
         //Alarm light state
         IPS_SetHidden($this->GetIDForIdent('AlarmLight'), !$this->ReadPropertyBoolean('EnableAlarmLightState'));
         //Alarm call state
         IPS_SetHidden($this->GetIDForIdent('AlarmCall'), !$this->ReadPropertyBoolean('EnableAlarmCallState'));
+        //Alerting sensor
+        IPS_SetHidden($this->GetIDForIdent('AlertingSensor'), !$this->ReadPropertyBoolean('EnableAlertingSensor'));
     }
 
     private function RegisterMessages(): void
