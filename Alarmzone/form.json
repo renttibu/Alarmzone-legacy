@@ -1157,20 +1157,6 @@
         },
         {
           "type": "PopupButton",
-          "caption": "Variablenprofile zuweisen",
-          "popup": {
-            "caption": "Variablenprofile wirklich zuweisen?",
-            "items": [
-              {
-                "type": "Button",
-                "caption": "Variablenprofile zuweisen",
-                "onClick": "AZ_AssignProfiles($id);"
-              }
-            ]
-          }
-        },
-        {
-          "type": "PopupButton",
           "caption": "Verknüpfungen erstellen",
           "popup": {
             "caption": "Verknüpfungen wirklich erstellen?",
