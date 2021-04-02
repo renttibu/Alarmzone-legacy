@@ -1,20 +1,18 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung
+ */
+
 /** @noinspection DuplicatedCode */
 
 declare(strict_types=1);
 
 trait AZS_updateStates
 {
-    /**
-     * Updates several states.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateStates(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -46,15 +44,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the full protection mode.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateFullProtectionMode(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -86,15 +75,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the hull protection mode.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateHullProtectionMode(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -126,15 +106,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the partial protection mode.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdatePartialProtectionMode(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -166,15 +137,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the system state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateSystemState(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -207,15 +169,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the alarm state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateAlarmState(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -255,13 +208,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the alerting sensor.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     */
     public function UpdateAlertingSensor(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -289,15 +235,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the door window state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateDoorWindowState(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -326,15 +263,6 @@ trait AZS_updateStates
         return $result;
     }
 
-    /**
-     * Updates the motion detector state.
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     *
-     * @throws Exception
-     */
     public function UpdateMotionDetectorState(): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);

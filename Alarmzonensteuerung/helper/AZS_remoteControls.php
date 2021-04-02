@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung
+ */
+
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
@@ -7,13 +14,6 @@ declare(strict_types=1);
 
 trait AZS_remoteControls
 {
-    /**
-     * Triggers a remote control action.
-     *
-     * @param int $SenderID
-     * @param bool $ValueChanged
-     * @return bool
-     */
     public function TriggerRemoteControlAction(int $SenderID, bool $ValueChanged): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);

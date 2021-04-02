@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung
+ */
+
 /** @noinspection PhpUndefinedFunctionInspection */
 /** @noinspection PhpUnused */
 
@@ -7,9 +14,6 @@ declare(strict_types=1);
 
 trait AZS_controlAlarmZones
 {
-    /**
-     * Determines the variables of the alarm zones automatically.
-     */
     public function DetermineAlarmZoneVariables(): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -108,15 +112,6 @@ trait AZS_controlAlarmZones
         echo 'Variablen wurden automatisch ermittelt!';
     }
 
-    /**
-     * Disarms the alarm zones.
-     *
-     * @param string $Sender
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     */
     public function DisarmAlarmZones(string $Sender): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -142,19 +137,6 @@ trait AZS_controlAlarmZones
         return $result;
     }
 
-    /**
-     * Toggles the full protection mode.
-     *
-     * @param bool $State
-     * false    = disarm
-     * true     = arm
-     *
-     * @param string $Sender
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     */
     public function ToggleFullProtectionMode(bool $State, string $Sender): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -195,19 +177,6 @@ trait AZS_controlAlarmZones
         return $result;
     }
 
-    /**
-     * Toggles the hull protection mode.
-     *
-     * @param bool $State
-     * false    = disarm
-     * true     = arm
-     *
-     * @param string $Sender
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     */
     public function ToggleHullProtectionMode(bool $State, string $Sender): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -248,19 +217,6 @@ trait AZS_controlAlarmZones
         return $result;
     }
 
-    /**
-     * Toggles the partial protection mode.
-     *
-     * @param bool $State
-     * false    = disarm
-     * true     = arm
-     *
-     * @param string $Sender
-     *
-     * @return bool
-     * false    = an error occurred
-     * true     = ok
-     */
     public function TogglePartialProtectionMode(bool $State, string $Sender): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
