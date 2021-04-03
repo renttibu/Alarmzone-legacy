@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
+ */
+
 /** @noinspection PhpUnusedPrivateMethodInspection */
 /** @noinspection PhpUndefinedFunctionInspection */
 
@@ -9,26 +16,16 @@ trait AZ_notificationCenter
 {
     #################### Private
 
-    /**
-     * Sends a notification.
-     *
-     * @param string $ActionText
-     *
-     * @param string $MessageText
-     *
-     * @param string $LogText
-     *
-     * @param int $MessageType
-     * 0    = notification
-     * 1    = acknowledgement
-     * 2    = alert
-     * 3    = sabotage
-     * 4    = battery
-     *
-     * @throws Exception
-     */
     private function SendNotification(string $ActionText, string $MessageText, string $LogText, int $MessageType): void
     {
+        /*
+         * $MessageType
+         * 0    = notification
+         * 1    = acknowledgement
+         * 2    = alert
+         * 3    = sabotage
+         * 4    = battery
+         */
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return;
@@ -38,10 +35,10 @@ trait AZ_notificationCenter
             return;
         }
         $location = $this->ReadPropertyString('Location');
-        //Push
+        // Push
         $pushTitle = substr($location, 0, 32);
         $pushText = "\n" . $ActionText . "\n" . $MessageText;
-        //E-Mail
+        // E-Mail
         $eMailSubject = $location . ', ' . $ActionText;
         $alarmProtocol = $this->ReadPropertyInteger('AlarmProtocol');
         if ($alarmProtocol != 0 && @IPS_ObjectExists($alarmProtocol)) {
@@ -56,9 +53,9 @@ trait AZ_notificationCenter
             $LogText .= "\n\n" . $eventProtocol;
         }
         $eMailText = $LogText;
-        //SMS
+        // SMS
         $smsText = $location . "\n" . $ActionText . "\n" . $MessageText;
-        //Send notification
+        // Send notification
         @BZ_SendNotification($notificationCenter, $pushTitle, $pushText, $eMailSubject, $eMailText, $smsText, $MessageType);
         /*
         $script = 'BZ_SendNotification(' . $notificationCenter . ', "' . $pushTitle . '", "' . $pushText . '", "' . $eMailSubject . '", "' . $eMailText . '", "' . $smsText . '", ' . $MessageType . ');';
@@ -66,9 +63,6 @@ trait AZ_notificationCenter
          */
     }
 
-    /**
-     * Confirms the alarm message.
-     */
     private function ConfirmAlarmNotification(): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);

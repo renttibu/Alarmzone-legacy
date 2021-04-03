@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
+ */
+
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
@@ -7,9 +14,6 @@ declare(strict_types=1);
 
 trait AZ_doorWindowSensors
 {
-    /**
-     * Determines the door and window state variables automatically.
-     */
     public function DetermineDoorWindowVariables(): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -26,7 +30,7 @@ trait AZ_doorWindowSensors
                         $match = true;
                     }
                     if ($match) {
-                        //Check for variable
+                        // Check for variable
                         if ($object['ObjectType'] == 2) {
                             $name = strstr(@IPS_GetName($instanceID), ':', true);
                             if ($name == false) {
@@ -49,9 +53,9 @@ trait AZ_doorWindowSensors
                     }
                 }
             }
-            //Get already listed variables
+            // Get already listed variables
             $listedVariables = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
-            //Delete the variables that no longer exist
+            // Delete the variables that no longer exist
             if (!empty($listedVariables)) {
                 $deleteVariables = array_diff(array_column($listedVariables, 'ID'), array_column($variables, 'ID'));
                 if (!empty($deleteVariables)) {
@@ -60,7 +64,7 @@ trait AZ_doorWindowSensors
                     }
                 }
             }
-            //Add new variables
+            // Add new variables
             if (!empty($listedVariables)) {
                 $addVariables = array_diff(array_column($variables, 'ID'), array_column($listedVariables, 'ID'));
                 if (!empty($addVariables)) {
@@ -85,13 +89,13 @@ trait AZ_doorWindowSensors
                 $listedVariables = $variables;
             }
         }
-        //Sort variables by name
+        // Sort variables by name
         usort($listedVariables, function ($a, $b)
         {
             return $a['Name'] <=> $b['Name'];
         });
         $listedVariables = array_values($listedVariables);
-        //Update variable list
+        // Update variable list
         $value = json_encode($listedVariables);
         @IPS_SetProperty($this->InstanceID, 'DoorWindowSensors', $value);
         if (@IPS_HasChanges($this->InstanceID)) {
@@ -100,13 +104,6 @@ trait AZ_doorWindowSensors
         echo 'Tür- / Fenstersensoren wurden automatisch ermittelt!';
     }
 
-    /**
-     * Checks the alerting of a door and window sensor.
-     *
-     * @param int $SenderID
-     * @param bool $ValueChanged
-     * @throws Exception
-     */
     public function CheckDoorWindowSensorAlerting(int $SenderID, bool $ValueChanged): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -116,7 +113,7 @@ trait AZ_doorWindowSensors
         }
         $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
         if (!empty($doorWindowSensors)) {
-            //Check if sensor is listed
+            // Check if sensor is listed
             $key = array_search($SenderID, array_column($doorWindowSensors, 'ID'));
             if (is_int($key)) {
                 if (!$doorWindowSensors[$key]['Use']) {
@@ -127,7 +124,7 @@ trait AZ_doorWindowSensors
                 $type = IPS_GetVariable($SenderID)['VariableType'];
                 $value = $doorWindowSensors[$key]['Value'];
                 switch ($doorWindowSensors[$key]['Trigger']) {
-                    case 0: #on change (bool, integer, float, string)
+                    case 0: # on change (bool, integer, float, string)
                         $this->SendDebug(__FUNCTION__, 'Bei Änderung (bool, integer, float, string)', 0);
                         if ($ValueChanged) {
                             $execute = true;
@@ -135,15 +132,15 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 1: #on update (bool, integer, float, string)
+                    case 1: # on update (bool, integer, float, string)
                         $this->SendDebug(__FUNCTION__, 'Bei Aktualisierung (bool, integer, float, string)', 0);
                         $execute = true;
                         $open = true;
                         break;
 
-                    case 2: #on limit drop, once (integer, float)
+                    case 2: # on limit drop, once (integer, float)
                         switch ($type) {
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (integer)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -159,7 +156,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (float)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -178,9 +175,9 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 3: #on limit drop, every time (integer, float)
+                    case 3: # on limit drop, every time (integer, float)
                         switch ($type) {
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (integer)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -194,7 +191,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (float)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -211,9 +208,9 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 4: #on limit exceed, once (integer, float)
+                    case 4: # on limit exceed, once (integer, float)
                         switch ($type) {
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (integer)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -229,7 +226,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (float)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -248,9 +245,9 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 5: #on limit exceed, every time (integer, float)
+                    case 5: # on limit exceed, every time (integer, float)
                         switch ($type) {
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (integer)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -264,7 +261,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (float)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -281,7 +278,7 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 6: #on specific value, once (bool, integer, float, string)
+                    case 6: # on specific value, once (bool, integer, float, string)
                         switch ($type) {
                             case 0: #bool
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (bool)', 0);
@@ -296,7 +293,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (integer)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -312,7 +309,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (float)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -328,7 +325,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 3: #string
+                            case 3: # string
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (string)', 0);
                                 if ($ValueChanged) {
                                     $execute = true;
@@ -341,9 +338,9 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 7: #on specific value, every time (bool, integer, float, string)
+                    case 7: # on specific value, every time (bool, integer, float, string)
                         switch ($type) {
-                            case 0: #bool
+                            case 0: # bool
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (bool)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -354,7 +351,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (integer)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -368,7 +365,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (float)', 0);
                                 $execute = true;
                                 if ($value == 'false') {
@@ -382,7 +379,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 3: #string
+                            case 3: # string
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (string)', 0);
                                 $execute = true;
                                 if (GetValueString($SenderID) == (string) $value) {
@@ -395,7 +392,7 @@ trait AZ_doorWindowSensors
                 }
                 $this->SendDebug(__FUNCTION__, 'Bedingung erfüllt: ' . json_encode($execute), 0);
                 $this->SendDebug(__FUNCTION__, 'Tür / Fenster geöffnet: ' . json_encode($open), 0);
-                //Check alarm zone state
+                // Check alarm zone state
                 $sensorName = $doorWindowSensors[$key]['Name'];
                 $timeStamp = date('d.m.Y, H:i:s');
                 $location = $this->ReadPropertyString('Location');
@@ -405,7 +402,7 @@ trait AZ_doorWindowSensors
                     case 0: # disarmed
                         if ($execute) {
                             $this->CheckDoorWindowState(false);
-                            //Log
+                            // Log
                             $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';
                             if ($open) {
                                 $text = $sensorName . ' wurde geöffnet. (ID ' . $SenderID . ')';
@@ -419,7 +416,7 @@ trait AZ_doorWindowSensors
                         if ($execute) {
                             $this->CheckDoorWindowState(false);
                         }
-                        //Variable is black listed
+                        // Variable is black listed
                         if ($this->CheckSensorBlacklist($SenderID)) {
                             if ($execute) {
                                 $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';
@@ -430,13 +427,13 @@ trait AZ_doorWindowSensors
                                 $this->UpdateAlarmProtocol($logText, 0);
                             }
                         }
-                        //Variable is not black listed
+                        // Variable is not black listed
                         else {
                             $alerting = false;
                             $alertingDelayDuration = 0;
                             $alertingMode = 0;
                             if ($execute) {
-                                //Check if sensor is activated for full protection mode
+                                // Check if sensor is activated for full protection mode
                                 if ($this->GetValue('FullProtectionMode')) {
                                     if ($doorWindowSensors[$key]['FullProtectionModeActive']) {
                                         $alerting = true;
@@ -444,7 +441,7 @@ trait AZ_doorWindowSensors
                                         $alertingDelayDuration = $this->ReadPropertyInteger('AlertingDelayFullProtectionMode');
                                     }
                                 }
-                                //Check if sensor is activated for hull protection mode
+                                // Check if sensor is activated for hull protection mode
                                 if ($this->GetValue('HullProtectionMode')) {
                                     if ($doorWindowSensors[$key]['HullProtectionModeActive']) {
                                         $alerting = true;
@@ -452,7 +449,7 @@ trait AZ_doorWindowSensors
                                         $alertingDelayDuration = $this->ReadPropertyInteger('AlertingDelayHullProtectionMode');
                                     }
                                 }
-                                //Check if sensor is activated for partial protection mode
+                                // Check if sensor is activated for partial protection mode
                                 if ($this->GetValue('PartialProtectionMode')) {
                                     if ($doorWindowSensors[$key]['PartialProtectionModeActive']) {
                                         $alerting = true;
@@ -461,13 +458,13 @@ trait AZ_doorWindowSensors
                                     }
                                 }
                                 if ($alerting) {
-                                    //Pre Alarm
+                                    // Pre Alarm
                                     if ($alertingDelayDuration > 0) {
-                                        //Alarm state
+                                        // Alarm state
                                         $this->SetValue('AlarmState', 2);
                                         $this->SetValue('AlertingSensor', $sensorName);
                                         $this->SetTimerInterval('SetAlarmState', $alertingDelayDuration * 1000);
-                                        //Buffer
+                                        // Buffer
                                         $alertingSensor = json_encode([
                                             'id'                => $SenderID,
                                             'name'              => $sensorName,
@@ -480,14 +477,14 @@ trait AZ_doorWindowSensors
                                             'useAlarmLight'     => $doorWindowSensors[$key]['UseAlarmLight'],
                                             'useAlarmCall'      => $doorWindowSensors[$key]['UseAlarmCall']]);
                                         $this->SetBuffer('LastAlertingSensor', $alertingSensor);
-                                        //Log
+                                        // Log
                                         $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';
                                         if ($open) {
                                             $text = $sensorName . ' wurde geöffnet und hat einen Voralarm ausgelöst. (ID ' . $SenderID . ')';
                                         }
                                         $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                                         $this->UpdateAlarmProtocol($logText, 2);
-                                        //Notification
+                                        // Notification
                                         if ($doorWindowSensors[$key]['UseNotification']) {
                                             $actionText = $alarmZoneName . ', Alarm ' . $sensorName . '!';
                                             $alarmSymbol = $this->ReadPropertyString('PreAlarmSymbol');
@@ -500,19 +497,19 @@ trait AZ_doorWindowSensors
                                             }
                                         }
                                     }
-                                    //Alarm
+                                    // Alarm
                                     else {
-                                        //Alarm state
+                                        // Alarm state
                                         $this->SetValue('AlarmState', 1);
                                         $this->SetValue('AlertingSensor', $sensorName);
-                                        //Log
+                                        // Log
                                         $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';
                                         if ($open) {
                                             $text = $sensorName . ' wurde geöffnet und hat einen Alarm ausgelöst. (ID ' . $SenderID . ')';
                                         }
                                         $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                                         $this->UpdateAlarmProtocol($logText, 2);
-                                        //Options
+                                        // Options
                                         if ($doorWindowSensors[$key]['UseAlarmSiren']) {
                                             $this->SetValue('AlarmSiren', true);
                                         }
@@ -522,7 +519,7 @@ trait AZ_doorWindowSensors
                                         if ($doorWindowSensors[$key]['UseAlarmCall']) {
                                             $this->SetValue('AlarmCall', true);
                                         }
-                                        //Notification
+                                        // Notification
                                         if ($doorWindowSensors[$key]['UseNotification']) {
                                             $actionText = $alarmZoneName . ', Alarm ' . $sensorName . '!';
                                             $alarmSymbol = $this->ReadPropertyString('AlarmSymbol');
@@ -536,9 +533,9 @@ trait AZ_doorWindowSensors
                                         }
                                     }
                                 }
-                                //Non alerting
+                                // Non alerting
                                 else {
-                                    //Log
+                                    // Log
                                     $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';
                                     if ($open) {
                                         $text = $sensorName . ' wurde ohne Alarmauslösung geöffnet. (ID ' . $SenderID . ')';
@@ -563,24 +560,11 @@ trait AZ_doorWindowSensors
 
     #################### Private
 
-    /**
-     * Checks the state of all door and window sensors.
-     *
-     * @param bool $UseNotification
-     * false    = don't notify
-     * true     = notify
-     *
-     * @return bool
-     * false    = closed
-     * true     = opened
-     *
-     * @throws Exception
-     */
     private function CheckDoorWindowState(bool $UseNotification): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $timeStamp = date('d.m.Y, H:i:s');
-        //Check all door and window sensors
+        // Check all door and window sensors
         $doorWindowState = false;
         $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'));
         if (!empty($doorWindowSensors)) {
@@ -596,15 +580,15 @@ trait AZ_doorWindowSensors
                 $type = IPS_GetVariable($id)['VariableType'];
                 $value = $doorWindowSensor->Value;
                 switch ($doorWindowSensor->Trigger) {
-                    case 0: #on change (bool, integer, float, string)
-                    case 1: #on update (bool, integer, float, string)
+                    case 0: # on change (bool, integer, float, string)
+                    case 1: # on update (bool, integer, float, string)
                         $this->SendDebug(__FUNCTION__, 'Bei Änderung und bei Aktualisierung wird nicht berücksichtigt!', 0);
                         break;
 
-                    case 2: #on limit drop, once (integer, float)
-                    case 3: #on limit drop, every time (integer, float)
+                    case 2: # on limit drop, once (integer, float)
+                    case 3: # on limit drop, every time (integer, float)
                         switch ($type) {
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -617,7 +601,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -633,8 +617,8 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 4: #on limit exceed, once (integer, float)
-                    case 5: #on limit exceed, every time (integer, float)
+                    case 4: # on limit exceed, once (integer, float)
+                    case 5: # on limit exceed, every time (integer, float)
                         switch ($type) {
                             case 1: #integer
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
@@ -649,7 +633,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -665,10 +649,10 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 6: #on specific value, once (bool, integer, float, string)
-                    case 7: #on specific value, every time (bool, integer, float, string)
+                    case 6: # on specific value, once (bool, integer, float, string)
+                    case 7: # on specific value, every time (bool, integer, float, string)
                         switch ($type) {
-                            case 0: #bool
+                            case 0: # bool
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (bool)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -678,7 +662,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 1: #integer
+                            case 1: # integer
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (integer)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -691,7 +675,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 2: #float
+                            case 2: # float
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (float)', 0);
                                 if ($value == 'false') {
                                     $value = '0';
@@ -704,7 +688,7 @@ trait AZ_doorWindowSensors
                                 }
                                 break;
 
-                            case 3: #string
+                            case 3: # string
                                 $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (string)', 0);
                                 if (GetValueString($id) == (string) $value) {
                                     $open = true;
@@ -717,20 +701,20 @@ trait AZ_doorWindowSensors
                 }
                 if ($open) {
                     $doorWindowState = true;
-                    //Inform user, create log entry and add to blacklist
+                    // Inform user, create log entry and add to blacklist
                     if ($UseNotification) {
-                        //Log
+                        // Log
                         $location = $this->ReadPropertyString('Location');
                         $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
                         $sensorName = $doorWindowSensor->Name;
                         $text = $sensorName . ' ist noch geöffnet. Bitte prüfen! (ID ' . $id . ')';
                         $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                         $this->UpdateAlarmProtocol($logText, 0);
-                        //Notification
+                        // Notification
                         $actionText = $alarmZoneName . ', ' . $sensorName . ' ist noch geöffnet!';
                         $messageText = $timeStamp . ' ' . $sensorName . ' ist noch geöffnet.';
                         $this->SendNotification($actionText, $messageText, $logText, 1);
-                        //Update blacklist
+                        // Update blacklist
                         $this->AddSensorBlacklist($id);
                     }
                 }

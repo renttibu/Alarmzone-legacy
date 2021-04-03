@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2020, 2021
+ * @license    	CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
+ */
+
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
@@ -7,14 +14,6 @@ declare(strict_types=1);
 
 trait AZ_remoteControls
 {
-    /**
-     * Triggers a remote control action.
-     *
-     * @param int $SenderID
-     * @param bool $ValueChanged
-     *
-     * @return bool
-     */
     public function TriggerRemoteControlAction(int $SenderID, bool $ValueChanged): bool
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
@@ -37,21 +36,21 @@ trait AZ_remoteControls
         $type = IPS_GetVariable($SenderID)['VariableType'];
         $value = $vars[$key]['Value'];
         switch ($vars[$key]['Trigger']) {
-            case 0: #on change (bool, integer, float, string)
+            case 0: # on change (bool, integer, float, string)
                 $this->SendDebug(__FUNCTION__, 'Bei Änderung (bool, integer, float, string)', 0);
                 if ($ValueChanged) {
                     $execute = true;
                 }
                 break;
 
-            case 1: #on update (bool, integer, float, string)
+            case 1: # on update (bool, integer, float, string)
                 $this->SendDebug(__FUNCTION__, 'Bei Aktualisierung (bool, integer, float, string)', 0);
                 $execute = true;
                 break;
 
-            case 2: #on limit drop, once (integer, float)
+            case 2: # on limit drop, once (integer, float)
                 switch ($type) {
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (integer)', 0);
                         if ($ValueChanged) {
                             if ($value == 'false') {
@@ -66,7 +65,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (float)', 0);
                         if ($ValueChanged) {
                             if (GetValueFloat($SenderID) < floatval(str_replace(',', '.', $value))) {
@@ -78,9 +77,9 @@ trait AZ_remoteControls
                 }
                 break;
 
-            case 3: #on limit drop, every time (integer, float)
+            case 3: # on limit drop, every time (integer, float)
                 switch ($type) {
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (integer)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -93,7 +92,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (float)', 0);
                         if (GetValueFloat($SenderID) < floatval(str_replace(',', '.', $value))) {
                             $execute = true;
@@ -103,9 +102,9 @@ trait AZ_remoteControls
                 }
                 break;
 
-            case 4: #on limit exceed, once (integer, float)
+            case 4: # on limit exceed, once (integer, float)
                 switch ($type) {
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (integer)', 0);
                         if ($ValueChanged) {
                             if ($value == 'false') {
@@ -120,7 +119,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, einmalig (float)', 0);
                         if ($ValueChanged) {
                             if ($value == 'false') {
@@ -138,9 +137,9 @@ trait AZ_remoteControls
                 }
                 break;
 
-            case 5: #on limit exceed, every time (integer, float)
+            case 5: # on limit exceed, every time (integer, float)
                 switch ($type) {
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (integer)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -153,7 +152,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung, mehrmalig (float)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -169,9 +168,9 @@ trait AZ_remoteControls
                 }
                 break;
 
-            case 6: #on specific value, once (bool, integer, float, string)
+            case 6: # on specific value, once (bool, integer, float, string)
                 switch ($type) {
-                    case 0: #bool
+                    case 0: # bool
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (bool)', 0);
                         if ($ValueChanged) {
                             if ($value == 'false') {
@@ -183,7 +182,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (integer)', 0);
                         if ($ValueChanged) {
                             if ($value == 'false') {
@@ -198,7 +197,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (float)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -213,7 +212,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 3: #string
+                    case 3: # string
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, einmalig (string)', 0);
                         if ($ValueChanged) {
                             if (GetValueString($SenderID) == (string) $value) {
@@ -225,9 +224,9 @@ trait AZ_remoteControls
                 }
                 break;
 
-            case 7: #on specific value, every time (bool, integer, float, string)
+            case 7: # on specific value, every time (bool, integer, float, string)
                 switch ($type) {
-                    case 0: #bool
+                    case 0: # bool
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (bool)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -237,7 +236,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 1: #integer
+                    case 1: # integer
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (integer)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -250,7 +249,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 2: #float
+                    case 2: # float
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (float)', 0);
                         if ($value == 'false') {
                             $value = '0';
@@ -263,7 +262,7 @@ trait AZ_remoteControls
                         }
                         break;
 
-                    case 3: #string
+                    case 3: # string
                         $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert, mehrmalig (string)', 0);
                         if (GetValueString($SenderID) == (string) $value) {
                             $execute = true;

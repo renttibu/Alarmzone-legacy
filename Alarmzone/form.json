@@ -598,7 +598,7 @@
               }
             },
             {
-              "caption": "Variable",
+              "caption": "Auslösende Variable",
               "name": "ID",
               "width": "350px",
               "add": 0,
@@ -607,7 +607,7 @@
               }
             },
             {
-              "caption": "Auslöser",
+              "caption": "Auslöseart",
               "name": "Trigger",
               "width": "250px",
               "add": 7,
@@ -650,7 +650,7 @@
               }
             },
             {
-              "caption": "Auslösender Wert",
+              "caption": "Auslösewert",
               "name": "Value",
               "width": "140px",
               "add": "true",
@@ -736,7 +736,7 @@
               }
             },
             {
-              "caption": "Variable",
+              "caption": "Auslösende Variable",
               "name": "ID",
               "width": "350px",
               "add": 0,
@@ -745,7 +745,7 @@
               }
             },
             {
-              "caption": "Auslöser",
+              "caption": "Auslöseart",
               "name": "Trigger",
               "width": "250px",
               "add": 6,
@@ -788,7 +788,7 @@
               }
             },
             {
-              "caption": "Auslösender Wert",
+              "caption": "Auslösewert",
               "name": "Value",
               "width": "140px",
               "add": "true",
@@ -897,7 +897,7 @@
               }
             },
             {
-              "caption": "Variable",
+              "caption": "Auslösende Variable",
               "name": "ID",
               "width": "350px",
               "add": 0,
@@ -906,7 +906,7 @@
               }
             },
             {
-              "caption": "Auslöser",
+              "caption": "Auslöseart",
               "name": "Trigger",
               "width": "250px",
               "add": 6,
@@ -949,7 +949,7 @@
               }
             },
             {
-              "caption": "Auslösender Wert",
+              "caption": "Auslösewert",
               "name": "Value",
               "width": "140px",
               "add": "true",
