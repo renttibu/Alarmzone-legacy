@@ -602,6 +602,7 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
+              "onClick": "echo 'ID: ' . RemoteControls['ID'];",
               "edit": {
                 "type": "SelectVariable"
               }
@@ -740,6 +741,7 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
+              "onClick": "echo 'ID: ' . DoorWindowSensors['ID'];",
               "edit": {
                 "type": "SelectVariable"
               }
@@ -901,6 +903,7 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
+              "onClick": "echo 'ID: ' . MotionDetectors['ID'];",
               "edit": {
                 "type": "SelectVariable"
               }
