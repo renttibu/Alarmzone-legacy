@@ -211,13 +211,6 @@
       "type": "ExpansionPanel",
       "caption": "Alarmprotokoll",
       "items": [
-        {
-          "type": "SelectModule",
-          "name": "AlarmProtocol",
-          "caption": "Alarmprotokoll",
-          "moduleID": "{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}",
-          "width": "600px"
-        }
       ]
     },
     {
@@ -602,15 +595,26 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
-              "onClick": "echo 'ID: ' . $RemoteControls['ID'];",
+              "onClick": "AZ_EnableConfigurationButton($id, 'RemoteControlsConfigurationButton', $RemoteControls['ID']);",
               "edit": {
                 "type": "SelectVariable"
               }
             },
             {
+              "caption": "Info",
+              "name": "Info",
+              "width": "160px",
+              "add": "",
+              "visible": false,
+              "edit": {
+                "type": "Button",
+                "onClick": "AZ_ShowVariableDetails($id, $ID);"
+              }
+            },
+            {
               "caption": "Auslöseart",
               "name": "Trigger",
-              "width": "250px",
+              "width": "300px",
               "add": 7,
               "edit": {
                 "type": "Select",
@@ -704,6 +708,14 @@
               }
             }
           ]
+        },
+        {
+          "type": "OpenObjectButton",
+          "caption": "Bearbeiten",
+          "name": "RemoteControlsConfigurationButton",
+          "enabled": false,
+          "visible": false,
+          "objectID": 0
         }
       ]
     },
@@ -728,6 +740,12 @@
               }
             },
             {
+              "name": "ActualState",
+              "caption": "Aktueller Status",
+              "width": "150px",
+              "add": ""
+            },
+            {
               "caption": "Bezeichnung",
               "name": "Name",
               "width": "350px",
@@ -741,15 +759,26 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
-              "onClick": "echo 'ID: ' . $DoorWindowSensors['ID'];",
+              "onClick": "AZ_EnableConfigurationButton($id, 'DoorWindowSensorsConfigurationButton', $DoorWindowSensors['ID']);",
               "edit": {
                 "type": "SelectVariable"
               }
             },
             {
+              "caption": "Info",
+              "name": "Info",
+              "width": "160px",
+              "add": "",
+              "visible": false,
+              "edit": {
+                "type": "Button",
+                "onClick": "AZ_ShowVariableDetails($id, $ID);"
+              }
+            },
+            {
               "caption": "Auslöseart",
               "name": "Trigger",
-              "width": "250px",
+              "width": "300px",
               "add": 6,
               "edit": {
                 "type": "Select",
@@ -864,8 +893,12 @@
           ]
         },
         {
-          "type": "Label",
-          "caption": "\nFarbwerte:\ngrün\t\t= Tür / Fenster geschlossen\nviolett\t\t= Tür / Fenster geöffnet\ngrau\t\t= Tür / Fenster inaktiv\nrot\t\t\t= Fehler"
+          "type": "OpenObjectButton",
+          "caption": "Bearbeiten",
+          "name": "DoorWindowSensorsConfigurationButton",
+          "enabled": false,
+          "visible": false,
+          "objectID": 0
         }
       ]
     },
@@ -903,15 +936,26 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
-              "onClick": "echo 'ID: ' . $MotionDetectors['ID'];",
+              "onClick": "AZ_EnableConfigurationButton($id, 'MotionDetectorsConfigurationButton', $MotionDetectors['ID']);",
               "edit": {
                 "type": "SelectVariable"
               }
             },
             {
+              "caption": "Info",
+              "name": "Info",
+              "width": "160px",
+              "add": "",
+              "visible": false,
+              "edit": {
+                "type": "Button",
+                "onClick": "AZ_ShowVariableDetails($id, $ID);"
+              }
+            },
+            {
               "caption": "Auslöseart",
               "name": "Trigger",
-              "width": "250px",
+              "width": "300px",
               "add": 6,
               "edit": {
                 "type": "Select",
@@ -1024,6 +1068,14 @@
               }
             }
           ]
+        },
+        {
+          "type": "OpenObjectButton",
+          "caption": "Bearbeiten",
+          "name": "MotionDetectorsConfigurationButton",
+          "enabled": false,
+          "visible": false,
+          "objectID": 0
         }
       ]
     }
@@ -1110,7 +1162,7 @@
             {
               "caption": "Sender Name",
               "name": "SenderName",
-              "width": "450px"
+              "width": "auto"
             },
             {
               "caption": "Nachrichten ID",
@@ -1202,38 +1254,6 @@
           "type": "TestCenter"
         }
       ]
-    }
-  ],
-  "status": [
-    {
-      "code": 101,
-      "icon": "active",
-      "caption": "Alarmzone wird erstellt"
-    },
-    {
-      "code": 102,
-      "icon": "active",
-      "caption": "Alarmzone ist aktiv"
-    },
-    {
-      "code": 103,
-      "icon": "active",
-      "caption": "Alarmzone wird gelöscht"
-    },
-    {
-      "code": 104,
-      "icon": "inactive",
-      "caption": "Alarmzone ist inaktiv"
-    },
-    {
-      "code": 200,
-      "icon": "inactive",
-      "caption": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug!"
-    },
-    {
-      "code": 201,
-      "icon": "inactive",
-      "caption": "Es ist Fehler aufgetreten, bitte Konfiguration prüfen!"
     }
   ]
 }

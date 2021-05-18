@@ -264,7 +264,64 @@ class Alarmzone extends IPSModule
         $this->SetTimerInterval('StartActivation', 0);
         $this->SetTimerInterval('SetAlarmState', 0);
 
-        $this->RegisterMessages();
+        // Delete all references
+        foreach ($this->GetReferenceList() as $referenceID) {
+            $this->UnregisterReference($referenceID);
+        }
+
+        // Delete all registrations
+        foreach ($this->GetMessageList() as $senderID => $messages) {
+            foreach ($messages as $message) {
+                if ($message == VM_UPDATE) {
+                    $this->UnregisterMessage($senderID, VM_UPDATE);
+                }
+            }
+        }
+
+        // Register references and update messages
+        $properties = ['AlarmProtocol', 'NotificationCenter'];
+        foreach ($properties as $property) {
+            $id = $this->ReadPropertyInteger($property);
+            if ($id != 0 && @IPS_ObjectExists($id)) {
+                $this->RegisterReference($id);
+            }
+        }
+        // Register remote controls
+        $variables = json_decode($this->ReadPropertyString('RemoteControls'));
+        if (!empty($variables)) {
+            foreach ($variables as $variable) {
+                if ($variable->Use) {
+                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
+                        $this->RegisterReference($id);
+                        $this->RegisterMessage($variable->ID, VM_UPDATE);
+                    }
+                }
+            }
+        }
+        // Register door and window sensors
+        $variables = json_decode($this->ReadPropertyString('DoorWindowSensors'));
+        if (!empty($variables)) {
+            foreach ($variables as $variable) {
+                if ($variable->Use) {
+                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
+                        $this->RegisterReference($id);
+                        $this->RegisterMessage($variable->ID, VM_UPDATE);
+                    }
+                }
+            }
+        }
+        // Register motion detectors
+        $variables = json_decode($this->ReadPropertyString('MotionDetectors'));
+        if (!empty($variables)) {
+            foreach ($variables as $variable) {
+                if ($variable->Use) {
+                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
+                        $this->RegisterReference($id);
+                        $this->RegisterMessage($variable->ID, VM_UPDATE);
+                    }
+                }
+            }
+        }
         $this->ResetBlacklist();
         $this->UpdateStates();
         $this->ValidateConfiguration();
@@ -361,8 +418,34 @@ class Alarmzone extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $result = true;
-
+        // Alarm protocol
+        $id = $this->ReadPropertyInteger('AlarmProtocol');
+        $enabled = false;
+        if ($id != 0 && @IPS_ObjectExists($id)) {
+            $enabled = true;
+        }
+        $formData['elements'][5]['items'][0] = [
+            'type'  => 'RowLayout',
+            'items' => [$formData['elements'][5]['items'][0]['items'][0] = [
+                'type'     => 'SelectModule',
+                'name'     => 'AlarmProtocol',
+                'caption'  => 'Alarmprotokoll',
+                'moduleID' => '{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}',
+                'width'    => '600px',
+            ],
+                $formData['elements'][5]['items'][0]['items'][1] = [
+                    'type'    => 'Label',
+                    'caption' => ' ',
+                    'visible' => $enabled
+                ],
+                $formData['elements'][5]['items'][0]['items'][2] = [
+                    'type'     => 'OpenObjectButton',
+                    'caption'  => 'ID ' . $id . ' konfigurieren',
+                    'visible'  => $enabled,
+                    'objectID' => $id
+                ]
+            ]
+        ];
         // Remote controls
         $vars = json_decode($this->ReadPropertyString('RemoteControls'));
         if (!empty($vars)) {
@@ -374,7 +457,6 @@ class Alarmzone extends IPSModule
                 if ($id == 0 || !@IPS_ObjectExists($id)) {
                     if ($var->Use) {
                         $rowColor = '#FFC0C0'; # red
-                        $result = false;
                     }
                 } else {
                     if (!$var->Use) {
@@ -385,7 +467,6 @@ class Alarmzone extends IPSModule
                     if ($scriptID == 0 || !@IPS_ObjectExists($scriptID)) {
                         if ($var->Use) {
                             $rowColor = '#FFC0C0'; # red
-                            $result = false;
                         }
                     }
                 }
@@ -400,15 +481,16 @@ class Alarmzone extends IPSModule
                     'rowColor'  => $rowColor];
             }
         }
-
         // Door and window sensors
         $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
         if (!empty($doorWindowSensors)) {
+            $stateName = 'unbekannt';
             foreach ($doorWindowSensors as $doorWindowSensor) {
                 $id = $doorWindowSensor['ID'];
                 $rowColor = '';
                 if ($id != 0 && @IPS_ObjectExists($id)) {
                     $rowColor = '#C0FFC0'; // light green
+                    $stateName = 'geschlossen';
                     $blackListedSensors = json_decode($this->GetBuffer('Blacklist'), true);
                     $blacklisted = false;
                     if (!empty($blackListedSensors)) {
@@ -416,6 +498,7 @@ class Alarmzone extends IPSModule
                             if ($blackListedSensor == $doorWindowSensor['ID']) {
                                 $rowColor = '#DFDFDF'; # grey
                                 $blacklisted = true;
+                                $stateName = 'gesperrt';
                             }
                         }
                     }
@@ -429,12 +512,14 @@ class Alarmzone extends IPSModule
                                     case 1: #integer
                                         if (GetValueInteger($id) < intval($value)) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
                                     case 2: #float
                                         if (GetValueFloat($id) < floatval(str_replace(',', '.', $value))) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
@@ -447,12 +532,14 @@ class Alarmzone extends IPSModule
                                     case 1: #integer
                                         if (GetValueInteger($id) > intval($value)) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
                                     case 2: #float
                                         if (GetValueFloat($id) > floatval(str_replace(',', '.', $value))) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
@@ -468,24 +555,28 @@ class Alarmzone extends IPSModule
                                         }
                                         if (GetValueBoolean($id) == boolval($value)) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
                                     case 1: #integer
                                         if (GetValueInteger($id) == intval($value)) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
                                     case 2: #float
                                         if (GetValueFloat($id) == floatval(str_replace(',', '.', $value))) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
                                     case 3: #string
                                         if (GetValueString($id) == (string) $value) {
                                             $rowColor = '#C0C0FF'; # violett
+                                            $stateName = 'geöffnet';
                                         }
                                         break;
 
@@ -495,16 +586,18 @@ class Alarmzone extends IPSModule
                         }
                         if (!$doorWindowSensor['Use']) {
                             $rowColor = '#DFDFDF'; # grey
+                            $stateName = 'deaktiviert';
                         }
                     }
                 } else {
                     if ($doorWindowSensor['Use']) {
                         $rowColor = '#FFC0C0'; # red
-                        $result = false;
+                        $stateName = 'Fehler!';
                     }
                 }
                 $formData['elements'][8]['items'][0]['values'][] = [
                     'Use'                           => $doorWindowSensor['Use'],
+                    'ActualState'                   => $stateName,
                     'Name'                          => $doorWindowSensor['Name'],
                     'ID'                            => $doorWindowSensor['ID'],
                     'Trigger'                       => $doorWindowSensor['Trigger'],
@@ -534,7 +627,6 @@ class Alarmzone extends IPSModule
                         $id = $var->ID;
                         if ($id == 0 || !@IPS_ObjectExists($id)) {
                             $rowColor = '#FFC0C0'; # red
-                            $result = false;
                         } else {
                             if (!$var->Use) {
                                 $rowColor = '#DFDFDF'; # grey
@@ -559,7 +651,6 @@ class Alarmzone extends IPSModule
                 }
             }
         }
-
         // Registered messages
         $messages = $this->GetMessageList();
         foreach ($messages as $senderID => $messageID) {
@@ -588,13 +679,37 @@ class Alarmzone extends IPSModule
                 'MessageDescription'                                    => $messageDescription,
                 'rowColor'                                              => $rowColor];
         }
-
-        $status = $this->GetStatus();
-        if (!$result && $status == 102) {
-            $status = 201;
-        }
-        $this->SetStatus($status);
-
+        // Status
+        $formData['status'][0] = [
+            'code'    => 101,
+            'icon'    => 'active',
+            'caption' => 'Alarmzone wird erstellt',
+        ];
+        $formData['status'][1] = [
+            'code'    => 102,
+            'icon'    => 'active',
+            'caption' => 'Alarmzone ist aktiv (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][2] = [
+            'code'    => 103,
+            'icon'    => 'active',
+            'caption' => 'Alarmzone wird gelöscht (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][3] = [
+            'code'    => 104,
+            'icon'    => 'inactive',
+            'caption' => 'Alarmzone ist inaktiv (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][4] = [
+            'code'    => 200,
+            'icon'    => 'inactive',
+            'caption' => 'Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug! (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][5] = [
+            'code'    => 201,
+            'icon'    => 'inactive',
+            'caption' => 'Es ist Fehler aufgetreten, bitte Konfiguration prüfen! (ID ' . $this->InstanceID . ')',
+        ];
         return json_encode($formData);
     }
 
@@ -889,6 +1004,89 @@ class Alarmzone extends IPSModule
         echo 'Die Verknüpfungen wurde erfolgreich angelegt!';
     }
 
+    public function EnableConfigurationButton(string $ButtonName, int $ObjectID): void
+    {
+        $this->UpdateFormField($ButtonName, 'caption', 'Variable ' . $ObjectID . ' Bearbeiten');
+        $this->UpdateFormField($ButtonName, 'visible', true);
+        $this->UpdateFormField($ButtonName, 'enabled', true);
+        $this->UpdateFormField($ButtonName, 'objectID', $ObjectID);
+    }
+
+    public function ShowVariableDetails(int $VariableID): void
+    {
+        if ($VariableID == 0 || !@IPS_ObjectExists($VariableID)) {
+            return;
+        }
+        if ($VariableID != 0) {
+            // Variable
+            echo 'ID: ' . $VariableID . "\n";
+            echo 'Name: ' . IPS_GetName($VariableID) . "\n";
+            $variable = IPS_GetVariable($VariableID);
+            if (!empty($variable)) {
+                $variableType = $variable['VariableType'];
+                switch ($variableType) {
+                    case 0:
+                        $variableTypeName = 'Boolean';
+                        break;
+
+                    case 1:
+                        $variableTypeName = 'Integer';
+                        break;
+
+                    case 2:
+                        $variableTypeName = 'Float';
+                        break;
+
+                    case 3:
+                        $variableTypeName = 'String';
+                        break;
+
+                    default:
+                        $variableTypeName = 'Unbekannt';
+                }
+                echo 'Variablentyp: ' . $variableTypeName . "\n";
+            }
+            // Profile
+            $profile = @IPS_GetVariableProfile($variable['VariableProfile']);
+            if (empty($profile)) {
+                $profile = @IPS_GetVariableProfile($variable['VariableCustomProfile']);
+            }
+            if (!empty($profile)) {
+                $profileType = $variable['VariableType'];
+                switch ($profileType) {
+                    case 0:
+                        $profileTypeName = 'Boolean';
+                        break;
+
+                    case 1:
+                        $profileTypeName = 'Integer';
+                        break;
+
+                    case 2:
+                        $profileTypeName = 'Float';
+                        break;
+
+                    case 3:
+                        $profileTypeName = 'String';
+                        break;
+
+                    default:
+                        $profileTypeName = 'Unbekannt';
+                }
+                echo 'Profilname: ' . $profile['ProfileName'] . "\n";
+                echo 'Profiltyp: ' . $profileTypeName . "\n\n";
+            }
+            if (!empty($variable)) {
+                echo "\nVariable:\n";
+                print_r($variable);
+            }
+            if (!empty($profile)) {
+                echo "\nVariablenprofil:\n";
+                print_r($profile);
+            }
+        }
+    }
+
     #################### Private
 
     private function KernelReady(): void
@@ -936,57 +1134,6 @@ class Alarmzone extends IPSModule
         }
         IPS_SetVariableProfileAssociation($profile, 0, 'Untätig', 'Information', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', 'Motion', 0xFF0000);
-    }
-
-    private function RegisterMessages(): void
-    {
-        // Unregister VM_UPDATE
-        $registeredMessages = $this->GetMessageList();
-        if (!empty($registeredMessages)) {
-            foreach ($registeredMessages as $id => $registeredMessage) {
-                foreach ($registeredMessage as $messageType) {
-                    if ($messageType == VM_UPDATE) {
-                        $this->UnregisterMessage($id, VM_UPDATE);
-                    }
-                }
-            }
-        }
-
-        // Register remote controls
-        $variables = json_decode($this->ReadPropertyString('RemoteControls'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
-
-        // Register door and window sensors
-        $variables = json_decode($this->ReadPropertyString('DoorWindowSensors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
-
-        // Register motion detectors
-        $variables = json_decode($this->ReadPropertyString('MotionDetectors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
     }
 
     private function UpdateStates(): void

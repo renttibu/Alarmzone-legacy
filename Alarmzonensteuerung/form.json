@@ -134,6 +134,7 @@
               "name": "ID",
               "width": "450px",
               "add": 0,
+              "onClick": "AZS_EnableAlarmZonesConfigurationButton($id, $AlarmZones['ID']);",
               "edit": {
                 "type": "SelectModule",
                 "moduleID": "{CA80C88F-1CC4-8865-959B-3215FC5B1320}"
@@ -142,13 +143,21 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "450px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
               }
             }
           ]
+        },
+        {
+          "type": "OpenObjectButton",
+          "caption": "Bearbeiten",
+          "name": "AlarmZonesConfigurationButton",
+          "enabled": false,
+          "visible": false,
+          "objectID": 0
         }
       ]
     },
@@ -184,7 +193,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -226,7 +235,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -268,7 +277,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -310,7 +319,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -352,7 +361,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -394,7 +403,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -436,7 +445,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -478,7 +487,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -529,7 +538,7 @@
             {
               "caption": "Auslöseart",
               "name": "Trigger",
-              "width": "250px",
+              "width": "300px",
               "add": 7,
               "edit": {
                 "type": "Select",
@@ -658,7 +667,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -700,7 +709,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -742,7 +751,7 @@
             {
               "caption": "Bezeichnung",
               "name": "Description",
-              "width": "300px",
+              "width": "auto",
               "add": "",
               "edit": {
                 "type": "ValidationTextBox"
@@ -879,38 +888,6 @@
           "type": "TestCenter"
         }
       ]
-    }
-  ],
-  "status": [
-    {
-      "code": 101,
-      "icon": "active",
-      "caption": "Alarmzonensteuerung wird erstellt"
-    },
-    {
-      "code": 102,
-      "icon": "active",
-      "caption": "Alarmzonensteuerung ist aktiv"
-    },
-    {
-      "code": 103,
-      "icon": "active",
-      "caption": "Alarmzonensteuerung wird gelöscht"
-    },
-    {
-      "code": 104,
-      "icon": "inactive",
-      "caption": "Alarmzonensteuerung ist inaktiv"
-    },
-    {
-      "code": 200,
-      "icon": "inactive",
-      "caption": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug!"
-    },
-    {
-      "code": 201,
-      "icon": "inactive",
-      "caption": "Es ist Fehler aufgetreten, bitte Konfiguration prüfen!"
     }
   ]
 }

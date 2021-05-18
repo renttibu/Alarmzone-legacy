@@ -17,10 +17,9 @@ trait AZ_doorWindowSensors
     public function DetermineDoorWindowVariables(): void
     {
         $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
-        $listedVariables = [];
+        $variables = [];
         $instanceIDs = @IPS_GetInstanceListByModuleID(self::HOMEMATIC_DEVICE_GUID);
         if (!empty($instanceIDs)) {
-            $variables = [];
             foreach ($instanceIDs as $instanceID) {
                 $childrenIDs = @IPS_GetChildrenIDs($instanceID);
                 foreach ($childrenIDs as $childrenID) {
@@ -36,64 +35,62 @@ trait AZ_doorWindowSensors
                             if ($name == false) {
                                 $name = @IPS_GetName($instanceID);
                             }
+                            $type = IPS_GetVariable($childrenID)['VariableType'];
+                            $triggerValue = 'true';
+                            if ($type == 1) {
+                                $triggerValue = '1';
+                            }
                             array_push($variables, [
-                                'Use'                           => true,
-                                'Name'                          => $name,
-                                'ID'                            => $childrenID,
-                                'Trigger'                       => 6,
-                                'Value'                         => 1,
-                                'FullProtectionModeActive'      => true,
-                                'HullProtectionModeActive'      => true,
-                                'PartialProtectionModeActive'   => true,
-                                'UseNotification'               => true,
-                                'UseAlarmSiren'                 => true,
-                                'UseAlarmLight'                 => true,
-                                'UseAlarmCall'                  => true]);
+                                'Use'                         => true,
+                                'Name'                        => $name,
+                                'ID'                          => $childrenID,
+                                'Trigger'                     => 6,
+                                'Value'                       => $triggerValue,
+                                'FullProtectionModeActive'    => true,
+                                'HullProtectionModeActive'    => true,
+                                'PartialProtectionModeActive' => true,
+                                'UseNotification'             => true,
+                                'UseAlarmSiren'               => true,
+                                'UseAlarmLight'               => true,
+                                'UseAlarmCall'                => true]);
                         }
                     }
                 }
             }
-            // Get already listed variables
-            $listedVariables = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
-            // Delete the variables that no longer exist
-            if (!empty($listedVariables)) {
-                $deleteVariables = array_diff(array_column($listedVariables, 'ID'), array_column($variables, 'ID'));
-                if (!empty($deleteVariables)) {
-                    foreach ($deleteVariables as $key => $deleteVariable) {
-                        unset($listedVariables[$key]);
+        }
+        // Get already listed variables
+        $listedVariables = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
+        // Add new variables
+        if (!empty($listedVariables)) {
+            $addVariables = array_diff(array_column($variables, 'ID'), array_column($listedVariables, 'ID'));
+            if (!empty($addVariables)) {
+                foreach ($addVariables as $addVariable) {
+                    $name = strstr(@IPS_GetName(@IPS_GetParent($addVariable)), ':', true);
+                    $type = IPS_GetVariable($addVariable)['VariableType'];
+                    $triggerValue = 'true';
+                    if ($type == 1) {
+                        $triggerValue = '1';
                     }
+                    array_push($listedVariables, [
+                        'Use'                         => true,
+                        'Name'                        => $name,
+                        'ID'                          => $addVariable,
+                        'Trigger'                     => 6,
+                        'Value'                       => $triggerValue,
+                        'FullProtectionModeActive'    => true,
+                        'HullProtectionModeActive'    => true,
+                        'PartialProtectionModeActive' => true,
+                        'UseNotification'             => true,
+                        'UseAlarmSiren'               => true,
+                        'UseAlarmLight'               => true,
+                        'UseAlarmCall'                => true]);
                 }
             }
-            // Add new variables
-            if (!empty($listedVariables)) {
-                $addVariables = array_diff(array_column($variables, 'ID'), array_column($listedVariables, 'ID'));
-                if (!empty($addVariables)) {
-                    foreach ($addVariables as $addVariable) {
-                        $name = strstr(@IPS_GetName(@IPS_GetParent($addVariable)), ':', true);
-                        array_push($listedVariables, [
-                            'Use'                           => true,
-                            'Name'                          => $name,
-                            'ID'                            => $addVariable,
-                            'Trigger'                       => 6,
-                            'Value'                         => 1,
-                            'FullProtectionModeActive'      => true,
-                            'HullProtectionModeActive'      => true,
-                            'PartialProtectionModeActive'   => true,
-                            'UseNotification'               => true,
-                            'UseAlarmSiren'                 => true,
-                            'UseAlarmLight'                 => true,
-                            'UseAlarmCall'                  => true]);
-                    }
-                }
-            } else {
-                $listedVariables = $variables;
-            }
+        } else {
+            $listedVariables = $variables;
         }
         // Sort variables by name
-        usort($listedVariables, function ($a, $b)
-        {
-            return $a['Name'] <=> $b['Name'];
-        });
+        array_multisort(array_column($listedVariables, 'Name'), SORT_ASC, $listedVariables);
         $listedVariables = array_values($listedVariables);
         // Update variable list
         $value = json_encode($listedVariables);
@@ -426,8 +423,7 @@ trait AZ_doorWindowSensors
                                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                                 $this->UpdateAlarmProtocol($logText, 0);
                             }
-                        }
-                        // Variable is not black listed
+                        } // Variable is not black listed
                         else {
                             $alerting = false;
                             $alertingDelayDuration = 0;
@@ -496,8 +492,7 @@ trait AZ_doorWindowSensors
                                                 $this->SendNotification($actionText, $messageText, $logText, 2);
                                             }
                                         }
-                                    }
-                                    // Alarm
+                                    } // Alarm
                                     else {
                                         // Alarm state
                                         $this->SetValue('AlarmState', 1);
@@ -532,8 +527,7 @@ trait AZ_doorWindowSensors
                                             }
                                         }
                                     }
-                                }
-                                // Non alerting
+                                } // Non alerting
                                 else {
                                     // Log
                                     $text = $sensorName . ' wurde geschlossen. (ID ' . $SenderID . ')';

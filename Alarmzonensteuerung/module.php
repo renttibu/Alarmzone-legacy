@@ -222,7 +222,54 @@ class Alarmzonensteuerung extends IPSModule
         // Alerting sensor
         IPS_SetHidden($this->GetIDForIdent('AlertingSensor'), !$this->ReadPropertyBoolean('EnableAlertingSensor'));
 
-        $this->RegisterMessages();
+        // Delete all references
+        foreach ($this->GetReferenceList() as $referenceID) {
+            $this->UnregisterReference($referenceID);
+        }
+
+        // Delete all registrations
+        foreach ($this->GetMessageList() as $senderID => $messages) {
+            foreach ($messages as $message) {
+                if ($message == VM_UPDATE) {
+                    $this->UnregisterMessage($senderID, VM_UPDATE);
+                }
+            }
+        }
+
+        // Register references and update messages
+        $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
+        foreach ($alarmZones as $alarmZone) {
+            $id = $alarmZone->ID;
+            if ($id != 0 && @IPS_ObjectExists($id)) {
+                $this->RegisterReference($id);
+            }
+        }
+        $properties = [
+            'FullProtectionMode',
+            'HullProtectionMode',
+            'PartialProtectionMode',
+            'SystemState',
+            'AlarmState',
+            'AlertingSensor',
+            'DoorWindowState',
+            'MotionDetectorState',
+            'RemoteControls',
+            'AlarmSiren',
+            'AlarmLight',
+            'AlarmCall'];
+        foreach ($properties as $property) {
+            $variables = json_decode($this->ReadPropertyString($property));
+            if (!empty($variables)) {
+                foreach ($variables as $variable) {
+                    if ($variable->Use) {
+                        if ($variable->ID != 0 && IPS_ObjectExists($variable->ID)) {
+                            $this->RegisterMessage($variable->ID, VM_UPDATE);
+                            $this->RegisterReference($variable->ID);
+                        }
+                    }
+                }
+            }
+        }
         $this->WriteAttributeBoolean('DisableUpdateMode', false);
         $this->UpdateStates();
         $this->ValidateConfiguration();
@@ -313,8 +360,6 @@ class Alarmzonensteuerung extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $result = true;
-
         // Alarm zones
         $vars = json_decode($this->ReadPropertyString('AlarmZones'));
         if (!empty($vars)) {
@@ -323,7 +368,6 @@ class Alarmzonensteuerung extends IPSModule
                 $id = $var->ID;
                 if ($id == 0 || !@IPS_ObjectExists($id)) {
                     $rowColor = '#FFC0C0'; # red
-                    $result = false;
                 }
                 $formData['elements'][2]['items'][0]['values'][] = [
                     'ID'          => $id,
@@ -331,7 +375,6 @@ class Alarmzonensteuerung extends IPSModule
                     'rowColor'    => $rowColor];
             }
         }
-
         // Properties
         $properties = [];
         array_push($properties, ['name' => 'FullProtectionMode', 'position' => 3]);
@@ -357,7 +400,6 @@ class Alarmzonensteuerung extends IPSModule
                         if ($id == 0 || !@IPS_ObjectExists($id)) {
                             if ($var->Use) {
                                 $rowColor = '#FFC0C0'; # red
-                                $result = false;
                             }
                         }
                         $formData['elements'][$propertyPosition]['items'][0]['values'][] = [
@@ -369,7 +411,6 @@ class Alarmzonensteuerung extends IPSModule
                 }
             }
         }
-
         // Remote controls
         $vars = json_decode($this->ReadPropertyString('RemoteControls'));
         if (!empty($vars)) {
@@ -381,14 +422,12 @@ class Alarmzonensteuerung extends IPSModule
                 if ($id == 0 || !@IPS_ObjectExists($id)) {
                     if ($var->Use) {
                         $rowColor = '#FFC0C0'; # red
-                        $result = false;
                     }
                 }
                 if ($action == 5) { # script
                     if ($scriptID == 0 || !@IPS_ObjectExists($scriptID)) {
                         if ($var->Use) {
                             $rowColor = '#FFC0C0'; # red
-                            $result = false;
                         }
                     }
                 }
@@ -401,7 +440,6 @@ class Alarmzonensteuerung extends IPSModule
                     'rowColor' => $rowColor];
             }
         }
-
         // Registered messages
         $messages = $this->GetMessageList();
         foreach ($messages as $senderID => $messageID) {
@@ -430,18 +468,51 @@ class Alarmzonensteuerung extends IPSModule
                 'MessageDescription'                                    => $messageDescription,
                 'rowColor'                                              => $rowColor];
         }
-        $status = $this->GetStatus();
-        if (!$result && $status == 102) {
-            $status = 201;
-        }
-        $this->SetStatus($status);
-
+        // Status
+        $formData['status'][0] = [
+            'code'    => 101,
+            'icon'    => 'active',
+            'caption' => 'Alarmzonensteuerung wird erstellt',
+        ];
+        $formData['status'][1] = [
+            'code'    => 102,
+            'icon'    => 'active',
+            'caption' => 'Alarmzonensteuerung ist aktiv (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][2] = [
+            'code'    => 103,
+            'icon'    => 'active',
+            'caption' => 'Alarmzonensteuerung wird gelöscht (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][3] = [
+            'code'    => 104,
+            'icon'    => 'inactive',
+            'caption' => 'Alarmzonensteuerung ist inaktiv (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][4] = [
+            'code'    => 200,
+            'icon'    => 'inactive',
+            'caption' => 'Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug! (ID ' . $this->InstanceID . ')',
+        ];
+        $formData['status'][5] = [
+            'code'    => 201,
+            'icon'    => 'inactive',
+            'caption' => 'Es ist Fehler aufgetreten, bitte Konfiguration prüfen! (ID ' . $this->InstanceID . ')',
+        ];
         return json_encode($formData);
     }
 
     public function ReloadConfiguration()
     {
         $this->ReloadForm();
+    }
+
+    public function EnableAlarmZonesConfigurationButton(int $ObjectID): void
+    {
+        $this->UpdateFormField('AlarmZonesConfigurationButton', 'caption', 'ID ' . $ObjectID . ' konfigurieren');
+        $this->UpdateFormField('AlarmZonesConfigurationButton', 'visible', true);
+        $this->UpdateFormField('AlarmZonesConfigurationButton', 'enabled', true);
+        $this->UpdateFormField('AlarmZonesConfigurationButton', 'objectID', $ObjectID);
     }
 
     #################### Request Action
@@ -474,60 +545,16 @@ class Alarmzonensteuerung extends IPSModule
         $this->ApplyChanges();
     }
 
-    private function RegisterMessages(): void
-    {
-        // Unregister VM_UPDATE
-        $registeredMessages = $this->GetMessageList();
-        if (!empty($registeredMessages)) {
-            foreach ($registeredMessages as $id => $registeredMessage) {
-                foreach ($registeredMessage as $messageType) {
-                    if ($messageType == VM_UPDATE) {
-                        $this->UnregisterMessage($id, VM_UPDATE);
-                    }
-                }
-            }
-        }
-        $properties = [
-            'FullProtectionMode',
-            'HullProtectionMode',
-            'PartialProtectionMode',
-            'SystemState',
-            'AlarmState',
-            'AlertingSensor',
-            'DoorWindowState',
-            'MotionDetectorState',
-            'RemoteControls',
-            'AlarmSiren',
-            'AlarmLight',
-            'AlarmCall'];
-
-        // Register VM_UPDATE
-        foreach ($properties as $property) {
-            $variables = json_decode($this->ReadPropertyString($property));
-            if (!empty($variables)) {
-                foreach ($variables as $variable) {
-                    if ($variable->Use) {
-                        if ($variable->ID != 0 && IPS_ObjectExists($variable->ID)) {
-                            $this->RegisterMessage($variable->ID, VM_UPDATE);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private function ValidateConfiguration(): bool
     {
         $result = true;
         $status = 102;
-
         // Maintenance mode
         $maintenance = $this->CheckMaintenanceMode();
         if ($maintenance) {
             $result = false;
             $status = 104;
         }
-
         IPS_SetDisabled($this->InstanceID, $maintenance);
         $this->SetStatus($status);
         return $result;
