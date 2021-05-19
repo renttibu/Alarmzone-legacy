@@ -515,6 +515,89 @@ class Alarmzonensteuerung extends IPSModule
         $this->UpdateFormField('AlarmZonesConfigurationButton', 'objectID', $ObjectID);
     }
 
+    public function EnableRemoteControlsConfigurationButton(int $ObjectID): void
+    {
+        $this->UpdateFormField('RemoteControlsConfigurationButton', 'caption', 'ID ' . $ObjectID . ' bearbeiten');
+        $this->UpdateFormField('RemoteControlsConfigurationButton', 'visible', true);
+        $this->UpdateFormField('RemoteControlsConfigurationButton', 'enabled', true);
+        $this->UpdateFormField('RemoteControlsConfigurationButton', 'objectID', $ObjectID);
+    }
+
+    public function ShowVariableDetails(int $VariableID): void
+    {
+        if ($VariableID == 0 || !@IPS_ObjectExists($VariableID)) {
+            return;
+        }
+        if ($VariableID != 0) {
+            // Variable
+            echo 'ID: ' . $VariableID . "\n";
+            echo 'Name: ' . IPS_GetName($VariableID) . "\n";
+            $variable = IPS_GetVariable($VariableID);
+            if (!empty($variable)) {
+                $variableType = $variable['VariableType'];
+                switch ($variableType) {
+                    case 0:
+                        $variableTypeName = 'Boolean';
+                        break;
+
+                    case 1:
+                        $variableTypeName = 'Integer';
+                        break;
+
+                    case 2:
+                        $variableTypeName = 'Float';
+                        break;
+
+                    case 3:
+                        $variableTypeName = 'String';
+                        break;
+
+                    default:
+                        $variableTypeName = 'Unbekannt';
+                }
+                echo 'Variablentyp: ' . $variableTypeName . "\n";
+            }
+            // Profile
+            $profile = @IPS_GetVariableProfile($variable['VariableProfile']);
+            if (empty($profile)) {
+                $profile = @IPS_GetVariableProfile($variable['VariableCustomProfile']);
+            }
+            if (!empty($profile)) {
+                $profileType = $variable['VariableType'];
+                switch ($profileType) {
+                    case 0:
+                        $profileTypeName = 'Boolean';
+                        break;
+
+                    case 1:
+                        $profileTypeName = 'Integer';
+                        break;
+
+                    case 2:
+                        $profileTypeName = 'Float';
+                        break;
+
+                    case 3:
+                        $profileTypeName = 'String';
+                        break;
+
+                    default:
+                        $profileTypeName = 'Unbekannt';
+                }
+                echo 'Profilname: ' . $profile['ProfileName'] . "\n";
+                echo 'Profiltyp: ' . $profileTypeName . "\n\n";
+            }
+            if (!empty($variable)) {
+                echo "\nVariable:\n";
+                print_r($variable);
+            }
+            if (!empty($profile)) {
+                echo "\nVariablenprofil:\n";
+                print_r($profile);
+            }
+        }
+    }
+
     #################### Request Action
 
     public function RequestAction($Ident, $Value)

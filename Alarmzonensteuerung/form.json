@@ -531,8 +531,20 @@
               "name": "ID",
               "width": "350px",
               "add": 0,
+              "onClick": "AZS_EnableRemoteControlsConfigurationButton($id, $RemoteControls['ID']);",
               "edit": {
                 "type": "SelectVariable"
+              }
+            },
+            {
+              "caption": "Info",
+              "name": "Info",
+              "width": "160px",
+              "add": "",
+              "visible": false,
+              "edit": {
+                "type": "Button",
+                "onClick": "AZS_ShowVariableDetails($id, $ID);"
               }
             },
             {
@@ -632,6 +644,14 @@
               }
             }
           ]
+        },
+        {
+          "type": "OpenObjectButton",
+          "caption": "Bearbeiten",
+          "name": "RemoteControlsConfigurationButton",
+          "enabled": false,
+          "visible": false,
+          "objectID": 0
         }
       ]
     },
