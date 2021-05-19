@@ -844,7 +844,7 @@
             {
               "caption": "Sender Name",
               "name": "SenderName",
-              "width": "450px"
+              "width": "auto"
             },
             {
               "caption": "Nachrichten ID",
