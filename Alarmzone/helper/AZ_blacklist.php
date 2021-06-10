@@ -2,8 +2,8 @@
 
 /*
  * @author      Ulrich Bittner
- * @copyright   (c) 2020, 2021
- * @license    	CC BY-NC-SA 4.0
+ * @copyright   (c) 2021
+ * @license     CC BY-NC-SA 4.0
  * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
  */
 
@@ -11,27 +11,25 @@ declare(strict_types=1);
 
 trait AZ_blacklist
 {
+    public function AddSensorBlacklist(int $SensorID): void
+    {
+        $blackList = json_decode($this->GetBuffer('Blacklist'), true);
+        array_push($blackList, $SensorID);
+        $this->SetBuffer('Blacklist', json_encode(array_unique($blackList)));
+        $this->SendDebug(__FUNCTION__, 'Der Sensor mit der ID ' . $SensorID . ' wurde zur Sperrliste hinzugefügt.', 0);
+    }
+
     public function CheckSensorBlacklist(int $SensorID): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
-        $blackListedSensors = json_decode($this->GetBuffer('Blacklist'), true);
-        if (in_array($SensorID, $blackListedSensors)) {
+        if (in_array($SensorID, json_decode($this->GetBuffer('Blacklist'), true))) {
             return true;
         }
         return false;
     }
 
-    public function AddSensorBlacklist(int $SensorID): void
-    {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
-        $blackList = json_decode($this->GetBuffer('Blacklist'), true);
-        array_push($blackList, $SensorID);
-        $this->SetBuffer('Blacklist', json_encode(array_unique($blackList)));
-    }
-
     public function ResetBlacklist(): void
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $this->SetBuffer('Blacklist', json_encode([]));
+        $this->SendDebug(__FUNCTION__, 'Die Sperrliste wurde erfolgreich zurückgesetzt.', 0);
     }
 }

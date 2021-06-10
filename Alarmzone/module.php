@@ -1,16 +1,14 @@
 <?php
 
-/*
- * @author      Ulrich Bittner
- * @copyright   (c) 2020, 2021
- * @license    	CC BY-NC-SA 4.0
- * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
- */
-
-/** @noinspection PhpUnusedPrivateMethodInspection */
-/** @noinspection PhpUndefinedFunctionInspection */
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
+
+/*
+ * @author      Ulrich Bittner
+ * @copyright   (c) 2021
+ * @license     CC BY-NC-SA 4.0
+ * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
+ */
 
 declare(strict_types=1);
 
@@ -25,10 +23,12 @@ class Alarmzone extends IPSModule
     use AZ_controlAlarmZone;
     use AZ_doorWindowSensors;
     use AZ_motionDetectors;
-    use AZ_notificationCenter;
-    use AZ_remoteControls;
 
     // Constants
+    private const LIBRARY_GUID = '{8464371D-1C4E-B070-9884-82DB73545FFA}';
+    private const MODULE_NAME = 'Alarmzone';
+    private const MODULE_PREFIX = 'UBAZ';
+    private const ALARMPROTOCOL_MODULE_GUID = '{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}';
     private const HOMEMATIC_DEVICE_GUID = '{EE4A81C6-5C90-4DB7-AD2F-F6BBD521412E}';
 
     public function Create()
@@ -48,11 +48,11 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', true);
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
+        $this->RegisterPropertyBoolean('EnableAlertingSensor', true);
         $this->RegisterPropertyBoolean('EnableAlarmSirenState', true);
         $this->RegisterPropertyBoolean('EnableAlarmLightState', true);
         $this->RegisterPropertyBoolean('EnableAlarmCallState', true);
-        $this->RegisterPropertyBoolean('EnableAlertingSensor', true);
-        // Descriptions
+        // Designations
         $this->RegisterPropertyString('SystemName', 'Alarmzone');
         $this->RegisterPropertyString('Location', '');
         $this->RegisterPropertyString('AlarmZoneName', '');
@@ -67,24 +67,8 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyInteger('FullProtectionModeActivationDelay', 0);
         $this->RegisterPropertyInteger('HullProtectionModeActivationDelay', 0);
         $this->RegisterPropertyInteger('PartialProtectionModeActivationDelay', 0);
-        // Alerting delay
-        $this->RegisterPropertyInteger('AlertingDelayFullProtectionMode', 0);
-        $this->RegisterPropertyInteger('AlertingDelayHullProtectionMode', 0);
-        $this->RegisterPropertyInteger('AlertingDelayPartialProtectionMode', 0);
         // Alarm protocol
         $this->RegisterPropertyInteger('AlarmProtocol', 0);
-        // Notification center
-        $this->RegisterPropertyInteger('NotificationCenter', 0);
-        $this->RegisterPropertyString('AlarmZoneDisarmedSymbol', json_decode('"\ud83d\udfe2"'));
-        $this->RegisterPropertyString('AlarmZoneDelayedArmedSymbol', json_decode('"\ud83d\udd57"'));
-        $this->RegisterPropertyString('FullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
-        $this->RegisterPropertyString('HullProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
-        $this->RegisterPropertyString('PartialProtectionModeArmedSymbol', json_decode('"\ud83d\udd34"'));
-        $this->RegisterPropertyString('PreAlarmSymbol', json_decode('"\u26a0\ufe0f"'));
-        $this->RegisterPropertyString('AlarmSymbol', json_decode('"\u2757"'));
-        $this->RegisterPropertyString('AlarmZoneSystemFailure', json_decode('"\u26a0\ufe0f"'));
-        // Remote controls
-        $this->RegisterPropertyString('RemoteControls', '[]');
         // Alarm sensors
         $this->RegisterPropertyString('DoorWindowSensors', '[]');
         $this->RegisterPropertyString('MotionDetectors', '[]');
@@ -129,7 +113,7 @@ class Alarmzone extends IPSModule
             IPS_SetIcon($this->GetIDForIdent('PartialProtectionMode'), 'Moon');
         }
         // Alarm zone state
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmZoneState';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.AlarmZoneState';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 1);
         }
@@ -139,7 +123,7 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert', 'Clock', 0xFFFF00);
         $this->RegisterVariableInteger('AlarmZoneState', 'Alarmzone', $profile, 60);
         // Door and window state
-        $profile = 'AZ.' . $this->InstanceID . '.DoorWindowState';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.DoorWindowState';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
@@ -148,7 +132,7 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 1, 'Geöffnet', '', 0xFF0000);
         $this->RegisterVariableBoolean('DoorWindowState', 'Türen und Fenster', $profile, 70);
         // Motion detector state
-        $profile = 'AZ.' . $this->InstanceID . '.MotionDetectorState';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.MotionDetectorState';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
@@ -157,56 +141,54 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', '', 0xFF0000);
         $this->RegisterVariableBoolean('MotionDetectorState', 'Bewegungsmelder', $profile, 80);
         // Alarm state
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmState';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.AlarmState';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 1);
         }
         IPS_SetVariableProfileIcon($profile, '');
         IPS_SetVariableProfileAssociation($profile, 0, 'OK', 'Warning', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Alarm', 'Alert', 0xFF0000);
-        IPS_SetVariableProfileAssociation($profile, 2, 'Voralarm', 'Clock', 0xFFFF00);
         $this->RegisterVariableInteger('AlarmState', 'Alarm', $profile, 90);
+        // Alerting sensor
+        $id = @$this->GetIDForIdent('AlertingSensor');
+        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 100);
+        $this->SetValue('AlertingSensor', 'OK');
+        if ($id == false) {
+            IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
+        }
         // Alarm siren
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmSirenStatus';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.AlarmSirenStatus';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
         IPS_SetVariableProfileIcon($profile, 'Alert');
         IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
-        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', $profile, 100);
+        $this->RegisterVariableBoolean('AlarmSiren', 'Alarmsirene', $profile, 110);
         // Alarm light
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmLightStatus';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.AlarmLightStatus';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
         IPS_SetVariableProfileIcon($profile, 'Bulb');
         IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
-        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', $profile, 110);
+        $this->RegisterVariableBoolean('AlarmLight', 'Alarmbeleuchtung', $profile, 120);
         // Alarm call
-        $profile = 'AZ.' . $this->InstanceID . '.AlarmCallStatus';
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.AlarmCallStatus';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
         IPS_SetVariableProfileIcon($profile, 'Mobile');
         IPS_SetVariableProfileAssociation($profile, 0, 'Aus', '', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'An', '', 0xFF0000);
-        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', $profile, 120);
-        // Alerting sensor
-        $id = @$this->GetIDForIdent('AlertingSensor');
-        $this->RegisterVariableString('AlertingSensor', 'Auslösender Alarmsensor', '', 130);
-        $this->SetValue('AlertingSensor', 'OK');
-        if ($id == false) {
-            IPS_SetIcon($this->GetIDForIdent('AlertingSensor'), 'Eyes');
-        }
+        $this->RegisterVariableBoolean('AlarmCall', 'Alarmanruf', $profile, 130);
 
         // Attribute
         $this->RegisterAttributeBoolean('PreAlarm', false);
 
         // Timers
-        $this->RegisterTimer('StartActivation', 0, 'AZ_StartActivation(' . $this->InstanceID . ');');
-        $this->RegisterTimer('SetAlarmState', 0, 'AZ_SetAlarmState(' . $this->InstanceID . ');');
+        $this->RegisterTimer('StartActivation', 0, self::MODULE_PREFIX . '_StartActivation(' . $this->InstanceID . ');');
     }
 
     public function ApplyChanges()
@@ -249,20 +231,17 @@ class Alarmzone extends IPSModule
         IPS_SetHidden($this->GetIDForIdent('MotionDetectorState'), !$this->ReadPropertyBoolean('EnableMotionDetectorState'));
         // Alarm state
         IPS_SetHidden($this->GetIDForIdent('AlarmState'), !$this->ReadPropertyBoolean('EnableAlarmState'));
+        // Alerting sensor
+        IPS_SetHidden($this->GetIDForIdent('AlertingSensor'), !$this->ReadPropertyBoolean('EnableAlertingSensor'));
         // Alarm siren state
         IPS_SetHidden($this->GetIDForIdent('AlarmSiren'), !$this->ReadPropertyBoolean('EnableAlarmSirenState'));
         // Alarm light state
         IPS_SetHidden($this->GetIDForIdent('AlarmLight'), !$this->ReadPropertyBoolean('EnableAlarmLightState'));
         // Alarm call state
         IPS_SetHidden($this->GetIDForIdent('AlarmCall'), !$this->ReadPropertyBoolean('EnableAlarmCallState'));
-        // Alerting sensor
-        IPS_SetHidden($this->GetIDForIdent('AlertingSensor'), !$this->ReadPropertyBoolean('EnableAlertingSensor'));
-
-        // Buffer
-        $this->SetBuffer('LastAlertingSensor', '[]');
 
         $this->SetTimerInterval('StartActivation', 0);
-        $this->SetTimerInterval('SetAlarmState', 0);
+        $this->ResetBlacklist();
 
         // Delete all references
         foreach ($this->GetReferenceList() as $referenceID) {
@@ -278,53 +257,32 @@ class Alarmzone extends IPSModule
             }
         }
 
-        // Register references and update messages
-        $properties = ['AlarmProtocol', 'NotificationCenter'];
-        foreach ($properties as $property) {
-            $id = $this->ReadPropertyInteger($property);
-            if ($id != 0 && @IPS_ObjectExists($id)) {
-                $this->RegisterReference($id);
+        // Validation
+        if ($this->ValidateConfiguration()) {
+            // Register references and update messages
+            $this->SendDebug(__FUNCTION__, 'Referenzen und Nachrichten werden registriert.', 0);
+            $properties = ['AlarmProtocol'];
+            foreach ($properties as $property) {
+                $id = $this->ReadPropertyInteger($property);
+                if ($id != 0 && @IPS_ObjectExists($id)) {
+                    $this->RegisterReference($id);
+                }
             }
-        }
-        // Register remote controls
-        $variables = json_decode($this->ReadPropertyString('RemoteControls'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterReference($id);
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
+            $propertyNames = ['DoorWindowSensors', 'MotionDetectors'];
+            foreach ($propertyNames as $propertyName) {
+                foreach (json_decode($this->ReadPropertyString($propertyName)) as $variable) {
+                    if ($variable->Use) {
+                        $id = $variable->ID;
+                        if ($id != 0 && @IPS_ObjectExists($id)) {
+                            $this->RegisterReference($id);
+                            $this->RegisterMessage($id, VM_UPDATE);
+                        }
                     }
                 }
             }
+
+            $this->UpdateStates();
         }
-        // Register door and window sensors
-        $variables = json_decode($this->ReadPropertyString('DoorWindowSensors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterReference($id);
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
-        // Register motion detectors
-        $variables = json_decode($this->ReadPropertyString('MotionDetectors'));
-        if (!empty($variables)) {
-            foreach ($variables as $variable) {
-                if ($variable->Use) {
-                    if ($variable->ID != 0 && @IPS_ObjectExists($variable->ID)) {
-                        $this->RegisterReference($id);
-                        $this->RegisterMessage($variable->ID, VM_UPDATE);
-                    }
-                }
-            }
-        }
-        $this->ResetBlacklist();
-        $this->UpdateStates();
-        $this->ValidateConfiguration();
     }
 
     public function Destroy()
@@ -336,7 +294,7 @@ class Alarmzone extends IPSModule
         $profiles = ['AlarmZoneState', 'AlarmState', 'DoorWindowState', 'MotionDetectorState', 'AlarmSirenStatus', 'AlarmLightStatus', 'AlarmCallStatus'];
         if (!empty($profiles)) {
             foreach ($profiles as $profile) {
-                $profileName = 'AZ.' . $this->InstanceID . '.' . $profile;
+                $profileName = self::MODULE_PREFIX . '.' . $this->InstanceID . '.' . $profile;
                 if (IPS_VariableProfileExists($profileName)) {
                     IPS_DeleteVariableProfile($profileName);
                 }
@@ -370,45 +328,24 @@ class Alarmzone extends IPSModule
                     return;
                 }
 
-                // Check trigger variables
-                // Remote controls
-                $remoteControls = json_decode($this->ReadPropertyString('RemoteControls'), true);
-                if (!empty($remoteControls)) {
-                    if (array_search($SenderID, array_column($remoteControls, 'ID')) !== false) {
-                        //Trigger action
-                        $valueChanged = 'false';
-                        if ($Data[1]) {
-                            $valueChanged = 'true';
-                        }
-                        $scriptText = 'AZ_TriggerRemoteControlAction(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
-                        IPS_RunScriptText($scriptText);
+                // Check door and window variable
+                if (array_search($SenderID, array_column(json_decode($this->ReadPropertyString('DoorWindowSensors'), true), 'ID')) !== false) {
+                    $valueChanged = 'false';
+                    if ($Data[1]) {
+                        $valueChanged = 'true';
                     }
+                    $scriptText = self::MODULE_PREFIX . '_CheckDoorWindowSensorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
+                    @IPS_RunScriptText($scriptText);
                 }
 
-                // Door and window sensors
-                $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
-                if (!empty($doorWindowSensors)) {
-                    if (array_search($SenderID, array_column($doorWindowSensors, 'ID')) !== false) {
-                        $valueChanged = 'false';
-                        if ($Data[1]) {
-                            $valueChanged = 'true';
-                        }
-                        $scriptText = 'AZ_CheckDoorWindowSensorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
-                        IPS_RunScriptText($scriptText);
+                // Check motion detector variable
+                if (array_search($SenderID, array_column(json_decode($this->ReadPropertyString('MotionDetectors'), true), 'ID')) !== false) {
+                    $valueChanged = 'false';
+                    if ($Data[1]) {
+                        $valueChanged = 'true';
                     }
-                }
-
-                // Motion detectors
-                $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'), true);
-                if (!empty($motionDetectors)) {
-                    if (array_search($SenderID, array_column($motionDetectors, 'ID')) !== false) {
-                        $valueChanged = 'false';
-                        if ($Data[1]) {
-                            $valueChanged = 'true';
-                        }
-                        $scriptText = 'AZ_CheckMotionDetectorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
-                        IPS_RunScriptText($scriptText);
-                    }
+                    $scriptText = self::MODULE_PREFIX . '_CheckMotionDetectorAlerting(' . $this->InstanceID . ', ' . $SenderID . ', ' . $valueChanged . ');';
+                    @IPS_RunScriptText($scriptText);
                 }
                 break;
 
@@ -417,599 +354,909 @@ class Alarmzone extends IPSModule
 
     public function GetConfigurationForm()
     {
-        $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        // Alarm protocol
-        $id = $this->ReadPropertyInteger('AlarmProtocol');
-        $enabled = false;
-        if ($id != 0 && @IPS_ObjectExists($id)) {
-            $enabled = true;
-        }
-        $formData['elements'][5]['items'][0] = [
-            'type'  => 'RowLayout',
-            'items' => [$formData['elements'][5]['items'][0]['items'][0] = [
-                'type'     => 'SelectModule',
-                'name'     => 'AlarmProtocol',
-                'caption'  => 'Alarmprotokoll',
-                'moduleID' => '{33EF9DF1-C8D7-01E7-F168-0A1927F1C61F}',
-                'width'    => '600px',
-            ],
-                $formData['elements'][5]['items'][0]['items'][1] = [
-                    'type'    => 'Label',
-                    'caption' => ' ',
-                    'visible' => $enabled
+        $form = [];
+
+        #################### Elements
+
+        ########## Functions
+
+        ##### Functions panel
+
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Funktionen',
+            'items'   => [
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'MaintenanceMode',
+                    'caption' => 'Wartungsmodus'
                 ],
-                $formData['elements'][5]['items'][0]['items'][2] = [
-                    'type'     => 'OpenObjectButton',
-                    'caption'  => 'ID ' . $id . ' konfigurieren',
-                    'visible'  => $enabled,
-                    'objectID' => $id
+                [
+                    'type'    => 'Label',
+                    'caption' => ' '
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableLocation',
+                    'caption' => 'Standortbezeichnung'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmZoneName',
+                    'caption' => 'Alarmzonenbezeichnung'
+                ],
+                [
+                    'type'    => 'Label',
+                    'caption' => ' '
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableFullProtectionMode',
+                    'caption' => 'Vollschutz'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableHullProtectionMode',
+                    'caption' => 'Hüllschutz'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnablePartialProtectionMode',
+                    'caption' => 'Teilschutz'
+                ],
+                [
+                    'type'    => 'Label',
+                    'caption' => ' '
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmZoneState',
+                    'caption' => 'Alarmzonenstatus'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableDoorWindowState',
+                    'caption' => 'Tür- und Fensterstatus'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableMotionDetectorState',
+                    'caption' => 'Bewegungsmelderstatus'
+                ],
+                [
+                    'type'    => 'Label',
+                    'caption' => ' '
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmState',
+                    'caption' => 'Alarmstatus'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlertingSensor',
+                    'caption' => 'Auslösender Alarmsensor'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmSirenState',
+                    'caption' => 'Alarmsirene'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmLightState',
+                    'caption' => 'Alarmbeleuchtung'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'EnableAlarmCallState',
+                    'caption' => 'Alarmanruf'
                 ]
             ]
         ];
-        // Remote controls
-        $vars = json_decode($this->ReadPropertyString('RemoteControls'));
-        if (!empty($vars)) {
-            foreach ($vars as $var) {
-                $id = $var->ID;
-                $action = $var->Action;
-                $scriptID = $var->ScriptID;
-                $rowColor = '';
-                if ($id == 0 || !@IPS_ObjectExists($id)) {
-                    if ($var->Use) {
-                        $rowColor = '#FFC0C0'; # red
-                    }
-                } else {
-                    if (!$var->Use) {
-                        $rowColor = '#DFDFDF'; # grey
-                    }
-                }
-                if ($action == 5) { # script
-                    if ($scriptID == 0 || !@IPS_ObjectExists($scriptID)) {
-                        if ($var->Use) {
-                            $rowColor = '#FFC0C0'; # red
-                        }
-                    }
-                }
-                $formData['elements'][7]['items'][0]['values'][] = [
-                    'Use'       => $var->Use,
-                    'Name'      => $var->Name,
-                    'ID'        => $id,
-                    'Trigger'   => $var->Trigger,
-                    'Value'     => $var->Value,
-                    'Action'    => $var->Action,
-                    'ScriptID'  => $var->ScriptID,
-                    'rowColor'  => $rowColor];
-            }
-        }
-        // Door and window sensors
-        $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'), true);
-        if (!empty($doorWindowSensors)) {
-            $stateName = 'unbekannt';
-            foreach ($doorWindowSensors as $doorWindowSensor) {
-                $id = $doorWindowSensor['ID'];
-                $rowColor = '';
-                if ($id != 0 && @IPS_ObjectExists($id)) {
-                    $rowColor = '#C0FFC0'; // light green
-                    $stateName = 'geschlossen';
-                    $blackListedSensors = json_decode($this->GetBuffer('Blacklist'), true);
-                    $blacklisted = false;
-                    if (!empty($blackListedSensors)) {
-                        foreach ($blackListedSensors as $blackListedSensor) {
-                            if ($blackListedSensor == $doorWindowSensor['ID']) {
-                                $rowColor = '#DFDFDF'; # grey
-                                $blacklisted = true;
-                                $stateName = 'gesperrt';
-                            }
-                        }
-                    }
-                    if (!$blacklisted) {
-                        $type = IPS_GetVariable($id)['VariableType'];
-                        $value = $doorWindowSensor['Value'];
-                        switch ($doorWindowSensor['Trigger']) {
-                            case 2: #on limit drop, once (integer, float)
-                            case 3: #on limit drop, every time (integer, float)
-                                switch ($type) {
-                                    case 1: #integer
-                                        if (GetValueInteger($id) < intval($value)) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
 
-                                    case 2: #float
-                                        if (GetValueFloat($id) < floatval(str_replace(',', '.', $value))) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        ########## Designations
 
-                                }
-                                break;
+        ##### Designations panel
 
-                            case 4: #on limit exceed, once (integer, float)
-                            case 5: #on limit exceed, every time (integer, float)
-                                switch ($type) {
-                                    case 1: #integer
-                                        if (GetValueInteger($id) > intval($value)) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Bezeichnungen',
+            'items'   => [
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'SystemName',
+                    'caption' => 'Systembezeichnung (z.B. Alarmzone, Alarmanlage, Einbruchmeldeanlage)',
+                    'width'   => '600px'
+                ],
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'Location',
+                    'caption' => 'Standortbezeichnung (z.B. Musterstraße 1)',
+                    'width'   => '600px'
+                ],
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'AlarmZoneName',
+                    'caption' => 'Alarmzonenbezeichnung (z.B. Haus, Wohnung, Erdgeschoss, Obergeschoss)',
+                    'width'   => '600px'
+                ],
+                [
+                    'type'    => 'Label',
+                    'caption' => ' '
+                ],
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'FullProtectionName',
+                    'caption' => 'Vollschutz',
+                    'width'   => '600px'
+                ],
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'HullProtectionName',
+                    'caption' => 'Hüllschutz',
+                    'width'   => '600px'
+                ],
+                [
+                    'type'    => 'ValidationTextBox',
+                    'name'    => 'PartialProtectionName',
+                    'caption' => 'Teilschutz',
+                    'width'   => '600px'
+                ]
+            ]
+        ];
 
-                                    case 2: #float
-                                        if (GetValueFloat($id) > floatval(str_replace(',', '.', $value))) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        ########## Activation check
 
-                                }
-                                break;
+        ##### Activation check panel
 
-                            case 6: #on specific value, once (bool, integer, float, string)
-                            case 7: #on specific value, every time (bool, integer, float, string)
-                                switch ($type) {
-                                    case 0: #bool
-                                        if ($value == 'false') {
-                                            $value = '0';
-                                        }
-                                        if (GetValueBoolean($id) == boolval($value)) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Aktivierungsprüfung',
+            'items'   => [
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'CheckFullProtectionModeActivation',
+                    'caption' => 'Vollschutz'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'CheckHullProtectionModeActivation',
+                    'caption' => 'Hüllschutz'
+                ],
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'CheckPartialProtectionModeActivation',
+                    'caption' => 'Teilschutz'
+                ]
+            ]
+        ];
 
-                                    case 1: #integer
-                                        if (GetValueInteger($id) == intval($value)) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        ########## Activation delay
 
-                                    case 2: #float
-                                        if (GetValueFloat($id) == floatval(str_replace(',', '.', $value))) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        ##### Activation delay panel
 
-                                    case 3: #string
-                                        if (GetValueString($id) == (string) $value) {
-                                            $rowColor = '#C0C0FF'; # violett
-                                            $stateName = 'geöffnet';
-                                        }
-                                        break;
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Einschaltverzögerung',
+            'items'   => [
+                [
+                    'type'    => 'NumberSpinner',
+                    'name'    => 'FullProtectionModeActivationDelay',
+                    'caption' => 'Vollschutz',
+                    'suffix'  => 'Sekunden',
+                    'minimum' => 0,
+                    'maximum' => 60
+                ],
+                [
+                    'type'    => 'NumberSpinner',
+                    'name'    => 'HullProtectionModeActivationDelay',
+                    'caption' => 'Hüllschutz',
+                    'suffix'  => 'Sekunden',
+                    'minimum' => 0,
+                    'maximum' => 60
+                ],
+                [
+                    'type'    => 'NumberSpinner',
+                    'name'    => 'PartialProtectionModeActivationDelay',
+                    'caption' => 'Teilschutz',
+                    'suffix'  => 'Sekunden',
+                    'minimum' => 0,
+                    'maximum' => 60
+                ]
+            ]
+        ];
 
-                                }
-                                break;
+        ########## Alarm protocol
 
-                        }
-                        if (!$doorWindowSensor['Use']) {
-                            $rowColor = '#DFDFDF'; # grey
-                            $stateName = 'deaktiviert';
-                        }
-                    }
-                } else {
-                    if ($doorWindowSensor['Use']) {
-                        $rowColor = '#FFC0C0'; # red
-                        $stateName = 'Fehler!';
-                    }
-                }
-                $formData['elements'][8]['items'][0]['values'][] = [
-                    'Use'                           => $doorWindowSensor['Use'],
-                    'ActualState'                   => $stateName,
-                    'Name'                          => $doorWindowSensor['Name'],
-                    'ID'                            => $doorWindowSensor['ID'],
-                    'Trigger'                       => $doorWindowSensor['Trigger'],
-                    'Value'                         => $doorWindowSensor['Value'],
-                    'FullProtectionModeActive'      => $doorWindowSensor['FullProtectionModeActive'],
-                    'HullProtectionModeActive'      => $doorWindowSensor['HullProtectionModeActive'],
-                    'PartialProtectionModeActive'   => $doorWindowSensor['PartialProtectionModeActive'],
-                    'UseNotification'               => $doorWindowSensor['UseNotification'],
-                    'UseAlarmSiren'                 => $doorWindowSensor['UseAlarmSiren'],
-                    'UseAlarmLight'                 => $doorWindowSensor['UseAlarmLight'],
-                    'UseAlarmCall'                  => $doorWindowSensor['UseAlarmCall'],
-                    'rowColor'                      => $rowColor];
-            }
+        $alarmProtocolID = $this->ReadPropertyInteger('AlarmProtocol');
+        $enableButton = false;
+        if ($alarmProtocolID != 0 && @IPS_ObjectExists($alarmProtocolID)) {
+            $enableButton = true;
         }
 
-        // Properties
-        $properties = [];
-        array_push($properties, ['name' => 'MotionDetectors', 'position' => 9]);
-        if (!empty($properties)) {
-            foreach ($properties as $property) {
-                $propertyName = $property['name'];
-                $propertyPosition = $property['position'];
-                $vars = json_decode($this->ReadPropertyString($propertyName));
-                if (!empty($vars)) {
-                    foreach ($vars as $var) {
-                        $rowColor = '';
-                        $id = $var->ID;
-                        if ($id == 0 || !@IPS_ObjectExists($id)) {
-                            $rowColor = '#FFC0C0'; # red
-                        } else {
-                            if (!$var->Use) {
-                                $rowColor = '#DFDFDF'; # grey
-                            }
-                        }
-                        # motion detectors
-                        $formData['elements'][$propertyPosition]['items'][0]['values'][] = [
-                            'Use'                           => $var->Use,
-                            'Name'                          => $var->Name,
-                            'ID'                            => $id,
-                            'Trigger'                       => $var->Trigger,
-                            'Value'                         => $var->Value,
-                            'FullProtectionModeActive'      => $var->FullProtectionModeActive,
-                            'HullProtectionModeActive'      => $var->HullProtectionModeActive,
-                            'PartialProtectionModeActive'   => $var->PartialProtectionModeActive,
-                            'UseNotification'               => $var->UseNotification,
-                            'UseAlarmSiren'                 => $var->UseAlarmSiren,
-                            'UseAlarmLight'                 => $var->UseAlarmLight,
-                            'UseAlarmCall'                  => $var->UseAlarmCall,
-                            'rowColor'                      => $rowColor];
-                    }
-                }
-            }
-        }
-        // Registered messages
-        $messages = $this->GetMessageList();
-        foreach ($messages as $senderID => $messageID) {
-            $senderName = 'Objekt #' . $senderID . ' existiert nicht';
+        ##### Alarm protocol panel
+
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Alarmprotokoll',
+            'items'   => [
+                [
+                    'type'  => 'RowLayout',
+                    'items' => [
+                        [
+                            'type'     => 'SelectModule',
+                            'name'     => 'AlarmProtocol',
+                            'caption'  => 'Alarmprotokoll',
+                            'moduleID' => self::ALARMPROTOCOL_MODULE_GUID,
+                            'width'    => '600px',
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => ' ',
+                            'visible' => $enableButton
+                        ],
+                        [
+                            'type'     => 'OpenObjectButton',
+                            'caption'  => 'ID ' . $alarmProtocolID . ' konfigurieren',
+                            'visible'  => $enableButton,
+                            'objectID' => $alarmProtocolID
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        ########## Door window sensors
+
+        $doorWindowSensorValues = [];
+        foreach (json_decode($this->ReadPropertyString('DoorWindowSensors')) as $doorWindowSensor) {
             $rowColor = '#FFC0C0'; # red
-            if (@IPS_ObjectExists($senderID)) {
-                $senderName = IPS_GetName($senderID);
-                $rowColor = '#C0FFC0'; #  light green
-            }
-            switch ($messageID) {
-                case [10001]:
-                    $messageDescription = 'IPS_KERNELSTARTED';
-                    break;
+            $stateName = 'unbekannt';
+            $id = $doorWindowSensor->ID;
+            if ($id != 0 && @IPS_ObjectExists($id)) {
+                $rowColor = '#C0FFC0'; # light green
+                $stateName = 'geschlossen';
+                $blacklisted = false;
+                foreach (json_decode($this->GetBuffer('Blacklist'), true) as $blackListedSensor) {
+                    if ($blackListedSensor == $id) {
+                        $rowColor = '#DFDFDF'; # grey
+                        $blacklisted = true;
+                        $stateName = 'gesperrt';
+                    }
+                }
+                if (!$blacklisted) {
+                    $type = IPS_GetVariable($id)['VariableType'];
+                    $value = $doorWindowSensor->TriggerValue;
+                    switch ($doorWindowSensor->TriggerType) {
+                        case 2: #on limit drop, once (integer, float)
+                        case 3: #on limit drop, every time (integer, float)
+                            switch ($type) {
+                                case 1: #integer
+                                    if (GetValueInteger($id) < intval($value)) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
 
-                case [10603]:
-                    $messageDescription = 'VM_UPDATE';
-                    break;
+                                case 2: #float
+                                    if (GetValueFloat($id) < floatval(str_replace(',', '.', $value))) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
 
-                default:
-                    $messageDescription = 'keine Bezeichnung';
+                            }
+                            break;
+
+                        case 4: #on limit exceed, once (integer, float)
+                        case 5: #on limit exceed, every time (integer, float)
+                            switch ($type) {
+                                case 1: #integer
+                                    if (GetValueInteger($id) > intval($value)) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                                case 2: #float
+                                    if (GetValueFloat($id) > floatval(str_replace(',', '.', $value))) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                            }
+                            break;
+
+                        case 6: #on specific value, once (bool, integer, float, string)
+                        case 7: #on specific value, every time (bool, integer, float, string)
+                            switch ($type) {
+                                case 0: #bool
+                                    if ($value == 'false') {
+                                        $value = '0';
+                                    }
+                                    if (GetValueBoolean($id) == boolval($value)) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                                case 1: #integer
+                                    if (GetValueInteger($id) == intval($value)) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                                case 2: #float
+                                    if (GetValueFloat($id) == floatval(str_replace(',', '.', $value))) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                                case 3: #string
+                                    if (GetValueString($id) == (string) $value) {
+                                        $rowColor = '#C0C0FF'; # violett
+                                        $stateName = 'geöffnet';
+                                    }
+                                    break;
+
+                            }
+                            break;
+
+                    }
+                    if (!$doorWindowSensor->Use) {
+                        $rowColor = '#DFDFDF'; # grey
+                        $stateName = 'deaktiviert';
+                    }
+                }
             }
-            $formData['actions'][1]['items'][0]['values'][] = [
-                'SenderID'                                              => $senderID,
-                'SenderName'                                            => $senderName,
-                'MessageID'                                             => $messageID,
-                'MessageDescription'                                    => $messageDescription,
-                'rowColor'                                              => $rowColor];
+            $doorWindowSensorValues[] = ['ActualState' => $stateName, 'rowColor' => $rowColor];
         }
-        // Status
-        $formData['status'][0] = [
-            'code'    => 101,
-            'icon'    => 'active',
-            'caption' => 'Alarmzone wird erstellt',
+
+        ##### Door window panel
+
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Tür- / Fenstersensoren',
+            'items'   => [
+                [
+                    'type'     => 'List',
+                    'name'     => 'DoorWindowSensors',
+                    'rowCount' => 15,
+                    'add'      => true,
+                    'delete'   => true,
+                    'columns'  => [
+                        [
+                            'name'    => 'Use',
+                            'caption' => 'Aktiviert',
+                            'width'   => '100px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ],
+                        ],
+                        [
+                            'name'    => 'ActualState',
+                            'caption' => 'Aktueller Status',
+                            'width'   => '150px',
+                            'add'     => ''
+                        ],
+                        [
+                            'name'    => 'Name',
+                            'caption' => 'Bezeichnung',
+                            'width'   => '350px',
+                            'add'     => '',
+                            'edit'    => [
+                                'type' => 'ValidationTextBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'ID',
+                            'caption' => 'Auslösende Variable',
+                            'width'   => '350px',
+                            'add'     => 0,
+                            'onClick' => self::MODULE_PREFIX . '_EnableConfigurationButton($id, $DoorWindowSensors["ID"], "DoorWindowSensorsConfigurationButton", 0);',
+                            'edit'    => [
+                                'type' => 'SelectVariable'
+                            ]
+                        ],
+                        [
+                            'name'    => 'Info',
+                            'caption' => 'Info',
+                            'width'   => '160px',
+                            'add'     => '',
+                            'visible' => false,
+                            'edit'    => [
+                                'type'    => 'Button',
+                                'onClick' => self::MODULE_PREFIX . '_ShowVariableDetails($id, $ID);'
+                            ]
+                        ],
+                        [
+                            'name'    => 'TriggerType',
+                            'caption' => 'Auslöseart',
+                            'width'   => '300px',
+                            'add'     => 6,
+                            'edit'    => [
+                                'type'    => 'Select',
+                                'options' => [
+                                    [
+                                        'caption' => 'Bei Änderung',
+                                        'value'   => 0
+                                    ],
+                                    [
+                                        'caption' => 'Bei Aktualisierung',
+                                        'value'   => 1
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzunterschreitung (einmalig)',
+                                        'value'   => 2
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzunterschreitung (mehrmalig)',
+                                        'value'   => 3
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzüberschreitung (einmalig)',
+                                        'value'   => 4
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzüberschreitung (mehrmalig)',
+                                        'value'   => 5
+                                    ],
+                                    [
+                                        'caption' => 'Bei bestimmtem Wert (einmalig)',
+                                        'value'   => 6
+                                    ],
+                                    [
+                                        'caption' => 'Bei bestimmtem Wert (mehrmalig)',
+                                        'value'   => 7
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'name'    => 'TriggerValue',
+                            'caption' => 'Auslösewert',
+                            'width'   => '170px',
+                            'add'     => 'true',
+                            'edit'    => [
+                                'type' => 'ValidationTextBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'FullProtectionModeActive',
+                            'caption' => 'Vollschutz',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'HullProtectionModeActive',
+                            'caption' => 'Hüllschutz',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'PartialProtectionModeActive',
+                            'caption' => 'Teilschutz',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'UseAlarmSiren',
+                            'caption' => 'Alarmsirene',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'UseAlarmLight',
+                            'caption' => 'Alarmbeleuchtung',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'name'    => 'UseAlarmCall',
+                            'caption' => 'Alarmanruf',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ]
+                    ],
+                    'values' => $doorWindowSensorValues,
+                ],
+                [
+                    'type'     => 'OpenObjectButton',
+                    'caption'  => 'Bearbeiten',
+                    'name'     => 'DoorWindowSensorsConfigurationButton',
+                    'enabled'  => false,
+                    'visible'  => false,
+                    'objectID' => 0
+                ]
+            ]
         ];
-        $formData['status'][1] = [
-            'code'    => 102,
-            'icon'    => 'active',
-            'caption' => 'Alarmzone ist aktiv (ID ' . $this->InstanceID . ')',
+
+        ########## Motion detectors
+
+        $motionDetectorValues = [];
+        foreach (json_decode($this->ReadPropertyString('MotionDetectors')) as $motionDetector) {
+            $rowColor = '#FFC0C0'; # red
+            $id = $motionDetector->ID;
+            if ($id != 0 && @IPS_ObjectExists($id)) {
+                $rowColor = '#DFDFDF'; # grey
+                if ($motionDetector->Use) {
+                    $rowColor = '#C0FFC0'; # light green
+                }
+            }
+            $motionDetectorValues[] = ['rowColor' => $rowColor];
+        }
+
+        ##### Motion detectors panel
+
+        $form['elements'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Bewegungsmelder',
+            'items'   => [
+                [
+                    'type'     => 'List',
+                    'name'     => 'MotionDetectors',
+                    'rowCount' => 5,
+                    'add'      => true,
+                    'delete'   => true,
+                    'columns'  => [
+                        [
+                            'caption' => 'Aktiviert',
+                            'name'    => 'Use',
+                            'width'   => '100px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Bezeichnung',
+                            'name'    => 'Name',
+                            'width'   => '350px',
+                            'add'     => '',
+                            'edit'    => [
+                                'type' => 'ValidationTextBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Auslösende Variable',
+                            'name'    => 'ID',
+                            'width'   => '350px',
+                            'add'     => 0,
+                            'onClick' => self::MODULE_PREFIX . '_EnableConfigurationButton($id, $MotionDetectors["ID"], "MotionDetectorsConfigurationButton", 0);',
+                            'edit'    => [
+                                'type' => 'SelectVariable'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Info',
+                            'name'    => 'Info',
+                            'width'   => '160px',
+                            'add'     => '',
+                            'visible' => false,
+                            'edit'    => [
+                                'type'    => 'Button',
+                                'onClick' => self::MODULE_PREFIX . '_ShowVariableDetails($id, $ID);'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Auslöseart',
+                            'name'    => 'TriggerType',
+                            'width'   => '300px',
+                            'add'     => 6,
+                            'edit'    => [
+                                'type'    => 'Select',
+                                'options' => [
+                                    [
+                                        'caption' => 'Bei Änderung',
+                                        'value'   => 0
+                                    ],
+                                    [
+                                        'caption' => 'Bei Aktualisierung',
+                                        'value'   => 1
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzunterschreitung (einmalig)',
+                                        'value'   => 2
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzunterschreitung (mehrmalig)',
+                                        'value'   => 3
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzüberschreitung (einmalig)',
+                                        'value'   => 4
+                                    ],
+                                    [
+                                        'caption' => 'Bei Grenzüberschreitung (mehrmalig)',
+                                        'value'   => 5
+                                    ],
+                                    [
+                                        'caption' => 'Bei bestimmtem Wert (einmalig)',
+                                        'value'   => 6
+                                    ],
+                                    [
+                                        'caption' => 'Bei bestimmtem Wert (mehrmalig)',
+                                        'value'   => 7
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'caption' => 'Auslösewert',
+                            'name'    => 'TriggerValue',
+                            'width'   => '170px',
+                            'add'     => 'true',
+                            'edit'    => [
+                                'type' => 'ValidationTextBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Vollschutz',
+                            'name'    => 'FullProtectionModeActive',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Hüllschutz',
+                            'name'    => 'HullProtectionModeActive',
+                            'width'   => '170px',
+                            'add'     => false,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Teilschutz',
+                            'name'    => 'PartialProtectionModeActive',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Alarmsirene',
+                            'name'    => 'UseAlarmSiren',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Alarmbeleuchtung',
+                            'name'    => 'UseAlarmLight',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ],
+                        [
+                            'caption' => 'Alarmanruf',
+                            'name'    => 'UseAlarmCall',
+                            'width'   => '170px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ]
+                        ]
+                    ],
+                    'values' => $motionDetectorValues,
+                ],
+                [
+                    'type'     => 'OpenObjectButton',
+                    'caption'  => 'Bearbeiten',
+                    'name'     => 'MotionDetectorsConfigurationButton',
+                    'enabled'  => false,
+                    'visible'  => false,
+                    'objectID' => 0
+                ]
+            ]
         ];
-        $formData['status'][2] = [
-            'code'    => 103,
-            'icon'    => 'active',
-            'caption' => 'Alarmzone wird gelöscht (ID ' . $this->InstanceID . ')',
+
+        #################### Actions
+
+        ##### Configuration panel
+
+        $form['actions'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Konfiguration',
+            'items'   => [
+                [
+                    'type'    => 'Button',
+                    'caption' => 'Neu einlesen',
+                    'onClick' => self::MODULE_PREFIX . '_ReloadConfiguration($id);'
+                ],
+                [
+                    'type'  => 'RowLayout',
+                    'items' => [
+                        [
+                            'type'    => 'SelectCategory',
+                            'name'    => 'BackupCategory',
+                            'caption' => 'Kategorie',
+                            'width'   => '600px'
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => ' '
+                        ],
+                        [
+                            'type'    => 'Button',
+                            'caption' => 'Sichern',
+                            'onClick' => self::MODULE_PREFIX . '_CreateBackup($id, $BackupCategory);'
+                        ]
+                    ]
+                ],
+                [
+                    'type'  => 'RowLayout',
+                    'items' => [
+                        [
+                            'type'    => 'SelectScript',
+                            'name'    => 'ConfigurationScript',
+                            'caption' => 'Konfiguration',
+                            'width'   => '600px'
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => ' '
+                        ],
+                        [
+                            'type'    => 'PopupButton',
+                            'caption' => 'Wiederherstellen',
+                            'popup'   => [
+                                'caption' => 'Konfiguration wirklich wiederherstellen?',
+                                'items'   => [
+                                    [
+                                        'type'    => 'Button',
+                                        'caption' => 'Wiederherstellen',
+                                        'onClick' => self::MODULE_PREFIX . '_RestoreConfiguration($id, $ConfigurationScript);'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
-        $formData['status'][3] = [
-            'code'    => 104,
-            'icon'    => 'inactive',
-            'caption' => 'Alarmzone ist inaktiv (ID ' . $this->InstanceID . ')',
+
+        ##### Sensor detection panel
+
+        $form['actions'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Alarmsensoren',
+            'items'   => [
+                [
+                    'type'    => 'PopupButton',
+                    'caption' => 'Tür- und Fenstersensoren ermitteln',
+                    'popup'   => [
+                        'caption' => 'HomeMatic und Homematic IP Tür- und Fenstersensoren wirklich automatisch ermitteln?',
+                        'items'   => [
+                            [
+                                'type'    => 'Button',
+                                'caption' => 'Alarmsensoren ermitteln',
+                                'onClick' => self::MODULE_PREFIX . '_DetermineDoorWindowVariables($id);'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'type'    => 'PopupButton',
+                    'caption' => 'Bewegungsmelder ermitteln',
+                    'popup'   => [
+                        'caption' => 'HomeMatic und Homematic IP Bewegungsmelder wirklich automatisch ermitteln?',
+                        'items'   => [
+                            [
+                                'type'    => 'Button',
+                                'caption' => 'Bewegungsmelder ermitteln',
+                                'onClick' => self::MODULE_PREFIX . '_DetermineMotionDetectorVariables($id);'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
-        $formData['status'][4] = [
-            'code'    => 200,
-            'icon'    => 'inactive',
-            'caption' => 'Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug! (ID ' . $this->InstanceID . ')',
+
+        ##### Blacklist panel
+
+        $form['actions'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Sperrliste',
+            'items'   => [
+                [
+                    'type'    => 'PopupButton',
+                    'caption' => 'Sperrliste zurücksetzen',
+                    'popup'   => [
+                        'caption' => 'Sperrliste wirklich zurücksetzen?',
+                        'items'   => [
+                            [
+                                'type'    => 'Button',
+                                'caption' => 'Sperrliste zurücksetzen',
+                                'onClick' => self::MODULE_PREFIX . '_ResetBlackList($id); echo "Die Sperrliste wurde erfolgreich zurückgesetzt!";'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
-        $formData['status'][5] = [
-            'code'    => 201,
-            'icon'    => 'inactive',
-            'caption' => 'Es ist Fehler aufgetreten, bitte Konfiguration prüfen! (ID ' . $this->InstanceID . ')',
+
+        ##### Test center panel
+
+        $form['actions'][] = [
+            'type'    => 'ExpansionPanel',
+            'caption' => 'Schaltfunktionen',
+            'items'   => [
+                [
+                    'type' => 'TestCenter',
+                ]
+            ]
         ];
-        return json_encode($formData);
+
+        #################### Status
+
+        $library = IPS_GetLibrary(self::LIBRARY_GUID);
+        $version = '[Version ' . $library['Version'] . '-' . $library['Build'] . ' vom ' . date('d.m.Y', $library['Date']) . ']';
+
+        $form['status'] = [
+            [
+                'code'    => 101,
+                'icon'    => 'active',
+                'caption' => self::MODULE_NAME . ' wird erstellt',
+            ],
+            [
+                'code'    => 102,
+                'icon'    => 'active',
+                'caption' => self::MODULE_NAME . ' ist aktiv (ID ' . $this->InstanceID . ') ' . $version,
+            ],
+            [
+                'code'    => 103,
+                'icon'    => 'active',
+                'caption' => self::MODULE_NAME . ' wird gelöscht (ID ' . $this->InstanceID . ') ' . $version,
+            ],
+            [
+                'code'    => 104,
+                'icon'    => 'inactive',
+                'caption' => self::MODULE_NAME . ' ist inaktiv (ID ' . $this->InstanceID . ') ' . $version,
+            ],
+            [
+                'code'    => 200,
+                'icon'    => 'inactive',
+                'caption' => 'Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug! (ID ' . $this->InstanceID . ') ' . $version
+            ]
+        ];
+
+        return json_encode($form);
     }
 
     public function ReloadConfiguration()
     {
         $this->ReloadForm();
-    }
-
-    #################### Request Action
-
-    public function RequestAction($Ident, $Value)
-    {
-        switch ($Ident) {
-            case 'FullProtectionMode':
-                $id = $this->GetIDForIdent('FullProtectionMode');
-                $this->ToggleFullProtectionMode($Value, (string) $id);
-                break;
-
-            case 'HullProtectionMode':
-                $id = $this->GetIDForIdent('HullProtectionMode');
-                $this->ToggleHullProtectionMode($Value, (string) $id);
-                break;
-
-            case 'PartialProtectionMode':
-                $id = $this->GetIDForIdent('PartialProtectionMode');
-                $this->TogglePartialProtectionMode($Value, (string) $id);
-                break;
-
-        }
-    }
-
-    public function AssignProfiles(): void
-    {
-        // Door and window sensors
-        $doorWindowSensors = json_decode($this->ReadPropertyString('DoorWindowSensors'));
-        if (!empty($doorWindowSensors)) {
-            foreach ($doorWindowSensors as $doorWindowSensor) {
-                $id = $doorWindowSensor->ID;
-                if ($id != 0 && IPS_ObjectExists($id)) {
-                    // Check object
-                    $object = IPS_GetObject($id)['ObjectType'];
-                    // 0: Category, 1: Instance, 2: Variable, 3: Script, 4: Event, 5: Media, 6: Link)
-                    if ($object == 2) {
-                        // Get variable type
-                        $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $doorWindowSensor->Value;
-                        switch ($variable) {
-                            // 0: Boolean, 1: Integer, 2: Float, 3: String
-                            case 0:
-                                switch ($profile) {
-                                    // 0: Reversed, 1: Standard
-                                    case 0:
-                                        $profileName = 'AZ.DoorWindowSensor.Bool.Reversed';
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.DoorWindowSensor.Bool';
-                                        break;
-
-                                }
-                                break;
-
-                            case 1:
-                                switch ($profile) {
-                                    // 0: Reversed, 1: Standard
-                                    case 0:
-                                        $profileName = 'AZ.DoorWindowSensor.Integer.Reversed';
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.DoorWindowSensor.Integer';
-                                        break;
-
-                                }
-                                break;
-
-                            default:
-                                $profileName = '';
-                        }
-                        if (!empty($profileName)) {
-                            IPS_SetVariableCustomProfile($id, $profileName);
-                            IPS_SetVariableCustomAction($id, 1);
-                        }
-                    }
-                }
-            }
-        }
-        // Motion detectors
-        $motionDetectors = json_decode($this->ReadPropertyString('MotionDetectors'));
-        if (!empty($motionDetectors)) {
-            foreach ($motionDetectors as $motionDetector) {
-                $id = $motionDetector->ID;
-                if ($id != 0 && IPS_ObjectExists($id)) {
-                    $object = IPS_GetObject($id)['ObjectType'];
-                    // Check if object is a variable
-                    if ($object == 2) {
-                        // Get variable type
-                        $variable = IPS_GetVariable($id)['VariableType'];
-                        $profile = $motionDetector->Value;
-                        switch ($variable) {
-                            // 0: Boolean, 1: Integer, 2: Float, 3: String
-                            case 0:
-                                switch ($profile) {
-                                    // 0: Reversed, 1: Standard
-                                    case 0:
-                                        // not necessary yet
-                                        break;
-
-                                    case 1:
-                                        $profileName = 'AZ.MotionDetector.Bool';
-                                        break;
-
-                                }
-                                break;
-
-                            default:
-                                $profileName = '';
-                        }
-                        if (!empty($profileName)) {
-                            IPS_SetVariableCustomProfile($id, $profileName);
-                            IPS_SetVariableCustomAction($id, 1);
-                        }
-                    }
-                }
-            }
-        }
-        echo 'Die Variablenprofile wurden erfolgreich zugewiesen!';
-    }
-
-    public function CreateLinks(): void
-    {
-        // Door and window sensors
-        $categoryID = @IPS_GetObjectIDByIdent('DoorWindowSensorsCategory', $this->InstanceID);
-        // Get all monitored variables
-        $variables = json_decode($this->ReadPropertyString('DoorWindowSensors'));
-        if (!empty($variables)) {
-            if ($categoryID === false) {
-                $categoryID = IPS_CreateCategory();
-            }
-            IPS_SetIdent($categoryID, 'DoorWindowSensorsCategory');
-            IPS_SetName($categoryID, 'Tür- und Fenstersensoren');
-            IPS_SetParent($categoryID, $this->InstanceID);
-            IPS_SetIcon($categoryID, 'Window');
-            IPS_SetPosition($categoryID, 200);
-            IPS_SetHidden($categoryID, true);
-            //Get variables
-            $targetIDs = [];
-            $i = 0;
-            foreach ($variables as $variable) {
-                $targetIDs[$i] = ['name' => $variable->Name, 'targetID' => $variable->ID];
-                $i++;
-            }
-
-            // Sort array alphabetically by device name
-            sort($targetIDs);
-            // Get all existing links
-            $existingTargetIDs = [];
-            $childrenIDs = IPS_GetChildrenIDs($categoryID);
-            $i = 0;
-            foreach ($childrenIDs as $childID) {
-                // Check if children is a link
-                $objectType = IPS_GetObject($childID)['ObjectType'];
-                if ($objectType == 6) {
-                    // Get target id
-                    $existingTargetID = IPS_GetLink($childID)['TargetID'];
-                    $existingTargetIDs[$i] = ['linkID' => $childID, 'targetID' => $existingTargetID];
-                    $i++;
-                }
-            }
-
-            // Delete dead links
-            $deadLinks = array_diff(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($deadLinks)) {
-                foreach ($deadLinks as $targetID) {
-                    $position = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$position]['linkID'];
-                    if (IPS_LinkExists($linkID)) {
-                        IPS_DeleteLink($linkID);
-                    }
-                }
-            }
-
-            // Create new links
-            $newLinks = array_diff(array_column($targetIDs, 'targetID'), array_column($existingTargetIDs, 'targetID'));
-            if (!empty($newLinks)) {
-                foreach ($newLinks as $targetID) {
-                    $linkID = IPS_CreateLink();
-                    IPS_SetParent($linkID, $categoryID);
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetLinkTargetID($linkID, $targetID);
-                    IPS_SetIcon($linkID, 'Window');
-                }
-            }
-
-            // Edit existing links
-            $existingLinks = array_intersect(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($existingLinks)) {
-                foreach ($existingLinks as $targetID) {
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    $targetID = $targetIDs[$position]['targetID'];
-                    $index = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$index]['linkID'];
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetIcon($linkID, 'Window');
-                }
-            }
-        }
-
-        // Motion Detectors
-        $categoryID = @IPS_GetObjectIDByIdent('MotionDetectorsCategory', $this->InstanceID);
-        // Get all monitored variables
-        $variables = json_decode($this->ReadPropertyString('MotionDetectors'));
-        if (!empty($variables)) {
-            if ($categoryID === false) {
-                $categoryID = IPS_CreateCategory();
-            }
-            IPS_SetIdent($categoryID, 'MotionDetectorsCategory');
-            IPS_SetName($categoryID, 'Bewegungsmelder');
-            IPS_SetParent($categoryID, $this->InstanceID);
-            IPS_SetIcon($categoryID, 'Motion');
-            IPS_SetPosition($categoryID, 210);
-            IPS_SetHidden($categoryID, true);
-            // Get variables
-            $targetIDs = [];
-            $i = 0;
-            foreach ($variables as $variable) {
-                $targetIDs[$i] = ['name' => $variable->Name, 'targetID' => $variable->ID];
-                $i++;
-            }
-            // Sort array alphabetically by device name
-            sort($targetIDs);
-            // Get all existing links
-            $existingTargetIDs = [];
-            $childrenIDs = IPS_GetChildrenIDs($categoryID);
-            $i = 0;
-            foreach ($childrenIDs as $childID) {
-                // Check if children is a link
-                $objectType = IPS_GetObject($childID)['ObjectType'];
-                if ($objectType == 6) {
-                    // Get target id
-                    $existingTargetID = IPS_GetLink($childID)['TargetID'];
-                    $existingTargetIDs[$i] = ['linkID' => $childID, 'targetID' => $existingTargetID];
-                    $i++;
-                }
-            }
-
-            // Delete dead links
-            $deadLinks = array_diff(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($deadLinks)) {
-                foreach ($deadLinks as $targetID) {
-                    $position = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$position]['linkID'];
-                    if (IPS_LinkExists($linkID)) {
-                        IPS_DeleteLink($linkID);
-                    }
-                }
-            }
-            // Create new links
-            $newLinks = array_diff(array_column($targetIDs, 'targetID'), array_column($existingTargetIDs, 'targetID'));
-            if (!empty($newLinks)) {
-                foreach ($newLinks as $targetID) {
-                    $linkID = IPS_CreateLink();
-                    IPS_SetParent($linkID, $categoryID);
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetLinkTargetID($linkID, $targetID);
-                    IPS_SetIcon($linkID, 'Motion');
-                }
-            }
-            // Edit existing links
-            $existingLinks = array_intersect(array_column($existingTargetIDs, 'targetID'), array_column($targetIDs, 'targetID'));
-            if (!empty($existingLinks)) {
-                foreach ($existingLinks as $targetID) {
-                    $position = array_search($targetID, array_column($targetIDs, 'targetID'));
-                    $targetID = $targetIDs[$position]['targetID'];
-                    $index = array_search($targetID, array_column($existingTargetIDs, 'targetID'));
-                    $linkID = $existingTargetIDs[$index]['linkID'];
-                    IPS_SetPosition($linkID, $position);
-                    $name = $targetIDs[$position]['name'];
-                    IPS_SetName($linkID, $name);
-                    IPS_SetIcon($linkID, 'Motion');
-                }
-            }
-        }
-        echo 'Die Verknüpfungen wurde erfolgreich angelegt!';
-    }
-
-    public function EnableConfigurationButton(string $ButtonName, int $ObjectID): void
-    {
-        $this->UpdateFormField($ButtonName, 'caption', 'Variable ' . $ObjectID . ' Bearbeiten');
-        $this->UpdateFormField($ButtonName, 'visible', true);
-        $this->UpdateFormField($ButtonName, 'enabled', true);
-        $this->UpdateFormField($ButtonName, 'objectID', $ObjectID);
     }
 
     public function ShowVariableDetails(int $VariableID): void
@@ -1087,53 +1334,48 @@ class Alarmzone extends IPSModule
         }
     }
 
+    public function EnableConfigurationButton(int $ObjectID, string $ButtonName, int $Type): void
+    {
+        // Variable
+        $description = 'ID ' . $ObjectID . ' bearbeiten';
+        // Instance
+        if ($Type == 1) {
+            $description = 'ID ' . $ObjectID . ' konfigurieren';
+        }
+        $this->UpdateFormField($ButtonName, 'caption', $description);
+        $this->UpdateFormField($ButtonName, 'visible', true);
+        $this->UpdateFormField($ButtonName, 'enabled', true);
+        $this->UpdateFormField($ButtonName, 'objectID', $ObjectID);
+    }
+
+    #################### Request Action
+
+    public function RequestAction($Ident, $Value)
+    {
+        switch ($Ident) {
+            case 'FullProtectionMode':
+                $id = $this->GetIDForIdent('FullProtectionMode');
+                $this->ToggleFullProtectionMode($Value, (string) $id);
+                break;
+
+            case 'HullProtectionMode':
+                $id = $this->GetIDForIdent('HullProtectionMode');
+                $this->ToggleHullProtectionMode($Value, (string) $id);
+                break;
+
+            case 'PartialProtectionMode':
+                $id = $this->GetIDForIdent('PartialProtectionMode');
+                $this->TogglePartialProtectionMode($Value, (string) $id);
+                break;
+
+        }
+    }
+
     #################### Private
 
     private function KernelReady(): void
     {
         $this->ApplyChanges();
-    }
-
-    private function CreateHomematicProfiles(): void
-    {
-        ########## HomeMatic & Homematic IP devices
-
-        // Door and window sensors
-        $profile = 'AZ.DoorWindowSensor.Bool';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Window');
-        IPS_SetVariableProfileAssociation($profile, 0, 'Geschlossen', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Geöffnet', '', 0xFF0000);
-        $profile = 'AZ.DoorWindowSensor.Bool.Reversed';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Window');
-        IPS_SetVariableProfileAssociation($profile, 0, 'Geöffnet', '', 0xFF0000);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Geschlossen', '', 0x00FF00);
-        $profile = 'AZ.DoorWindowSensor.Integer';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 1);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Window');
-        IPS_SetVariableProfileAssociation($profile, 0, 'Geschlossen', '', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Geöffnet', '', 0xFF0000);
-        $profile = 'AZ.DoorWindowSensor.Integer.Reversed';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 1);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Window');
-        IPS_SetVariableProfileAssociation($profile, 0, 'Geöffnet', '', 0xFF0000);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Geschlossen', '', 0x00FF00);
-        // Motion detectors
-        $profile = 'AZ.MotionDetector.Bool';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, 'Untätig', 'Information', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 1, 'Bewegung erkannt', 'Motion', 0xFF0000);
     }
 
     private function UpdateStates(): void
@@ -1146,25 +1388,15 @@ class Alarmzone extends IPSModule
     {
         $result = true;
         $status = 102;
-
-        // Notification center
-        $id = $this->ReadPropertyInteger('NotificationCenter');
-        if (@!IPS_ObjectExists($id)) {
-            $status = 200;
-            $text = 'Bitte die ausgewählte Benachrichtigungszentrale überprüfen!';
-            $this->SendDebug(__FUNCTION__, $text, 0);
-            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', ' . $text, KL_WARNING);
-        }
-
         // Alarm protocol
         $id = $this->ReadPropertyInteger('AlarmProtocol');
         if (@!IPS_ObjectExists($id)) {
+            $result = false;
             $status = 200;
             $text = 'Bitte das ausgewählte Alarmprotokoll überprüfen!';
             $this->SendDebug(__FUNCTION__, $text, 0);
             $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', ' . $text, KL_WARNING);
         }
-
         // Maintenance mode
         $maintenance = $this->CheckMaintenanceMode();
         if ($maintenance) {

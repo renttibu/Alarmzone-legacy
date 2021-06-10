@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection DuplicatedCode */
+
 /*
  * @author      Ulrich Bittner
  * @copyright   (c) 2020, 2021
@@ -7,15 +9,12 @@
  * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung
  */
 
-/** @noinspection DuplicatedCode */
-
 declare(strict_types=1);
 
 trait AZS_updateStates
 {
     public function UpdateStates(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $result = true;
         $update1 = $this->UpdateFullProtectionMode();
         $update2 = $this->UpdateHullProtectionMode();
@@ -46,7 +45,6 @@ trait AZS_updateStates
 
     public function UpdateFullProtectionMode(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -77,7 +75,6 @@ trait AZS_updateStates
 
     public function UpdateHullProtectionMode(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -108,7 +105,6 @@ trait AZS_updateStates
 
     public function UpdatePartialProtectionMode(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -139,7 +135,6 @@ trait AZS_updateStates
 
     public function UpdateSystemState(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -171,7 +166,6 @@ trait AZS_updateStates
 
     public function UpdateAlarmState(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -181,8 +175,6 @@ trait AZS_updateStates
         }
         $result = false;
         $state = 0; # no alarm
-        $alarm = false;
-        $preAlarm = false;
         foreach ($vars as $var) {
             if ($var['Use']) {
                 $id = $var['ID'];
@@ -190,19 +182,10 @@ trait AZS_updateStates
                     $result = true;
                     $actualValue = GetValueInteger($var['ID']);
                     if ($actualValue == 1) { # alarm
-                        $alarm = true;
-                    }
-                    if ($actualValue == 2) { # pre alarm
-                        $preAlarm = true;
+                        $state = 1;
                     }
                 }
             }
-        }
-        if ($preAlarm) {
-            $state = 2;
-        }
-        if ($alarm) {
-            $state = 1;
         }
         $this->SetValue('AlarmState', $state);
         return $result;
@@ -210,7 +193,6 @@ trait AZS_updateStates
 
     public function UpdateAlertingSensor(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -237,7 +219,6 @@ trait AZS_updateStates
 
     public function UpdateDoorWindowState(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -265,7 +246,6 @@ trait AZS_updateStates
 
     public function UpdateMotionDetectorState(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -293,7 +273,6 @@ trait AZS_updateStates
 
     public function UpdateAlarmSiren(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -321,7 +300,6 @@ trait AZS_updateStates
 
     public function UpdateAlarmLight(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -349,7 +327,6 @@ trait AZS_updateStates
 
     public function UpdateAlarmCall(): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }

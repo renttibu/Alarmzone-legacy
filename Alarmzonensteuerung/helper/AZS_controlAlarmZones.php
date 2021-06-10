@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection PhpUndefinedFunctionInspection */
+/** @noinspection PhpUnused */
+
 /*
  * @author      Ulrich Bittner
  * @copyright   (c) 2020, 2021
@@ -7,16 +10,12 @@
  * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung
  */
 
-/** @noinspection PhpUndefinedFunctionInspection */
-/** @noinspection PhpUnused */
-
 declare(strict_types=1);
 
 trait AZS_controlAlarmZones
 {
     public function DetermineAlarmZoneVariables(): void
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
         if (empty($alarmZones)) {
             return;
@@ -109,12 +108,11 @@ trait AZS_controlAlarmZones
         if (@IPS_HasChanges($this->InstanceID)) {
             @IPS_ApplyChanges($this->InstanceID);
         }
-        echo 'Variablen wurden automatisch ermittelt!';
+        echo 'Die Variablen wurden erfolgreich ermittelt!';
     }
 
     public function DisarmAlarmZones(string $Sender): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $alarmZones = json_decode($this->ReadPropertyString('AlarmZones'));
         if (empty($alarmZones)) {
             return false;
@@ -126,10 +124,10 @@ trait AZS_controlAlarmZones
                 return false;
             }
             /*
-            $scriptText = 'AZ_DisarmAlarmZone(' . $id . ', "' . $Sender . '");';
+            $scriptText = self::ALARMZONE_MODULE_PREFIX . '_DisarmAlarmZone(' . $id . ', "' . $Sender . '");';
             $response = @IPS_RunScriptText($scriptText);
              */
-            $response = @AZ_DisarmAlarmZone($id, $Sender);
+            $response = @UBAZ_DisarmAlarmZone($id, $Sender);
             if (!$response) {
                 $result = false;
             }
@@ -139,7 +137,6 @@ trait AZS_controlAlarmZones
 
     public function ToggleFullProtectionMode(bool $State, string $Sender): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $vars = json_decode($this->ReadPropertyString('FullProtectionMode'), true);
         if (empty($vars)) {
             return false;
@@ -159,11 +156,11 @@ trait AZS_controlAlarmZones
                     if (is_int($parentID)) {
                         if ($parentID != 0 && @IPS_ObjectExists($parentID)) {
                             $this->WriteAttributeBoolean('DisableUpdateMode', true);
-                            $response = @AZ_ToggleFullProtectionMode($parentID, $State, $Sender);
                             /*
-                            $scriptText = 'AZ_ToggleFullProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
+                            $scriptText = self::ALARMZONE_MODULE_PREFIX . '_ToggleFullProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
                             $response = @IPS_RunScriptText($scriptText);
                              */
+                            $response = @UBAZ_ToggleFullProtectionMode($parentID, $State, $Sender);
                             if (!$response) {
                                 $result = false;
                             }
@@ -179,7 +176,6 @@ trait AZS_controlAlarmZones
 
     public function ToggleHullProtectionMode(bool $State, string $Sender): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $vars = json_decode($this->ReadPropertyString('HullProtectionMode'), true);
         if (empty($vars)) {
             return false;
@@ -199,11 +195,11 @@ trait AZS_controlAlarmZones
                     if (is_int($parentID)) {
                         if ($parentID != 0 && @IPS_ObjectExists($parentID)) {
                             $this->WriteAttributeBoolean('DisableUpdateMode', true);
-                            $response = @AZ_ToggleHullProtectionMode($parentID, $State, $Sender);
                             /*
-                            $scriptText = 'AZ_ToggleHullProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
+                            $scriptText = self::ALARMZONE_MODULE_PREFIX . '_ToggleHullProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
                             $response = @IPS_RunScriptText($scriptText);
                              */
+                            $response = @UBAZ_ToggleHullProtectionMode($parentID, $State, $Sender);
                             if (!$response) {
                                 $result = false;
                             }
@@ -219,7 +215,6 @@ trait AZS_controlAlarmZones
 
     public function TogglePartialProtectionMode(bool $State, string $Sender): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $vars = json_decode($this->ReadPropertyString('PartialProtectionMode'), true);
         if (empty($vars)) {
             return false;
@@ -239,11 +234,11 @@ trait AZS_controlAlarmZones
                     if (is_int($parentID)) {
                         if ($parentID != 0 && @IPS_ObjectExists($parentID)) {
                             $this->WriteAttributeBoolean('DisableUpdateMode', true);
-                            $response = @AZ_TogglePartialProtectionMode($parentID, $State, $Sender);
                             /*
-                            $scriptText = 'AZ_TogglePartialProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
+                            $scriptText = self::ALARMZONE_MODULE_PREFIX . '_TogglePartialProtectionMode(' . $parentID . ', ' . $State . ', "' . $Sender . '");';
                             $response = @IPS_RunScriptText($scriptText);
                              */
+                            $response = @UBAZ_TogglePartialProtectionMode($parentID, $State, $Sender);
                             if (!$response) {
                                 $result = false;
                             }

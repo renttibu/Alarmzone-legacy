@@ -6,9 +6,9 @@
   "aliases": [
     "Alarmzonensteuerung"
   ],
-  "url": "https://github.com/ubittner/Alarmzone",
+  "url": "https://github.com/ubittner/Alarmzone/tree/master/Alarmzonensteuerung",
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
-  "prefix": "AZS"
+  "prefix": "UBAZS"
 }

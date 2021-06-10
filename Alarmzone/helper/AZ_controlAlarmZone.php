@@ -1,14 +1,13 @@
 <?php
 
+/** @noinspection PhpUnused */
+
 /*
  * @author      Ulrich Bittner
- * @copyright   (c) 2020, 2021
- * @license    	CC BY-NC-SA 4.0
+ * @copyright   (c) 2021
+ * @license     CC BY-NC-SA 4.0
  * @see         https://github.com/ubittner/Alarmzone/tree/master/Alarmzone
  */
-
-/** @noinspection DuplicatedCode */
-/** @noinspection PhpUnused */
 
 declare(strict_types=1);
 
@@ -22,7 +21,6 @@ trait AZ_controlAlarmZone
          * 2    = hull protection mode
          * 3    = partial protection mode
          */
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -56,8 +54,8 @@ trait AZ_controlAlarmZone
                         continue;
                     }
                     $type = IPS_GetVariable($id)['VariableType'];
-                    $value = $var->Value;
-                    switch ($var->Trigger) {
+                    $value = $var->TriggerValue;
+                    switch ($var->TriggerType) {
                         case 0: #on change (bool, integer, float, string)
                         case 1: #on update (bool, integer, float, string)
                             $this->SendDebug(__FUNCTION__, 'Bei Änderung und bei Aktualisierung wird nicht berücksichtigt!', 0);
@@ -67,15 +65,15 @@ trait AZ_controlAlarmZone
                         case 3: #on limit drop, every time (integer, float)
                             switch ($type) {
                                 case 1: #integer
-                                    $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
                                     if (GetValueInteger($id) < intval($value)) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
                                         $activation = false;
                                     }
                                     break;
 
                                 case 2: #float
-                                    $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                     if (GetValueFloat($id) < floatval(str_replace(',', '.', $value))) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                         $activation = false;
                                     }
                                     break;
@@ -87,15 +85,15 @@ trait AZ_controlAlarmZone
                         case 5: #on limit exceed, every time (integer, float)
                             switch ($type) {
                                 case 1: #integer
-                                    $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
                                     if (GetValueInteger($id) > intval($value)) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (integer)', 0);
                                         $activation = false;
                                     }
                                     break;
 
                                 case 2: #float
-                                    $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                     if (GetValueFloat($id) > floatval(str_replace(',', '.', $value))) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei Grenzunterschreitung (float)', 0);
                                         $activation = false;
                                     }
                                     break;
@@ -107,32 +105,32 @@ trait AZ_controlAlarmZone
                         case 7: #on specific value, every time (bool, integer, float, string)
                             switch ($type) {
                                 case 0: #bool
-                                    $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (bool)', 0);
                                     if ($value == 'false') {
                                         $value = '0';
                                     }
                                     if (GetValueBoolean($id) == boolval($value)) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (bool)', 0);
                                         $activation = false;
                                     }
                                     break;
 
                                 case 1: #integer
-                                    $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (integer)', 0);
                                     if (GetValueInteger($id) == intval($value)) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (integer)', 0);
                                         $activation = false;
                                     }
                                     break;
 
                                 case 2: #float
-                                    $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (float)', 0);
                                     if (GetValueFloat($id) == floatval(str_replace(',', '.', $value))) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (float)', 0);
                                         $activation = false;
                                     }
                                     break;
 
                                 case 3: #string
-                                    $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (string)', 0);
                                     if (GetValueString($id) == (string) $value) {
+                                        $this->SendDebug(__FUNCTION__, 'Bei bestimmten Wert (string)', 0);
                                         $activation = false;
                                     }
                                     break;
@@ -149,7 +147,6 @@ trait AZ_controlAlarmZone
 
     public function StartActivation(): void
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $this->DeactivateStartActivationTimer();
         if ($this->CheckMaintenanceMode()) {
             return;
@@ -159,47 +156,33 @@ trait AZ_controlAlarmZone
             $this->SetValue('AlarmZoneState', 1); # armed
             // Get activation mode
             $text = 'Es ist ein unbekannter Status bei der verzögerten Aktivierung aufgetreten.  (ID ' . $this->InstanceID . ')';
-            $modeName = $this->ReadPropertyString('AlarmZoneName');
             if ($this->GetValue('FullProtectionMode')) {
                 $modeName = $this->ReadPropertyString('FullProtectionName');
-                $armedSymbol = $this->ReadPropertyString('FullProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('FullProtectionMode') . ')';
             }
             if ($this->GetValue('HullProtectionMode')) {
                 $modeName = $this->ReadPropertyString('HullProtectionName');
-                $armedSymbol = $this->ReadPropertyString('HullProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('HullProtectionMode') . ')';
             }
             if ($this->GetValue('PartialProtectionMode')) {
                 $modeName = $this->ReadPropertyString('PartialProtectionName');
-                $armedSymbol = $this->ReadPropertyString('PartialProtectionModeArmedSymbol');
                 $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('PartialProtectionMode') . ')';
             }
-            // Log
+            // Protocol
             $location = $this->ReadPropertyString('Location');
             $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
             $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
             $this->UpdateAlarmProtocol($logText, 1);
-            // Notification
-            if (!empty($armedSymbol)) {
-                $actionText = $armedSymbol . ' ' . $alarmZoneName . ' scharf!';
-            } else {
-                $actionText = $alarmZoneName . ' scharf!';
-            }
-            $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
-            $this->SendNotification($actionText, $messageText, $logText, 1);
         }
     }
 
     public function DeactivateStartActivationTimer(): void
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         $this->SetTimerInterval('StartActivation', 0);
     }
 
     public function DisarmAlarmZone(string $SenderID): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -212,7 +195,9 @@ trait AZ_controlAlarmZone
         $this->SetValue('AlarmSiren', false);
         $this->SetValue('AlarmLight', false);
         $this->SetValue('AlarmCall', false);
-        // Log
+        $this->DeactivateStartActivationTimer();
+        $this->ResetBlacklist();
+        // Protocol
         $systemName = $this->ReadPropertyString('SystemName');
         $timeStamp = date('d.m.Y, H:i:s');
         $location = $this->ReadPropertyString('Location');
@@ -220,25 +205,12 @@ trait AZ_controlAlarmZone
         $text = $systemName . ' deaktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent('FullProtectionMode') . ')';
         $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
         $this->UpdateAlarmProtocol($logText, 1);
-        // Notification
-        $disarmedSymbol = $this->ReadPropertyString('AlarmZoneDisarmedSymbol');
-        if (!empty($disarmedSymbol)) {
-            $actionText = $disarmedSymbol . ' ' . $alarmZoneName . ' unscharf!';
-        } else {
-            $actionText = $alarmZoneName . ' unscharf!';
-        }
-        $messageText = $timeStamp . ' ' . $systemName . ' deaktiviert.';
-        $this->SendNotification($actionText, $messageText, $logText, 1);
-        $this->ConfirmAlarmNotification();
-        $this->DeactivateStartActivationTimer();
-        $this->ResetBlacklist();
         $this->CheckDoorWindowState(false);
         return true;
     }
 
     public function ToggleFullProtectionMode(bool $State, string $SenderID): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         // Disarm
         if (!$State) {
             $result = $this->DisarmAlarmZone($SenderID);
@@ -255,7 +227,6 @@ trait AZ_controlAlarmZone
 
     public function ToggleHullProtectionMode(bool $State, string $SenderID): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         // Disarm
         if (!$State) {
             $result = $this->DisarmAlarmZone($SenderID);
@@ -272,7 +243,6 @@ trait AZ_controlAlarmZone
 
     public function TogglePartialProtectionMode(bool $State, string $SenderID): bool
     {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         // Disarm
         if (!$State) {
             $result = $this->DisarmAlarmZone($SenderID);
@@ -287,77 +257,6 @@ trait AZ_controlAlarmZone
         return $result;
     }
 
-    public function SetAlarmState(): void
-    {
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
-        $this->SetTimerInterval('SetAlarmState', 0);
-        if ($this->CheckMaintenanceMode()) {
-            $this->SetBuffer('LastAlertingSensor', '[]');
-            return;
-        }
-        // Check for pre alarm
-        if ($this->GetValue('AlarmState') == 2) {
-            $sensor = json_decode($this->GetBuffer('LastAlertingSensor'));
-            if (empty($sensor)) {
-                return;
-            }
-            $alertingMode = $sensor->alertingMode;
-            $alerting = false;
-            switch ($alertingMode) {
-                case 1: # full protection
-                    if ($this->GetValue('FullProtectionMode') && $sensor->fullProtection) {
-                        $alerting = true;
-                    }
-                    break;
-
-                case 2: # hull protection
-                    if ($this->GetValue('HullProtectionMode') && $sensor->hullProtection) {
-                        $alerting = true;
-                    }
-                    break;
-
-                case 3: # partial protection
-                    if ($this->GetValue('PartialProtectionMode') && $sensor->partialProtection) {
-                        $alerting = true;
-                    }
-                    break;
-
-            }
-            if ($alerting) {
-                // Alarm state
-                $this->SetValue('AlarmState', 1);
-                // Log
-                $text = $sensor->name . ' hat nach einem Voralarm einen Alarm ausgelöst. (ID ' . $sensor->id . ')';
-                $timeStamp = date('d.m.Y, H:i:s');
-                $location = $this->ReadPropertyString('Location');
-                $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
-                $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
-                $this->UpdateAlarmProtocol($logText, 2);
-                // Options
-                if ($sensor->useAlarmSiren) {
-                    $this->SetValue('AlarmSiren', true);
-                }
-                if ($sensor->useAlarmLight) {
-                    $this->SetValue('AlarmLight', true);
-                }
-                if ($sensor->useAlarmCall) {
-                    $this->SetValue('AlarmCall', true);
-                }
-                // Notification
-                if ($sensor->useNotification) {
-                    $actionText = $alarmZoneName . ', Alarm ' . $sensor->name . '!';
-                    $alarmSymbol = $this->ReadPropertyString('AlarmSymbol');
-                    if (!empty($alarmSymbol)) {
-                        $actionText = $alarmSymbol . ' ' . $alarmZoneName . ', Alarm ' . $sensor->name . '!';
-                    }
-                    $messageText = $timeStamp . ' ' . $sensor->name . ' hat einen Alarm ausgelöst.';
-                    $this->SendNotification($actionText, $messageText, $logText, 2);
-                }
-            }
-        }
-        $this->SetBuffer('LastAlertingSensor', '[]');
-    }
-
     #################### Private
 
     private function ArmAlarmZone(string $SenderID, int $Mode): bool
@@ -368,7 +267,6 @@ trait AZ_controlAlarmZone
          * 2    = hull protection mode
          * 3    = partial protection mode
          */
-        $this->SendDebug(__FUNCTION__, 'Die Methode wird ausgeführt (' . microtime(true) . ')', 0);
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
@@ -382,7 +280,6 @@ trait AZ_controlAlarmZone
                 $fullProtectionState = false;
                 $hullProtectionState = true;
                 $partialProtectionState = false;
-                $armedSymbol = $this->ReadPropertyString('HullProtectionModeArmedSymbol');
                 break;
 
             case 3: # partial protection mode
@@ -393,7 +290,6 @@ trait AZ_controlAlarmZone
                 $fullProtectionState = false;
                 $hullProtectionState = false;
                 $partialProtectionState = true;
-                $armedSymbol = $this->ReadPropertyString('PartialProtectionModeArmedSymbol');
                 break;
 
             default: # full protection mode
@@ -404,7 +300,6 @@ trait AZ_controlAlarmZone
                 $fullProtectionState = true;
                 $hullProtectionState = false;
                 $partialProtectionState = false;
-                $armedSymbol = $this->ReadPropertyString('FullProtectionModeArmedSymbol');
         }
         $this->SetValue('FullProtectionMode', $fullProtectionState);
         $this->SetValue('HullProtectionMode', $hullProtectionState);
@@ -429,21 +324,11 @@ trait AZ_controlAlarmZone
             $this->SetValue('HullProtectionMode', false);
             $this->SetValue('PartialProtectionMode', false);
             $this->ResetBlacklist();
-            // Log
+            $this->DeactivateStartActivationTimer();
+            // Protocol
             $text = 'Die Aktivierung wurde durch die Sensorenprüfung abgebrochen! (ID ' . $this->GetIDForIdent($identName) . ')';
             $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
             $this->UpdateAlarmProtocol($logText, 0);
-            // Notification
-            $failureSymbol = $this->ReadPropertyString('AlarmZoneSystemFailure');
-            if (!empty($failureSymbol)) {
-                $actionText = $failureSymbol . ' ' . $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
-            } else {
-                $actionText = $alarmZoneName . ' Abbruch durch Sensorenprüfung!';
-            }
-            $messageText = $timeStamp . ' ' . $modeName . ' Abbruch.';
-            $this->SendNotification($actionText, $messageText, $logText, 1);
-            $this->DeactivateStartActivationTimer();
-            $this->ResetBlacklist();
         }
         // Continue activation
         if ($alarmZoneActivation) {
@@ -454,34 +339,17 @@ trait AZ_controlAlarmZone
                 $milliseconds = $alarmZoneActivationDelayDuration * 1000;
                 $this->SetTimerInterval('StartActivation', $milliseconds);
                 $this->SetValue('AlarmZoneState', 2);
-                // Log
+                // Protocol
                 $text = $modeName . ' wird in ' . $alarmZoneActivationDelayDuration . ' Sekunden automatisch aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                 $this->UpdateAlarmProtocol($logText, 0);
-                // Notification
-                $delayedArmedSymbol = $this->ReadPropertyString('AlarmZoneDelayedArmedSymbol');
-                if (!empty($delayedArmedSymbol)) {
-                    $actionText = $delayedArmedSymbol . ' ' . $alarmZoneName . ' verzögert scharf!';
-                } else {
-                    $actionText = $alarmZoneName . ' verzögert scharf!';
-                }
-                $messageText = $timeStamp . ' ' . $modeName . ' wird verzögert aktiviert.';
-                $this->SendNotification($actionText, $messageText, $logText, 1);
             }// Activate mode immediately
             else {
                 $this->SetValue('AlarmZoneState', 1);
-                // Log
+                // Protocol
                 $text = $modeName . ' aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                 $this->UpdateAlarmProtocol($logText, 1);
-                // Notification
-                if (!empty($armedSymbol)) {
-                    $actionText = $armedSymbol . ' ' . $alarmZoneName . ' scharf!';
-                } else {
-                    $actionText = $alarmZoneName . ' scharf!';
-                }
-                $messageText = $timeStamp . ' ' . $modeName . ' aktiviert.';
-                $this->SendNotification($actionText, $messageText, $logText, 1);
             }
         }
         return $result;

@@ -6,9 +6,9 @@
   "aliases": [
     "Alarmzone"
   ],
-  "url": "https://github.com/ubittner/Alarmzone",
+  "url": "https://github.com/ubittner/Alarmzone/tree/master/Alarmzone",
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
-  "prefix": "AZ"
+  "prefix": "UBAZ"
 }
