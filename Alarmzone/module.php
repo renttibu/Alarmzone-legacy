@@ -683,6 +683,12 @@ class Alarmzone extends IPSModule
                                     break;
 
                                 case 1: #integer
+                                    if ($value == 'false') {
+                                        $value = '0';
+                                    }
+                                    if ($value == 'true') {
+                                        $value = '1';
+                                    }
                                     if (GetValueInteger($id) == intval($value)) {
                                         $rowColor = '#C0C0FF'; # violett
                                         $stateName = 'geöffnet';
