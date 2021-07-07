@@ -45,6 +45,7 @@ class Alarmzone extends IPSModule
         $this->RegisterPropertyBoolean('EnableHullProtectionMode', true);
         $this->RegisterPropertyBoolean('EnablePartialProtectionMode', true);
         $this->RegisterPropertyBoolean('EnableAlarmZoneState', true);
+        $this->RegisterPropertyBoolean('DetailedAlarmZoneState', false);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', true);
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
@@ -120,7 +121,9 @@ class Alarmzone extends IPSModule
         IPS_SetVariableProfileIcon($profile, '');
         IPS_SetVariableProfileAssociation($profile, 0, 'Unscharf', 'IPS', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Scharf', 'Warning', 0xFF0000);
-        IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert', 'Clock', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert Scharf', 'Clock', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 3, 'Teilscharf', 'Warning', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 4, 'Verzögert Teilscharf', 'Warning', 0xFFFF00);
         $this->RegisterVariableInteger('AlarmZoneState', 'Alarmzone', $profile, 60);
         // Door and window state
         $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.DoorWindowState';
@@ -409,9 +412,23 @@ class Alarmzone extends IPSModule
                     'caption' => ' '
                 ],
                 [
-                    'type'    => 'CheckBox',
-                    'name'    => 'EnableAlarmZoneState',
-                    'caption' => 'Alarmzonenstatus'
+                    'type'  => 'RowLayout',
+                    'items' => [
+                        [
+                            'type'    => 'CheckBox',
+                            'name'    => 'EnableAlarmZoneState',
+                            'caption' => 'Alarmzonenstatus'
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => ' '
+                        ],
+                        [
+                            'type'    => 'CheckBox',
+                            'name'    => 'DetailedAlarmZoneState',
+                            'caption' => 'Detaillierter Alarmzonenstatus'
+                        ]
+                    ]
                 ],
                 [
                     'type'    => 'CheckBox',
@@ -858,6 +875,33 @@ class Alarmzone extends IPSModule
                             'edit'    => [
                                 'type' => 'CheckBox'
                             ]
+                        ],
+                        [
+                            'name'    => 'CheckFullProtectionActivation',
+                            'caption' => 'Aktivierungsprüfung Vollschutz',
+                            'width'   => '260px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ],
+                        ],
+                        [
+                            'name'    => 'CheckHullProtectionActivation',
+                            'caption' => 'Aktivierungsprüfung Hüllschutz',
+                            'width'   => '260px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ],
+                        ],
+                        [
+                            'name'    => 'CheckPartialProtectionActivation',
+                            'caption' => 'Aktivierungsprüfung Teilschutz',
+                            'width'   => '260px',
+                            'add'     => true,
+                            'edit'    => [
+                                'type' => 'CheckBox'
+                            ],
                         ],
                         [
                             'name'    => 'UseAlarmSiren',

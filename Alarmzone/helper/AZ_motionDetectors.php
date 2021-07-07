@@ -399,6 +399,7 @@ trait AZ_motionDetectors
                 break;
 
             case 1: # armed
+            case 3: # partial armed
                 if ($execute) {
                     $this->CheckMotionDetectorState();
                 }
@@ -444,7 +445,8 @@ trait AZ_motionDetectors
                 }
                 break;
 
-            case 2: # delayed
+            case 2: # delayed armed
+            case 4: # delayed partial armed
                 if ($execute) {
                     $this->CheckMotionDetectorState();
                 }

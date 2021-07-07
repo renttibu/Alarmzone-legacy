@@ -41,6 +41,7 @@ class Alarmzonensteuerung extends IPSModule
         $this->RegisterPropertyBoolean('EnableHullProtectionMode', true);
         $this->RegisterPropertyBoolean('EnablePartialProtectionMode', true);
         $this->RegisterPropertyBoolean('EnableSystemState', true);
+        $this->RegisterPropertyBoolean('DetailedSystemState', false);
         $this->RegisterPropertyBoolean('EnableDoorWindowState', true);
         $this->RegisterPropertyBoolean('EnableMotionDetectorState', true);
         $this->RegisterPropertyBoolean('EnableAlarmState', true);
@@ -111,7 +112,9 @@ class Alarmzonensteuerung extends IPSModule
         IPS_SetVariableProfileIcon($profile, '');
         IPS_SetVariableProfileAssociation($profile, 0, 'Unscharf', 'IPS', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, 'Scharf', 'Warning', 0xFF0000);
-        IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert', 'Clock', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 2, 'Verzögert Scharf', 'Clock', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 3, 'Teilscharf', 'Warning', 0xFFFF00);
+        IPS_SetVariableProfileAssociation($profile, 4, 'Verzögert Teilscharf', 'Warning', 0xFFFF00);
         $this->RegisterVariableInteger('SystemState', 'Systemstatus', $profile, 50);
         // Door and window state
         $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.DoorWindowState';
@@ -404,9 +407,23 @@ class Alarmzonensteuerung extends IPSModule
                     'caption' => ' '
                 ],
                 [
-                    'type'    => 'CheckBox',
-                    'name'    => 'EnableSystemState',
-                    'caption' => 'Systemstatus'
+                    'type'  => 'RowLayout',
+                    'items' => [
+                        [
+                            'type'    => 'CheckBox',
+                            'name'    => 'EnableSystemState',
+                            'caption' => 'Systemstatus'
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => ' '
+                        ],
+                        [
+                            'type'    => 'CheckBox',
+                            'name'    => 'DetailedSystemState',
+                            'caption' => 'Detaillierter Systemstatus'
+                        ]
+                    ]
                 ],
                 [
                     'type'    => 'CheckBox',

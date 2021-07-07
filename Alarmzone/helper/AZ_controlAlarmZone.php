@@ -34,21 +34,25 @@ trait AZ_controlAlarmZone
             switch ($Mode) {
                     case 1: # full protection mode
                         $mode = $var->FullProtectionModeActive;
+                        $checkActivation = $var->CheckFullProtectionActivation;
                         break;
 
                     case 2: # hull protection mode
                         $mode = $var->HullProtectionModeActive;
+                        $checkActivation = $var->CheckHullProtectionActivation;
                         break;
 
                     case 3: # partial protection mode
                         $mode = $var->PartialProtectionModeActive;
+                        $checkActivation = $var->CheckPartialProtectionActivation;
                         break;
 
                     default:
                         $mode = false;
+                        $checkActivation = false;
                 }
             if ($mode) {
-                if ($var->Use) {
+                if ($var->Use && $checkActivation) {
                     $id = $var->ID;
                     if ($id == 0 || @!IPS_ObjectExists($id)) {
                         continue;
@@ -152,8 +156,12 @@ trait AZ_controlAlarmZone
             return;
         }
         $timeStamp = date('d.m.Y, H:i:s');
-        if ($this->GetValue('AlarmZoneState') == 2) { # delayed
-            $this->SetValue('AlarmZoneState', 1); # armed
+        if ($this->GetValue('AlarmZoneState') == 2 || $this->GetValue('AlarmZoneState') == 4) { # delayed
+            $state = 1; # armed
+            if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
+                $state = 3; # partial armed
+            }
+            $this->SetValue('AlarmZoneState', $state);
             // Get activation mode
             $text = 'Es ist ein unbekannter Status bei der verzögerten Aktivierung aufgetreten.  (ID ' . $this->InstanceID . ')';
             if ($this->GetValue('FullProtectionMode')) {
@@ -338,14 +346,22 @@ trait AZ_controlAlarmZone
                 // Activate timer
                 $milliseconds = $alarmZoneActivationDelayDuration * 1000;
                 $this->SetTimerInterval('StartActivation', $milliseconds);
-                $this->SetValue('AlarmZoneState', 2);
+                $stateValue = 2;
+                if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
+                    $stateValue = 4;
+                }
+                $this->SetValue('AlarmZoneState', $stateValue);
                 // Protocol
                 $text = $modeName . ' wird in ' . $alarmZoneActivationDelayDuration . ' Sekunden automatisch aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                 $this->UpdateAlarmProtocol($logText, 0);
             }// Activate mode immediately
             else {
-                $this->SetValue('AlarmZoneState', 1);
+                $state = 1; # armed
+                if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
+                    $state = 3; # partial armed
+                }
+                $this->SetValue('AlarmZoneState', $state);
                 // Protocol
                 $text = $modeName . ' aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;

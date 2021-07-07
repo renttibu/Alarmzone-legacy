@@ -400,6 +400,7 @@ trait AZ_doorWindowSensors
                         break;
 
                     case 1: # armed
+                    case 3: # partial armed
                         if ($execute) {
                             $this->CheckDoorWindowState(false);
                         }
@@ -471,7 +472,8 @@ trait AZ_doorWindowSensors
                         }
                         break;
 
-                    case 2: # delayed
+                    case 2: # delayed armed
+                    case 4: # delayed partial armed
                         if ($execute) {
                             $this->CheckDoorWindowState(true);
                         }

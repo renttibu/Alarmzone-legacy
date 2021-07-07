@@ -143,21 +143,72 @@ trait AZS_updateStates
             return false;
         }
         $result = false;
-        $state = 0; # disarmed
+        $amount = 0;
+        foreach ($vars as $var) {
+            if ($var['Use']) {
+                $amount++;
+            }
+        }
+        $ZoneStates = [];
+        $ZoneStates['disarmed'] = 0;
+        $ZoneStates['armed'] = 0;
+        $ZoneStates['delayedArmed'] = 0;
+        $ZoneStates['partialArmed'] = 0;
+        $ZoneStates['delayedPartialArmed'] = 0;
         foreach ($vars as $var) {
             if ($var['Use']) {
                 $id = $var['ID'];
                 if ($id != 0 && @IPS_ObjectExists($id)) {
                     $result = true;
-                    $actualValue = GetValueInteger($var['ID']);
-                    if ($actualValue == 1) { # armed
-                        $state = 1;
-                        break;
-                    }
-                    if ($actualValue == 2) { # delayed
-                        $state = 2;
+                    switch (GetValueInteger($var['ID'])) {
+                        case 0: # disarmed
+                            $ZoneStates['disarmed'] += 1;
+                            break;
+
+                        case 1: # armed
+                            $ZoneStates['armed'] += 1;
+                            break;
+
+                        case 2: # delayed armed
+                            $ZoneStates['delayedArmed'] += 1;
+                            break;
+
+                        case 3: # partial armed
+                            $ZoneStates['partialArmed'] += 1;
+                            break;
+
+                        case 4: # delayed partial armed
+                            $ZoneStates['delayedPartialArmed'] += 1;
+                            break;
+
                     }
                 }
+            }
+        }
+        $state = 0;
+        if (!$this->ReadPropertyBoolean('DetailedSystemState')) {
+            if ($ZoneStates['armed'] > 0) {
+                $state = 1;
+            }
+            if ($ZoneStates['delayedArmed'] > 0) {
+                $state = 2;
+            }
+        } else {
+            if ($ZoneStates['armed'] > 0) {
+                if ($ZoneStates['armed'] == $amount) {
+                    $state = 1;
+                } else {
+                    $state = 3;
+                }
+            }
+            if ($ZoneStates['delayedArmed'] > 0) {
+                $state = 2;
+            }
+            if ($ZoneStates['partialArmed'] > 0) {
+                $state = 3;
+            }
+            if ($ZoneStates['delayedPartialArmed'] > 0) {
+                $state = 4;
             }
         }
         $this->SetValue('SystemState', $state);
