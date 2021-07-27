@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
 /*
@@ -155,30 +156,58 @@ trait AZ_controlAlarmZone
         if ($this->CheckMaintenanceMode()) {
             return;
         }
+        $this->ResetBlacklist();
         $timeStamp = date('d.m.Y, H:i:s');
-        if ($this->GetValue('AlarmZoneState') == 2 || $this->GetValue('AlarmZoneState') == 4) { # delayed
+        $location = $this->ReadPropertyString('Location');
+        $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
+        // Full protection
+        $mode = 1;
+        $checkActivationModeName = 'CheckFullProtectionModeActivation';
+        $identName = 'FullProtectionMode';
+        $modeName = $this->ReadPropertyString('FullProtectionName');
+        // Hull protection
+        if ($this->GetValue('HullProtectionMode')) {
+            $mode = 2;
+            $checkActivationModeName = 'CheckHullProtectionModeActivation';
+            $identName = 'HullProtectionMode';
+            $modeName = $this->ReadPropertyString('HullProtectionName');
+        }
+        // Partial protection
+        if ($this->GetValue('PartialProtectionMode')) {
+            $mode = 3;
+            $checkActivationModeName = 'CheckPartialProtectionModeActivation';
+            $identName = 'PartialProtectionMode';
+            $modeName = $this->ReadPropertyString('PartialProtectionName');
+        }
+        $alarmZoneActivation = true;
+        if ($this->ReadPropertyBoolean($checkActivationModeName)) {
+            $alarmZoneActivation = $this->CheckActivation($mode);
+        }
+        if (!$alarmZoneActivation) {
+            $this->SetValue('FullProtectionMode', false);
+            $this->SetValue('HullProtectionMode', false);
+            $this->SetValue('PartialProtectionMode', false);
+            $this->SetValue('AlarmZoneState', 0);
+            $this->SetValue('AlarmState', 0);
+            $this->SetValue('AlertingSensor', 'OK');
+            $this->SetValue('AlarmSiren', false);
+            $this->SetValue('AlarmLight', false);
+            $this->SetValue('AlarmCall', false);
+            $this->ResetBlacklist();
+            $this->DeactivateStartActivationTimer();
+            // Protocol
+            $text = 'Die Aktivierung wurde durch die Sensorenprüfung abgebrochen! (ID ' . $this->GetIDForIdent($identName) . ')';
+            $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
+            $this->UpdateAlarmProtocol($logText, 0);
+        } else {
+            $this->CheckDoorWindowState(true); # add to blacklist
             $state = 1; # armed
             if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
                 $state = 3; # partial armed
             }
             $this->SetValue('AlarmZoneState', $state);
-            // Get activation mode
-            $text = 'Es ist ein unbekannter Status bei der verzögerten Aktivierung aufgetreten.  (ID ' . $this->InstanceID . ')';
-            if ($this->GetValue('FullProtectionMode')) {
-                $modeName = $this->ReadPropertyString('FullProtectionName');
-                $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('FullProtectionMode') . ')';
-            }
-            if ($this->GetValue('HullProtectionMode')) {
-                $modeName = $this->ReadPropertyString('HullProtectionName');
-                $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('HullProtectionMode') . ')';
-            }
-            if ($this->GetValue('PartialProtectionMode')) {
-                $modeName = $this->ReadPropertyString('PartialProtectionName');
-                $text = 'Der ' . $modeName . ' wurde durch die Einschaltverzögerung automatisch aktiviert. (ID ' . $this->GetIDForIdent('PartialProtectionMode') . ')';
-            }
             // Protocol
-            $location = $this->ReadPropertyString('Location');
-            $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
+            $text = $modeName . ' aktiviert. (Einschaltverzögerung, ID ' . $this->GetIDForIdent($identName) . ')';
             $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
             $this->UpdateAlarmProtocol($logText, 1);
         }
@@ -314,49 +343,54 @@ trait AZ_controlAlarmZone
         $this->SetValue('PartialProtectionMode', $partialProtectionState);
         $this->SetValue('AlarmState', 0);
         $this->SetValue('AlertingSensor', 'OK');
-        // Always check doors and windows and inform user about open doors and windows
+
         $this->ResetBlacklist();
-        $this->CheckDoorWindowState(true);
-        // Check for activation mode
-        $alarmZoneActivation = true;
-        if ($this->ReadPropertyBoolean($checkActivationModeName)) {
-            $alarmZoneActivation = $this->CheckActivation($Mode);
-        }
+
         $timeStamp = date('d.m.Y, H:i:s');
         $location = $this->ReadPropertyString('Location');
         $alarmZoneName = $this->ReadPropertyString('AlarmZoneName');
-        // Abort activation
-        if (!$alarmZoneActivation) {
-            $result = false;
-            $this->SetValue('FullProtectionMode', false);
-            $this->SetValue('HullProtectionMode', false);
-            $this->SetValue('PartialProtectionMode', false);
-            $this->ResetBlacklist();
-            $this->DeactivateStartActivationTimer();
+
+        // Check activation delay
+        $alarmZoneActivationDelayDuration = $this->ReadPropertyInteger($activationDelayName);
+        if ($alarmZoneActivationDelayDuration > 0) {
+            $this->CheckDoorWindowState(false); # don't add to blacklist
+            // Activate timer
+            $milliseconds = $alarmZoneActivationDelayDuration * 1000;
+            $this->SetTimerInterval('StartActivation', $milliseconds); # Methode -> StartActivation
+            $stateValue = 0; //2;
+            if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
+                $stateValue = 4;
+            }
+            $this->SetValue('AlarmZoneState', $stateValue);
             // Protocol
-            $text = 'Die Aktivierung wurde durch die Sensorenprüfung abgebrochen! (ID ' . $this->GetIDForIdent($identName) . ')';
+            $text = $modeName . ' wird in ' . $alarmZoneActivationDelayDuration . ' Sekunden automatisch aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
             $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
             $this->UpdateAlarmProtocol($logText, 0);
-        }
-        // Continue activation
-        if ($alarmZoneActivation) {
-            // Check for activation delay
-            $alarmZoneActivationDelayDuration = $this->ReadPropertyInteger($activationDelayName);
-            if ($alarmZoneActivationDelayDuration > 0) {
-                // Activate timer
-                $milliseconds = $alarmZoneActivationDelayDuration * 1000;
-                $this->SetTimerInterval('StartActivation', $milliseconds);
-                $stateValue = 2;
-                if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
-                    $stateValue = 4;
-                }
-                $this->SetValue('AlarmZoneState', $stateValue);
+        } else {
+            // Check for activation
+            $alarmZoneActivation = true;
+            if ($this->ReadPropertyBoolean($checkActivationModeName)) {
+                $alarmZoneActivation = $this->CheckActivation($Mode);
+            }
+            if (!$alarmZoneActivation) {
+                $result = false;
+                $this->SetValue('FullProtectionMode', false);
+                $this->SetValue('HullProtectionMode', false);
+                $this->SetValue('PartialProtectionMode', false);
+                $this->SetValue('AlarmZoneState', 0);
+                $this->SetValue('AlarmState', 0);
+                $this->SetValue('AlertingSensor', 'OK');
+                $this->SetValue('AlarmSiren', false);
+                $this->SetValue('AlarmLight', false);
+                $this->SetValue('AlarmCall', false);
+                $this->ResetBlacklist();
+                $this->DeactivateStartActivationTimer();
                 // Protocol
-                $text = $modeName . ' wird in ' . $alarmZoneActivationDelayDuration . ' Sekunden automatisch aktiviert. (ID ' . $SenderID . ', ID ' . $this->GetIDForIdent($identName) . ')';
+                $text = 'Die Aktivierung wurde durch die Sensorenprüfung abgebrochen! (ID ' . $this->GetIDForIdent($identName) . ')';
                 $logText = $timeStamp . ', ' . $location . ', ' . $alarmZoneName . ', ' . $text;
                 $this->UpdateAlarmProtocol($logText, 0);
-            }// Activate mode immediately
-            else {
+            } else {
+                $this->CheckDoorWindowState(true); # add to blacklist
                 $state = 1; # armed
                 if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
                     $state = 3; # partial armed
