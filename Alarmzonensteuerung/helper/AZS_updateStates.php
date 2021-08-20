@@ -138,6 +138,9 @@ trait AZS_updateStates
         if ($this->CheckMaintenanceMode()) {
             return false;
         }
+        if ($this->ReadAttributeBoolean('DisableUpdateMode')) {
+            return false;
+        }
         $vars = json_decode($this->ReadPropertyString('SystemState'), true);
         if (empty($vars)) {
             return false;
