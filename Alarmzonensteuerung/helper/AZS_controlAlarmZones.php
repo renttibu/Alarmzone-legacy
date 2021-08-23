@@ -171,6 +171,7 @@ trait AZS_controlAlarmZones
         }
         $this->WriteAttributeBoolean('DisableUpdateMode', false);
         $this->UpdateFullProtectionMode();
+        $this->UpdateSystemState();
         return $result;
     }
 
@@ -210,6 +211,7 @@ trait AZS_controlAlarmZones
         }
         $this->WriteAttributeBoolean('DisableUpdateMode', false);
         $this->UpdateHullProtectionMode();
+        $this->UpdateSystemState();
         return $result;
     }
 
@@ -249,6 +251,7 @@ trait AZS_controlAlarmZones
         }
         $this->WriteAttributeBoolean('DisableUpdateMode', false);
         $this->UpdatePartialProtectionMode();
+        $this->UpdateSystemState();
         return $result;
     }
 }
