@@ -357,7 +357,7 @@ trait AZ_controlAlarmZone
             // Activate timer
             $milliseconds = $alarmZoneActivationDelayDuration * 1000;
             $this->SetTimerInterval('StartActivation', $milliseconds); # Methode -> StartActivation
-            $stateValue = 0; //2;
+            $stateValue = 2; //0; 2022-07-06 Changed back to value 2
             if ($this->ReadPropertyBoolean('DetailedAlarmZoneState') && $this->GetValue('DoorWindowState')) {
                 $stateValue = 4;
             }
